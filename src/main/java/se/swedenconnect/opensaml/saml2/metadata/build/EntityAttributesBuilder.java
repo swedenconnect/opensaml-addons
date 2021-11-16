@@ -93,8 +93,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
   }
 
   /**
-   * Adds an {@value #ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME} attribute containing the supplied URIs as attribute
-   * values.
+   * Adds an {@value AttributeConstants#ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME} attribute containing the supplied URIs
+   * as attribute values.
    * <p>
    * If the attribute already exists its value will be updated.
    * </p>
@@ -115,7 +115,7 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
     if (assuranceCertification == null) {
       if (uris != null && !uris.isEmpty()) {
         assuranceCertification = AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE
-            .createBuilder().value(uris).build();
+          .createBuilder().value(uris).build();
         return this.attribute(assuranceCertification);
       }
     }
@@ -149,7 +149,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
   }
 
   /**
-   * Adds an {@value #ENTITY_CATEGORY_ATTRIBUTE_NAME} attribute containing the supplied URIs as attribute values.
+   * Adds an {@value AttributeConstants#ENTITY_CATEGORY_ATTRIBUTE_NAME} attribute containing the supplied URIs as
+   * attribute values.
    * <p>
    * If the attribute already exists its value will be updated.
    * </p>
