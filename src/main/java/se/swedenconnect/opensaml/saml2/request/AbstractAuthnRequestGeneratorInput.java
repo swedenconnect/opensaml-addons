@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.opensaml.common.builder;
-
-import org.opensaml.core.xml.XMLObject;
+package se.swedenconnect.opensaml.saml2.request;
 
 /**
- * Interface for a builder pattern according to:
- * 
- * <pre>
- * EntityDescriptorBuilder builder = new EntityDescriptorBuilder();
- * EntityDescriptor ed = builder.entityID("http://eid.idsec.se").entityCategories(...)[...].build();
- * </pre>
+ * Abstract base class for authentication request generator input.
  * 
  * @author Martin Lindström (martin@idsec.se)
- *
- * @param <T>
- *          the type
  */
-public interface SAMLObjectBuilder<T extends XMLObject> {
+public class AbstractAuthnRequestGeneratorInput extends AbstractRequestGeneratorInput implements AuthnRequestGeneratorInput {
 
-  /**
-   * Builds the {@code XMLObject}.
-   * <p>
-   * If invoked several times the method <b>must</b> return the same object.
-   * </p>
-   * 
-   * @return the built object
-   */
-  T build();
+  /** {@inheritDoc} */
+  @Override
+  public HokRequirement getHokRequirement() {
+    return HokRequirement.DONT_USE;
+  }
 
 }

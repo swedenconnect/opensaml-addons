@@ -27,7 +27,7 @@ import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeValue;
 
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
-import se.swedenconnect.opensaml.saml2.attribute.AttributeTemplate;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
 
 /**
  * A builder for {@link EntityAttributes} objects.
@@ -35,27 +35,6 @@ import se.swedenconnect.opensaml.saml2.attribute.AttributeTemplate;
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAttributes> {
-
-  /**
-   * The attribute name for the assurance certification attribute stored as an attribute in the entity attributes
-   * extension.
-   */
-  public static final String ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME = "urn:oasis:names:tc:SAML:attribute:assurance-certification";
-
-  /**
-   * The attribute template for the assurance certification attribute stored as an attribute in the entity attributes
-   * extension.
-   */
-  public static final AttributeTemplate ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE = new AttributeTemplate(
-    ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, null);
-
-  /** The attribute name for the entity category attribute stored as an attribute in the entity attributes extension. */
-  public static final String ENTITY_CATEGORY_ATTRIBUTE_NAME = "http://macedir.org/entity-category";
-
-  /**
-   * The attribute template for the entity category attribute stored as an attribute in the entity attributes extension.
-   */
-  public static final AttributeTemplate ENTITY_CATEGORY_TEMPLATE = new AttributeTemplate(ENTITY_CATEGORY_ATTRIBUTE_NAME, null);
 
   /**
    * Default constructor.
@@ -129,13 +108,14 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
    */
   public EntityAttributesBuilder assuranceCertificationAttribute(final List<String> uris) {
     Attribute assuranceCertification = this.object().getAttributes().stream()
-      .filter(a -> ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME.equals(a.getName()))
+      .filter(a -> AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME.equals(a.getName()))
       .findFirst()
       .orElse(null);
 
     if (assuranceCertification == null) {
       if (uris != null && !uris.isEmpty()) {
-        assuranceCertification = ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE.createBuilder().value(uris).build();
+        assuranceCertification = AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE
+            .createBuilder().value(uris).build();
         return this.attribute(assuranceCertification);
       }
     }
@@ -183,13 +163,13 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
    */
   public EntityAttributesBuilder entityCategoriesAttribute(final List<String> uris) {
     Attribute entityCategories = this.object().getAttributes().stream()
-      .filter(a -> ENTITY_CATEGORY_ATTRIBUTE_NAME.equals(a.getName()))
+      .filter(a -> AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME.equals(a.getName()))
       .findFirst()
       .orElse(null);
 
     if (entityCategories == null) {
       if (uris != null && !uris.isEmpty()) {
-        entityCategories = ENTITY_CATEGORY_TEMPLATE.createBuilder().value(uris).build();
+        entityCategories = AttributeConstants.ENTITY_CATEGORY_TEMPLATE.createBuilder().value(uris).build();
         return this.attribute(entityCategories);
       }
     }

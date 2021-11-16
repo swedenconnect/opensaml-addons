@@ -54,6 +54,7 @@ import org.w3c.dom.Element;
 import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.common.utils.LocalizedString;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
 import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
 
@@ -234,7 +235,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
     Assert.assertNotNull(entityAttributes);
     Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
-      EntityAttributesBuilder.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
+      AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assert.assertNotNull(entityCategoryAttribute);
     Assert.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
 
@@ -465,12 +466,12 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assert.assertNotNull(entityAttributes);
 
     Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
-      EntityAttributesBuilder.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
+      AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assert.assertNotNull(entityCategoryAttribute);
     Assert.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
 
     Attribute assuranceCertificationAttribute = AttributeUtils.getAttribute(
-      EntityAttributesBuilder.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, entityAttributes.getAttributes());
+      AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assert.assertNotNull(assuranceCertificationAttribute);
     Assert.assertEquals(Arrays.asList(assuranceCertificationUris), AttributeUtils.getAttributeStringValues(assuranceCertificationAttribute));
 

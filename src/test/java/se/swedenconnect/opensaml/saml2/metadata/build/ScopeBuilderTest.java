@@ -13,33 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.swedenconnect.opensaml.common.builder;
+package se.swedenconnect.opensaml.saml2.metadata.build;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.opensaml.core.xml.XMLObject;
 
+import se.swedenconnect.opensaml.OpenSAMLTestBase;
+import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
+
 /**
- * Interface for a builder pattern according to:
- * 
- * <pre>
- * EntityDescriptorBuilder builder = new EntityDescriptorBuilder();
- * EntityDescriptor ed = builder.entityID("http://eid.idsec.se").entityCategories(...)[...].build();
- * </pre>
+ * Test cases for {@link ScopeBuilder}.
  * 
  * @author Martin Lindström (martin@idsec.se)
- *
- * @param <T>
- *          the type
  */
-public interface SAMLObjectBuilder<T extends XMLObject> {
+public class ScopeBuilderTest extends OpenSAMLTestBase {
 
-  /**
-   * Builds the {@code XMLObject}.
-   * <p>
-   * If invoked several times the method <b>must</b> return the same object.
-   * </p>
-   * 
-   * @return the built object
-   */
-  T build();
-
+  @Test
+  public void testBuild() throws Exception {
+    
+    final XMLObject object = ScopeBuilder.builder().regexp(false).value("example.com").build();
+    Assert.assertTrue(object instanceof Scope);
+    final Scope scope = (Scope) object;
+    Assert.assertEquals(Boolean.FALSE, scope.getRegexp());
+    Assert.assertEquals("example.com", scope.getValue());
+  }
+  
 }

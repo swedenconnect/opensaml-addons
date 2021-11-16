@@ -25,9 +25,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.xml.namespace.QName;
+
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.ext.saml2alg.DigestMethod;
 import org.opensaml.saml.ext.saml2alg.SigningMethod;
+import org.opensaml.saml.ext.saml2mdattr.EntityAttributes;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.Extensions;
 import org.opensaml.saml.saml2.metadata.KeyDescriptor;
@@ -37,13 +41,16 @@ import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.signature.X509Data;
 
+import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
+
 /**
  * Utility methods for accessing metadata elements.
  * 
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntityDescriptorUtils {
-  
+
   /** Factory for creating certificates. */
   private static CertificateFactory certFactory = null;
 
@@ -54,7 +61,7 @@ public class EntityDescriptorUtils {
     catch (CertificateException e) {
       throw new SecurityException(e);
     }
-  }  
+  }
 
   /**
    * Finds the first extension matching the supplied type.
@@ -65,7 +72,7 @@ public class EntityDescriptorUtils {
    *          the extension type
    * @param <T>
    *          the type of the extension
-   * @return the matching extension
+   * @return the matching extension or null
    */
   public static <T> T getMetadataExtension(final Extensions extensions, final Class<T> clazz) {
     if (extensions == null) {
@@ -77,6 +84,22 @@ public class EntityDescriptorUtils {
       .map(clazz::cast)
       .findFirst()
       .orElse(null);
+  }
+
+  /**
+   * Finds the first extension matching the supplied QName.
+   * 
+   * @param extensions
+   *          the Extensions to search
+   * @param qname
+   *          the QName to match
+   * @return the matching extension or null
+   */
+  public static XMLObject getMetadataExtension(final Extensions extensions, final QName qname) {
+    if (extensions == null) {
+      return null;
+    }
+    return extensions.getUnknownXMLObjects(qname).stream().findFirst().orElse(null);
   }
 
   /**
@@ -100,6 +123,22 @@ public class EntityDescriptorUtils {
       .map(clazz::cast)
       .collect(Collectors.toList());
   }
+  
+  /**
+   * Finds all extensions matching the supplied QName.
+   * 
+   * @param extensions
+   *          the Extensions to search
+   * @param qname
+   *          the QName
+   * @return a (possibly empty) list of extensions elements of the given type
+   */
+  public static List<XMLObject> getMetadataExtensions(final Extensions extensions, final QName qname) {
+    if (extensions == null) {
+      return Collections.emptyList();
+    }
+    return Collections.unmodifiableList(extensions.getUnknownXMLObjects(qname));
+  }  
 
   /**
    * Utility that extracs certificates found under the KeyDescriptor elements of a metadata record.
@@ -116,7 +155,7 @@ public class EntityDescriptorUtils {
    */
   public static List<X509Credential> getMetadataCertificates(final SSODescriptor descriptor, final UsageType usageType) {
     final List<X509Credential> creds = new ArrayList<>();
-    for (final KeyDescriptor kd : descriptor.getKeyDescriptors()) {      
+    for (final KeyDescriptor kd : descriptor.getKeyDescriptors()) {
       if (usageType.equals(kd.getUse()) || kd.getUse() == null || UsageType.UNSPECIFIED.equals(kd.getUse())) {
         if (kd.getKeyInfo() == null) {
           continue;
@@ -177,6 +216,49 @@ public class EntityDescriptorUtils {
   }
 
   /**
+   * Extracts the string values found in the entity category (http://macedir.org/entity-category) attribute under a
+   * EntityAttributes element found in the extensions element of the supplied entity descriptor.
+   * 
+   * @param ed
+   *          the entity descriptor
+   * @return a (possible empty) list of entity category values
+   */
+  public static List<String> getEntityCategories(final EntityDescriptor ed) {
+    final EntityAttributes attrs = getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
+    if (attrs == null) {
+      return Collections.emptyList();
+    }
+    final List<String> entityCategories = new ArrayList<>();
+    attrs.getAttributes().stream()
+      .filter(a -> AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME.equals(a.getName()))
+      .forEach(a -> entityCategories.addAll(AttributeUtils.getAttributeStringValues(a)));
+
+    return entityCategories;
+  }
+
+  /**
+   * Extracts the string values found in the assurance certification
+   * (urn:oasis:names:tc:SAML:attribute:assurance-certification) attribute under a EntityAttributes element found in the
+   * extensions element of the supplied entity descriptor.
+   * 
+   * @param ed
+   *          the entity descriptor
+   * @return a (possible empty) list of entity category values
+   */
+  public static List<String> getAssuranceCertificationUris(final EntityDescriptor ed) {
+    final EntityAttributes attrs = getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
+    if (attrs == null) {
+      return Collections.emptyList();
+    }
+    final List<String> assuranceCertificationUris = new ArrayList<>();
+    attrs.getAttributes().stream()
+      .filter(a -> AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME.equals(a.getName()))
+      .forEach(a -> assuranceCertificationUris.addAll(AttributeUtils.getAttributeStringValues(a)));
+
+    return assuranceCertificationUris;
+  }
+
+  /**
    * Returns the SSODescriptor for the supplied SP or IdP entity descriptor.
    * 
    * @param ed
@@ -184,6 +266,9 @@ public class EntityDescriptorUtils {
    * @return the SSODescriptor
    */
   public static SSODescriptor getSSODescriptor(final EntityDescriptor ed) {
+    if (ed == null) {
+      return null;
+    }
     if (ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) != null) {
       return ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
     }

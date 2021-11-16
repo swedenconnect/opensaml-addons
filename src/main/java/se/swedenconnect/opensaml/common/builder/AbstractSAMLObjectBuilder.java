@@ -19,12 +19,12 @@ import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLRuntimeException;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
-import org.opensaml.saml.common.SAMLObject;
 import org.w3c.dom.Element;
 
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
@@ -37,7 +37,7 @@ import net.shibboleth.utilities.java.support.xml.XMLParserException;
  * @param <T>
  *          the type
  */
-public abstract class AbstractSAMLObjectBuilder<T extends SAMLObject> implements SAMLObjectBuilder<T> {
+public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements SAMLObjectBuilder<T> {
 
   /** The object that is being built. */
   private T object;
