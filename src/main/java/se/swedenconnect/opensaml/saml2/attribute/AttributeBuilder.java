@@ -78,7 +78,7 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
    *           for unmarshalling errors
    * @throws MarshallingException
    *           for marshalling errors
-   * @see AbstractSAMLObjectBuilder#AbstractSAMLObjectBuilder(org.opensaml.saml.common.SAMLObject)
+   * @see AbstractSAMLObjectBuilder#AbstractSAMLObjectBuilder(XMLObject)
    */
   public AttributeBuilder(final Attribute template) throws MarshallingException, UnmarshallingException {
     super(template);

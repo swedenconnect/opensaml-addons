@@ -60,7 +60,7 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
    *          the location
    * @param index
    *          the index
-   * @return
+   * @return a builder
    */
   public static DiscoveryResponseBuilder builder(final String location, final Integer index) {
     return new DiscoveryResponseBuilder(location, index);

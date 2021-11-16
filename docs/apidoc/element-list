@@ -1,0 +1,17 @@
+se.swedenconnect.opensaml.common.builder
+se.swedenconnect.opensaml.common.utils
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.config
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.scope
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.xmlsec

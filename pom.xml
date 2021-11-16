@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>Sweden Connect :: OpenSAML 4.X utility extensions</name>
   <description>OpenSAML 4.X utility extension library</description>
@@ -329,7 +329,7 @@
           <links>
             <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/4.1.1/apidocs/</link>
             <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/8.2.1/apidocs/</link>
-            <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/3.1.0/</link>
+            <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/latest/</link>
           </links>
           <detectJavaApiLink>true</detectJavaApiLink>
         </configuration>
