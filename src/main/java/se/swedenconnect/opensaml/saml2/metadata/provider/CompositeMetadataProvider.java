@@ -16,6 +16,7 @@
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,12 +35,15 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.impl.CompositeMetadataResolver;
+import org.opensaml.saml.saml2.common.CacheableSAMLObject;
+import org.opensaml.saml.saml2.common.TimeBoundSAMLObject;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGenerationStrategy;
 
@@ -78,6 +82,12 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
 
   /** Generates ID. */
   private RandomIdentifierGenerationStrategy idGenerator = new RandomIdentifierGenerationStrategy(20);
+
+  /** Duration telling for how long the metadata returned by {@link #getMetadata()} should be valid. */
+  private Duration validity;
+
+  /** Duration telling the cache duraction for the metadata returned by {@link #getMetadata()}. */
+  private Duration cacheDuration;
 
   /**
    * Constructs a composite metadata provider by assigning it a list of provider instances that it shall read its
@@ -148,8 +158,31 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
     metadata.setName(this.getID());
     metadata.setID("metadata_" + this.idGenerator.generateIdentifier(true));
 
-    for (MetadataProvider provider : this.metadataProviders) {
-      Iterator<EntityDescriptor> it = provider.iterator().iterator();
+    Instant calculatedValidUntil = null;
+    Duration calculatedCacheDuration = null;
+
+    for (final MetadataProvider provider : this.metadataProviders) {
+      if (this.validity == null || this.cacheDuration == null) {
+        try {
+          final XMLObject providerMetadata = provider.getMetadata();
+          final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();
+          if (calculatedValidUntil == null 
+              || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil))) {
+            calculatedValidUntil = providerValidUntil;
+          }
+          final Duration providerCacheDuration = ((CacheableSAMLObject) providerMetadata).getCacheDuration();
+          if (calculatedCacheDuration == null 
+              || (providerCacheDuration != null && providerCacheDuration.compareTo(calculatedCacheDuration) < 1)) {
+            calculatedCacheDuration = providerCacheDuration;
+          }
+        }
+        catch (final ResolverException e) {
+          log.error("Error getting metadata from provider '{}'", provider.getID(), e);
+          continue;
+        }
+      }
+
+      final Iterator<EntityDescriptor> it = provider.iterator().iterator();
       while (it.hasNext()) {
         final EntityDescriptor ed = it.next();
         if (entityIds.contains(ed.getEntityID())) {
@@ -175,6 +208,22 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
         }
       }
     }
+
+    // Set the cacheDuration and validUntil
+    //
+    if (this.validity != null) {
+      metadata.setValidUntil(Instant.now().plus(this.validity));
+    }
+    else {
+      metadata.setValidUntil(calculatedValidUntil);
+    }
+    if (this.cacheDuration != null) {
+      metadata.setCacheDuration(this.cacheDuration);
+    }
+    else {
+      metadata.setCacheDuration(calculatedCacheDuration);
+    }
+
     this.compositeMetadataCreationTime = Instant.now();
     this.compositeMetadata = metadata;
     log.info("Composite metadata for {} collected and compiled into EntitiesDescriptor", this.getID());
@@ -188,7 +237,8 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
 
   /** {@inheritDoc} */
   @Override
-  protected void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization, final MetadataFilter filter)
+  protected void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization,
+      final MetadataFilter filter)
       throws ResolverException {
 
     this.metadataResolver = new CompositeMetadataResolverEx();
@@ -324,6 +374,32 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
   @Override
   public void setPerformSchemaValidation(final boolean performSchemaValidation) {
     throw new UnsupportedOperationException("Cannot configure 'performSchemaValidation' for a CompositeMetadataResolver");
+  }
+
+  /**
+   * Assigns how long the aggregated metadata (returned via {@link #getMetadata()}) should be valid. If not assigned,
+   * the provider will calculate the {@code validUntil} based on the lowest {@code validUntil} value from the underlying
+   * providers.
+   * 
+   * @param validity
+   *          the validity
+   */
+  public void setValidity(final Duration validity) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.validity = validity;
+  }
+
+  /**
+   * Assigns the {@code cacheDuration} to assign to the aggregated metadata (returned via {@link #getMetadata()}). If
+   * not assigned the {@code cacheDuration} will be based on the lowest {@code cacheDuration} value from the underlying
+   * providers.
+   * 
+   * @param cacheDuration
+   *          the cache duration
+   */
+  public void setCacheDuration(final Duration cacheDuration) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.cacheDuration = cacheDuration;
   }
 
   /**
