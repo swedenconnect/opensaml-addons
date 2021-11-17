@@ -15,6 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -75,7 +78,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
    */
   @AfterClass
   public static void tearDown() throws Exception {
-    if (entireMetadataProvider != null && entireMetadataProvider.isInitialized()) {      
+    if (entireMetadataProvider != null && entireMetadataProvider.isInitialized()) {
       entireMetadataProvider.destroy();
     }
   }
@@ -92,12 +95,13 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
 
     // Setup the composite provider with three providers (for the three parts)
     //
-    CompositeMetadataProvider provider = new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
-      new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
-    
+    CompositeMetadataProvider provider =
+        new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
+          new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
+
     try {
       provider.initialize();
-      
+
       EntityDescriptor ed = provider.getEntityDescriptor(TEST_IDP);
       Assert.assertNotNull(String.format("EntityDescriptor for '%s' was not found", TEST_IDP), ed);
 
@@ -119,17 +123,15 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
       XMLObject xmlObject = provider.getMetadata();
       Assert.assertNotNull("Could not get metadata XMLObject from provider", xmlObject);
       Assert.assertTrue("Expected EntitiesDescriptor", xmlObject instanceof EntitiesDescriptor);
-      
+
       // Make sure that no signature is there, and so on
       EntitiesDescriptor metadata = (EntitiesDescriptor) xmlObject;
       Assert.assertNull("Expected no signature", metadata.getSignature());
-      Assert.assertNull("Expected no cacheDuration attribute", metadata.getCacheDuration());
-      Assert.assertNull("Expected no validUntil", metadata.getValidUntil());
       Assert.assertEquals(provider.getID(), metadata.getName());
       Assert.assertNotNull("Expected ID to be assigned", metadata.getID());
 
       Element xml = provider.getMetadataDOM();
-      Assert.assertNotNull("Could not get metadata DOM from provider", xml);      
+      Assert.assertNotNull("Could not get metadata DOM from provider", xml);
     }
     finally {
       if (provider.isInitialized()) {
@@ -137,7 +139,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
       }
     }
   }
-  
+
   /**
    * Tests getting the DOM of the entire metadata held by the provider.
    * 
@@ -146,13 +148,14 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
    */
   @Test
   public void testDOM() throws Exception {
-    CompositeMetadataProvider provider = new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
-      new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
+    CompositeMetadataProvider provider =
+        new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
+          new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
 
     try {
       provider.initialize();
       Element dom = provider.getMetadataDOM();
-      EntitiesDescriptor ed = EntitiesDescriptor.class.cast(XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom)); 
+      EntitiesDescriptor ed = EntitiesDescriptor.class.cast(XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom));
       for (EntityDescriptor e : ed.getEntityDescriptors()) {
         EntityDescriptor e2 = provider.getEntityDescriptor(e.getEntityID());
         Assert.assertNotNull(String.format("EntityDescriptor for '%s' was not found", e.getEntityID()), e2);
@@ -165,5 +168,66 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
     }
   }
 
+  @Test
+  public void testValidUntil() throws Exception {
+
+    final Instant shortestValidity = Instant.parse("2025-01-01T12:00:00.00Z");
+    final Duration shortestCacheDuration = Duration.of(7, ChronoUnit.DAYS);
+
+    final EntitiesDescriptor one = unmarshall(part1.getInputStream(), EntitiesDescriptor.class);
+    one.setValidUntil(shortestValidity.plus(365, ChronoUnit.DAYS));
+    one.setCacheDuration(shortestCacheDuration.plus(1, ChronoUnit.DAYS));
+
+    final EntitiesDescriptor two = unmarshall(part2.getInputStream(), EntitiesDescriptor.class);
+    two.setValidUntil(shortestValidity);
+    two.setCacheDuration(shortestCacheDuration.plus(2, ChronoUnit.DAYS));
+
+    final EntitiesDescriptor three = unmarshall(part3.getInputStream(), EntitiesDescriptor.class);
+    three.setValidUntil(shortestValidity.plus(2 * 365, ChronoUnit.DAYS));
+    three.setCacheDuration(shortestCacheDuration);
+
+    final CompositeMetadataProvider provider = new CompositeMetadataProvider("MetadataService",
+      Arrays.asList(
+        new StaticMetadataProvider(one),
+        new StaticMetadataProvider(two),
+        new StaticMetadataProvider(three)));
+
+    try {
+      provider.initialize();
+      
+      final EntitiesDescriptor metadata = (EntitiesDescriptor) provider.getMetadata();
+      Assert.assertEquals(shortestValidity, metadata.getValidUntil());
+      Assert.assertEquals(shortestCacheDuration, metadata.getCacheDuration());      
+    }
+    finally {
+      if (provider.isInitialized()) {
+        provider.destroy();
+      }
+    }
+    
+    final CompositeMetadataProvider provider2 = new CompositeMetadataProvider("MetadataService",
+      Arrays.asList(
+        new StaticMetadataProvider(one),
+        new StaticMetadataProvider(two),
+        new StaticMetadataProvider(three)));
+    
+    final Duration twoDays = Duration.of(2, ChronoUnit.DAYS); 
+    provider2.setValidity(twoDays);
+    provider2.setCacheDuration(twoDays);
+
+    try {      
+      provider2.initialize();
+      final Instant now = Instant.now();
+      
+      final EntitiesDescriptor metadata = (EntitiesDescriptor) provider2.getMetadata();
+      Assert.assertTrue(metadata.getValidUntil().isBefore(now.plus(twoDays).plus(10, ChronoUnit.SECONDS))); 
+      Assert.assertEquals(twoDays, metadata.getCacheDuration());      
+    }
+    finally {
+      if (provider2.isInitialized()) {
+        provider2.destroy();
+      }
+    }
+  }
 
 }
