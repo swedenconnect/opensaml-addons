@@ -18,8 +18,7 @@ package se.swedenconnect.opensaml.saml2.metadata;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
 /**
- * Functional interface that request generators and processors use to obtain the peer metadata (most oftenly the IdP
- * metadata).
+ * Simple functional interface for obtaining the peer metadata.
  * 
  * @author Martin Lindström (martin@idsec.se)
  */

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -28,17 +29,20 @@ import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.assertion.AssertionValidationException;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.assertion.ConditionValidator;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 import org.opensaml.saml.saml2.assertion.StatementValidator;
 import org.opensaml.saml.saml2.assertion.SubjectConfirmationValidator;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Condition;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.Statement;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.xmlsec.signature.support.SignaturePrevalidator;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.slf4j.Logger;
@@ -49,6 +53,7 @@ import se.swedenconnect.opensaml.common.validation.AbstractSignableObjectValidat
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationResultException;
+import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 
 /**
  * A validator for {@code Assertion} objects.
@@ -58,6 +63,8 @@ import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationR
  * </p>
  * <ul>
  * <li>The static parameters defined for {@link AbstractSignableObjectValidator}.</li>
+ * <li>{@link CoreValidatorParameters#SP_METADATA}</li> Required. The SP metadata.</li>
+ * <li>{@link CoreValidatorParameters#IDP_METADATA}</li> Required. The IdP metadata.</li>
  * <li>{@link CoreValidatorParameters#STRICT_VALIDATION}: Optional. If not supplied, defaults to 'false'. Tells whether
  * strict validation should be performed.</li>
  * <li>{@link SAML2AssertionValidationParameters#CLOCK_SKEW}: Optional. Gives the number of milliseconds that is the
@@ -67,9 +74,8 @@ import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationR
  * used.</li>
  * <li>{@link CoreValidatorParameters#RECEIVE_INSTANT}: Optional. Gives the timestamp (Instant) for when the response
  * message was received. If not given the current time is used.</li>
- * <li>{@link CoreValidatorParameters#AUTHN_REQUEST}: Optional. If supplied will be used in a number of validations when
- * information from the corresponding {@code AuthnRequest} is needed. If not supplied, other, more detailed parameters
- * must be given.</li>
+ * <li>{@link CoreValidatorParameters#AUTHN_REQUEST}: Required. Will be used in a number of validations when information
+ * from the corresponding {@code AuthnRequest} is needed.</li>
  * <li>{@link CoreValidatorParameters#AUTHN_REQUEST_ID}: Required if the {@link CoreValidatorParameters#AUTHN_REQUEST}
  * is not assigned. Is used when validating the {@code InResponseTo} attribute of the response.</li>
  * <li>{@link CoreValidatorParameters#RECEIVE_URL}: Required. A String holding the URL on which we received the response
@@ -86,6 +92,7 @@ import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationR
  * <ul>
  * <li>{@link SAML2AssertionValidationParameters#CONFIRMED_SUBJECT_CONFIRMATION}: Optional. Will be present after
  * validation if subject confirmation was successfully performed.</li>
+ * <li>{@link #HOK_PROFILE_ACTIVE}: Is set to indicate whether the holder-of-key WebSSO profile is active.</li>
  * </ul>
  * 
  * <p>
@@ -101,6 +108,12 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    * Carries a {@link Instant} holding the issue instant of the Response that contained the assertion being validated.
    */
   public static final String RESPONSE_ISSUE_INSTANT = CoreValidatorParameters.STD_PREFIX + ".ResponseIssueInstant";
+
+  /**
+   * Tells whether the AuthnRequest corresponding to this assertion was sent to the IdP's holder of key-endpoints, i.e.,
+   * whether the Holder-of-key profile is in use. Carries a {@link Boolean}.
+   */
+  public static final String HOK_PROFILE_ACTIVE = CoreValidatorParameters.STD_PREFIX + ".HokProfileActive";
 
   /** Class logger. */
   private final Logger log = LoggerFactory.getLogger(AssertionValidator.class);
@@ -173,6 +186,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       ValidationSupport.check(this.validateVersion(assertion, context));
       ValidationSupport.check(this.validateIssueInstant(assertion, context));
       ValidationSupport.check(this.validateIssuer(assertion, context));
+      ValidationSupport.check(this.validateHolderOfKeyRequirement(assertion, context));
       ValidationSupport.check(this.validateSignature(assertion, context));
       ValidationSupport.check(this.validateSubject(assertion, context));
       ValidationSupport.check(this.validateConditions(assertion, context));
@@ -242,7 +256,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
     // is before the response issue instant. In these cases we assume that the response issue instant
     // has been verified.
     //
-    Instant responseIssueInstant = this.getResponseIssueInstant(context); 
+    Instant responseIssueInstant = this.getResponseIssueInstant(context);
     if (responseIssueInstant != null) {
       if (assertion.getIssueInstant().isAfter(responseIssueInstant)) {
         final String msg = String.format("Invalid Assertion - Its issue-instant (%s) is after the response message issue-instant (%s)",
@@ -336,6 +350,93 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
   }
 
   /**
+   * Performs initial validation concerning the Holder-of-key WebSSO Profile. The method checks that if the request was
+   * sent to an IdP HoK-endpoint, we verify that the SP received the response on an endpoint dedicated for HoK.
+   * <p>
+   * The method also sets the dynamic validation parameter {@link #HOK_PROFILE_ACTIVE}.
+   * </p>
+   * 
+   * @param assertion
+   *          the assertion
+   * @param context
+   *          the validation context
+   * @return a validation result
+   */
+  protected ValidationResult validateHolderOfKeyRequirement(final Assertion assertion, final ValidationContext context) {
+
+    Boolean hokActive = Boolean.FALSE;
+
+    try {
+      final String receiveUrl = (String) context.getStaticParameters().get(CoreValidatorParameters.RECEIVE_URL);
+      if (receiveUrl == null) {
+        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+          CoreValidatorParameters.RECEIVE_URL);
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INDETERMINATE;
+      }
+
+      final AuthnRequest authnRequest = (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
+      if (authnRequest == null || authnRequest.getDestination() == null) {
+        final String msg = String.format("Could not determine if Holder-of-key profile is active."
+            + "'%s' parameter is missing or no Destination was set in AuthnRequest",
+          CoreValidatorParameters.AUTHN_REQUEST);
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INDETERMINATE;
+      }
+      final String destination = authnRequest.getDestination();
+
+      final EntityDescriptor idpMetadata =
+          (EntityDescriptor) context.getStaticParameters().get(CoreValidatorParameters.IDP_METADATA);
+      if (idpMetadata == null) {
+        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+          CoreValidatorParameters.IDP_METADATA);
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INDETERMINATE;
+      }
+
+      hokActive = idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getSingleSignOnServices().stream()
+        .filter(s -> s.getLocation() != null && s.getLocation().equals(destination))
+        .filter(HolderOfKeyMetadataSupport::isHoKSingleSignOnService)
+        .findFirst()
+        .isPresent();
+
+      if (!hokActive) {
+        // HoK is not active.
+        return ValidationResult.VALID;
+      }
+
+      final EntityDescriptor spMetadata =
+          (EntityDescriptor) context.getStaticParameters().get(CoreValidatorParameters.SP_METADATA);
+      if (spMetadata == null) {
+        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+          CoreValidatorParameters.SP_METADATA);
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INDETERMINATE;
+      }
+
+      if (spMetadata.getSPSSODescriptor(SAMLConstants.SAML20P_NS).getAssertionConsumerServices().stream()
+        .filter(s -> receiveUrl.equals(s.getLocation()))
+        .filter(HolderOfKeyMetadataSupport::isHoKAssertionConsumerService)
+        .findFirst().isEmpty()) {
+        
+        final String msg = "Expected response to be delivered to a Holder-of-key AssertionConsumerService endpoint";
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INVALID;
+      }
+
+      return ValidationResult.VALID;
+    }
+    finally {
+      context.getDynamicParameters().put(HOK_PROFILE_ACTIVE, hokActive);
+    }
+  }
+
+  /**
    * Validates the {@code Subject} element of the assertion. The default implementation returns
    * {@link ValidationResult#VALID} if there is no {@code Subject} element since it is optional according to the SAML
    * 2.0 Core specifications.
@@ -362,8 +463,19 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
     final Subject subject = assertion.getSubject();
     List<SubjectConfirmation> confirmations = subject.getSubjectConfirmations();
     if (confirmations == null || confirmations.isEmpty()) {
-      log.debug("Assertion contains no SubjectConfirmations, default assertion validator skips subject confirmation");
-      return ValidationResult.VALID;
+      final boolean hokProfileActive = Optional.ofNullable(context.getDynamicParameters().get(HOK_PROFILE_ACTIVE))
+        .map(Boolean.class::cast).orElse(Boolean.FALSE);
+      if (hokProfileActive) {
+        String msg = String.format("No subject confirmation for method '%s' found for assertion with ID '%s'",
+          SubjectConfirmation.METHOD_HOLDER_OF_KEY, assertion.getID());
+        log.debug(msg);
+        context.setValidationFailureMessage(msg);
+        return ValidationResult.INVALID;
+      }
+      else {
+        log.debug("Assertion contains no SubjectConfirmations, default assertion validator skips subject confirmation");
+        return ValidationResult.VALID;
+      }
     }
 
     return this.validateSubjectConfirmations(assertion, confirmations, context);
@@ -384,24 +496,37 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
   protected ValidationResult validateSubjectConfirmations(final Assertion assertion, final List<SubjectConfirmation> subjectConfirmations,
       final ValidationContext context) {
 
-    for (SubjectConfirmation confirmation : subjectConfirmations) {
+    final boolean hokProfileActive = Optional.ofNullable(context.getDynamicParameters().get(HOK_PROFILE_ACTIVE))
+      .map(Boolean.class::cast).orElse(Boolean.FALSE);
+
+    for (final SubjectConfirmation confirmation : subjectConfirmations) {
+      if (hokProfileActive && !SubjectConfirmation.METHOD_HOLDER_OF_KEY.equals(confirmation.getMethod())) {
+        log.info("Holder-of-key profile is active - Ignoring SubjectConfirmation with method '{}'", confirmation.getMethod());
+        continue;
+      }
       final SubjectConfirmationValidator validator = subjectConfirmationValidators.get(confirmation.getMethod());
       if (validator != null) {
         try {
-          ValidationResult r = validator.validate(confirmation, assertion, context);
+          final ValidationResult r = validator.validate(confirmation, assertion, context);
           if (r == ValidationResult.VALID) {
             context.getDynamicParameters().put(
               SAML2AssertionValidationParameters.CONFIRMED_SUBJECT_CONFIRMATION, confirmation);
             return ValidationResult.VALID;
           }
           else {
-            log.info("Validation of SubjectConfirmation with method '{}' failed - {}", confirmation.getMethod(), 
+            log.info("Validation of SubjectConfirmation with method '{}' failed - {}", confirmation.getMethod(),
               context.getValidationFailureMessage());
+            if (hokProfileActive) {
+              return ValidationResult.INVALID;
+            }
           }
         }
         catch (AssertionValidationException e) {
           log.warn("Error while executing subject confirmation validation " + validator.getClass().getName(), e);
         }
+      }
+      else {
+        log.info("No validator installed for SubjectConfirmation method '{}'", confirmation.getMethod());
       }
     }
 
@@ -504,7 +629,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
         "Assertion '%s' with NotBefore condition of '%s' is not yet valid", assertion.getID(), notBefore));
       return ValidationResult.INVALID;
     }
-    
+
     final Instant notOnOrAfter = conditions.getNotOnOrAfter();
     log.debug("Evaluating Conditions NotOnOrAfter '{}' against 'skewed now' time '{}'", notOnOrAfter, receiveInstant.minus(clockSkew));
     if (notOnOrAfter != null && notOnOrAfter.isBefore(receiveInstant.minus(clockSkew))) {

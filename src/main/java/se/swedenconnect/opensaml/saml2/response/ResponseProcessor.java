@@ -17,8 +17,6 @@ package se.swedenconnect.opensaml.saml2.response;
 
 import org.opensaml.saml.common.assertion.ValidationContext;
 
-import se.swedenconnect.opensaml.saml2.metadata.PeerMetadataResolver;
-
 /**
  * Interface for a SAML response processor.
  * 
@@ -35,8 +33,6 @@ public interface ResponseProcessor {
    *          the received relay state
    * @param input
    *          the processing input
-   * @param peerMetadataResolver
-   *          a resolver for finding the peer metadata entry
    * @param validationContext
    *          optional validation context for controlling the validation and assertion validation process
    * @return a result
@@ -45,8 +41,8 @@ public interface ResponseProcessor {
    * @throws ResponseProcessingException
    *           for other processing errors
    */
-  ResponseProcessingResult processSamlResponse(final String samlResponse, final String relayState, 
-      final ResponseProcessingInput input, final PeerMetadataResolver peerMetadataResolver, 
-      final ValidationContext validationContext) throws ResponseStatusErrorException, ResponseProcessingException;
+  ResponseProcessingResult processSamlResponse(final String samlResponse, final String relayState,
+      final ResponseProcessingInput input, final ValidationContext validationContext)
+      throws ResponseStatusErrorException, ResponseProcessingException;
 
 }

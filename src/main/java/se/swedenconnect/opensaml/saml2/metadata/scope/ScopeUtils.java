@@ -15,11 +15,20 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLRuntimeException;
+import org.opensaml.saml.common.xml.SAMLConstants;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+
+import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
+import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
 
 /**
  * Utility methods for validating a scoped attribute against a {@code shibmd:Scope} element.
@@ -27,6 +36,65 @@ import org.opensaml.core.xml.XMLRuntimeException;
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ScopeUtils {
+
+  /**
+   * Given an (IdP) {@link EntityDescriptor}, the method finds all {@code shibmd:Scope} elements.
+   * 
+   * @param entityDescriptor
+   *          the metadata object
+   * @return a (possible empty) list of {@code shibmd:Scope} elements
+   */
+  public static List<XMLObject> getScopeExtensions(final EntityDescriptor entityDescriptor) {
+    return Optional.ofNullable(entityDescriptor.getIDPSSODescriptor(SAMLConstants.SAML20P_NS))
+      .map(d -> EntityDescriptorUtils.getMetadataExtensions(d.getExtensions(), Scope.DEFAULT_ELEMENT_NAME))
+      .orElse(Collections.emptyList());
+  }
+
+  /**
+   * Predicate that tells if a scoped attribute is "authorized", i.e., if its scope is listed in the supplied list of
+   * {@code shibmd:Scope} elements (gotten from the IdP metadata).
+   * <p>
+   * If an attribute that is not "scoped" (value@scope) the method returns {@code false}.
+   * </p>
+   * 
+   * @param scopedAttribute
+   *          the attribute to test
+   * @param scopes
+   *          the shibmd:Scope elements
+   * @return true if the attribute scope is listed among the Scope extensions and false otherwise
+   */
+  public static boolean isAuthorized(final Attribute scopedAttribute, final List<XMLObject> scopes) {
+    return scopes.stream()
+      .filter(s -> isMatch(s, scopedAttribute))
+      .findFirst()
+      .isPresent();
+  }
+
+  /**
+   * Given a {@code shibmd:Scope} element, the method tests whether the value of the (scoped) attribute matches the
+   * scope.
+   * <p>
+   * If the attribute contains multiple values, all must match the scope.
+   * </p>
+   *
+   * @param scope
+   *          the Scope element
+   * @param attribute
+   *          the attribute
+   * @return true if there is a match and false otherwise
+   */
+  public static boolean isMatch(final XMLObject scope, final Attribute attribute) {
+    if (attribute == null) {
+      return false;
+    }
+    List<String> attributeValues = AttributeUtils.getAttributeStringValues(attribute);
+    for (final String a : attributeValues) {
+      if (!isMatch(scope, a)) {
+        return false;
+      }
+    }
+    return !attributeValues.isEmpty();
+  }
 
   /**
    * Given a {@code shibmd:Scope} element, the method tests whether the value of the (scoped) attribute matches the
@@ -42,12 +110,11 @@ public class ScopeUtils {
     if (StringUtils.isBlank(attributeValue)) {
       return false;
     }
-    final String[] attributeParts = attributeValue.split("@", 2);
-    if (attributeParts.length == 1) {
+    final String domainValue = getScopedDomain(attributeValue);
+    if (domainValue == null) {
       // Not a scoped attribute
       return false;
     }
-    final String domainValue = attributeParts[1];
 
     boolean isRegexp = false;
     String scopeValue = null;
@@ -77,6 +144,22 @@ public class ScopeUtils {
         return false;
       }
     }
+  }
+
+  /**
+   * Gets the domain part (value@domain) from a scoped attribute value.
+   * 
+   * @param attributeValue
+   *          the attribute value
+   * @return the domain part, or null
+   */
+  public static String getScopedDomain(final String attributeValue) {
+    final String[] attributeParts = attributeValue.split("@", 2);
+    if (attributeParts.length == 1) {
+      // Not a scoped attribute
+      return null;
+    }
+    return attributeParts[1];
   }
 
   // Hidden
