@@ -17,6 +17,7 @@ package se.swedenconnect.opensaml.saml2.assertion.validation;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,11 +27,12 @@ import java.util.Set;
 
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValidationParametersBuilder;
-
 
 /**
  * Abstract builder class for building the {@link ValidationContext} object for use as validation input to the
@@ -44,17 +46,18 @@ import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValid
  */
 public abstract class AbstractAssertionValidationParametersBuilder<T extends AbstractAssertionValidationParametersBuilder<T>> extends
     AbstractResponseValidationParametersBuilder<T> {
-  
+
   /** Logging instance. */
   private final Logger log = LoggerFactory.getLogger(AbstractAssertionValidationParametersBuilder.class);
-  
+
   /**
    * Adds default settings before invoking the super implementation.
    */
   @Override
-  public ValidationContext build() {    
+  public ValidationContext build() {
     this.addStaticParameterIfMissing(SAML2AssertionValidationParameters.SC_CHECK_ADDRESS, Boolean.FALSE);
     this.addStaticParameterIfMissing(SAML2AssertionValidationParameters.STMT_AUTHN_CHECK_ADDRESS, Boolean.FALSE);
+
     return super.build();
   }
 
@@ -65,10 +68,10 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
    *          the response issue instant
    * @return the builder
    */
-  public T responseIssueInstant(final Instant instant) {    
+  public T responseIssueInstant(final Instant instant) {
     return this.staticParameter(AssertionValidator.RESPONSE_ISSUE_INSTANT, instant);
   }
-  
+
   /**
    * Assigns the issue instant from the Response message that contained the assertion being validated.
    * 
@@ -120,11 +123,11 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
       if (!set.isEmpty()) {
         this.staticParameter(SAML2AssertionValidationParameters.SC_VALID_ADDRESSES, set);
         this.staticParameter(SAML2AssertionValidationParameters.STMT_AUTHN_VALID_ADDRESSES, set);
-      }      
+      }
     }
     return this.getThis();
   }
-    
+
   /**
    * Assigns the valid addresses that we allow the user agent to have.
    * 
@@ -148,11 +151,11 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
     }
     return this.validAddresses(_addresses.toArray(new InetAddress[0]));
   }
-  
+
   public T subjectConfirmationCheckAddess(final boolean flag) {
     return this.staticParameter(SAML2AssertionValidationParameters.SC_CHECK_ADDRESS, Boolean.valueOf(flag));
   }
-  
+
   public T subjectLocalityCheckAddress(final boolean flag) {
     return this.staticParameter(SAML2AssertionValidationParameters.STMT_AUTHN_CHECK_ADDRESS, Boolean.valueOf(flag));
   }
@@ -198,7 +201,7 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   public T authnRequestIssueInstant(final Instant issueInstant) {
     return this.staticParameter(AuthnStatementValidator.AUTHN_REQUEST_ISSUE_INSTANT, issueInstant);
   }
-  
+
   /**
    * Assigns the issuance time for the corresponding {@code AuthnRequest} when validating an assertion.
    * 
@@ -221,7 +224,7 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   public T maxAcceptedSsoSessionTime(final long duration) {
     return this.maxAcceptedSsoSessionTime(Duration.ofMillis(duration));
   }
-  
+
   /**
    * Assigns the maximum session time that we, as a SP, can accept when receiving assertions based on older
    * authentications (SSO).
@@ -233,11 +236,43 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   public T maxAcceptedSsoSessionTime(final Duration duration) {
     return this.staticParameter(AuthnStatementValidator.MAX_ACCEPTED_SSO_SESSION_TIME, duration);
   }
-  
-  
+
   public T inResponseTo(final String id) {
     this.addStaticParameter(SAML2AssertionValidationParameters.SC_IN_RESPONSE_TO_REQUIRED, Boolean.TRUE);
     return this.staticParameter(SAML2AssertionValidationParameters.SC_VALID_IN_RESPONSE_TO, id);
+  }
+
+  /**
+   * Assigns the client certificate to be used for HoK validation.
+   * 
+   * @param clientCertificate
+   *          the client certificate
+   * @return the builder
+   */
+  public T clientCertificate(final X509Certificate clientCertificate) {
+    return this.staticParameter(SAML2AssertionValidationParameters.SC_HOK_PRESENTER_CERT, clientCertificate);
+  }
+
+  /**
+   * Assigns the SP metadata.
+   * 
+   * @param metadata
+   *          the SP metadata
+   * @return the builder
+   */
+  public T spMetadata(final EntityDescriptor metadata) {
+    return this.staticParameter(CoreValidatorParameters.SP_METADATA, metadata);
+  }
+
+  /**
+   * Assigns the SP metadata.
+   * 
+   * @param metadata
+   *          the SP metadata
+   * @return the builder
+   */
+  public T idpMetadata(final EntityDescriptor metadata) {
+    return this.staticParameter(CoreValidatorParameters.IDP_METADATA, metadata);
   }
 
 }

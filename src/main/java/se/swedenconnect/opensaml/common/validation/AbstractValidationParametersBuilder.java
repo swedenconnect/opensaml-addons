@@ -258,4 +258,26 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
     }
   }
 
+  /**
+   * Gets a static parameter.
+   * 
+   * @param name
+   *          the parameter name
+   * @return the value or null
+   */
+  protected final Object getStaticParameter(final String name) {
+    return this.staticParameters.get(name);
+  }
+
+  /**
+   * Gets a dynamic parameter.
+   * 
+   * @param name
+   *          the parameter name
+   * @return the value or null
+   */
+  protected final Object getDynamicParameter(final String name) {
+    return this.dynamicParameters.get(name);
+  }
+  
 }

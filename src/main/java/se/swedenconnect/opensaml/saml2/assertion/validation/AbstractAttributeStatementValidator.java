@@ -50,8 +50,8 @@ public abstract class AbstractAttributeStatementValidator implements StatementVa
       throws AssertionValidationException {
 
     if (statement instanceof AttributeStatement) {
-      AttributeStatement attributeStatement = (AttributeStatement) statement;
-      List<Attribute> list = attributeStatement.getAttributes() != null ? attributeStatement.getAttributes() : Collections.emptyList();
+      final AttributeStatement attributeStatement = (AttributeStatement) statement;
+      final List<Attribute> list = attributeStatement.getAttributes() != null ? attributeStatement.getAttributes() : Collections.emptyList();
       return this.validateRequiredAttributes(list, attributeStatement, assertion, context);
     }
     else {

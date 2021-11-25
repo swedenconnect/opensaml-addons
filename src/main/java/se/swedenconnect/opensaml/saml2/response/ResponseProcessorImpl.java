@@ -17,8 +17,13 @@ package se.swedenconnect.opensaml.saml2.response;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import javax.xml.namespace.QName;
+
+import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -28,8 +33,10 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.criterion.RoleDescriptorCriterion;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.assertion.impl.AudienceRestrictionConditionValidator;
 import org.opensaml.saml.saml2.assertion.impl.BearerSubjectConfirmationValidator;
+import org.opensaml.saml.saml2.assertion.impl.HolderOfKeySubjectConfirmationValidator;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Issuer;
@@ -37,6 +44,7 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
+import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import org.opensaml.security.credential.UsageType;
@@ -52,14 +60,16 @@ import org.slf4j.LoggerFactory;
 import net.shibboleth.utilities.java.support.codec.Base64Support;
 import net.shibboleth.utilities.java.support.codec.DecodingException;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.component.ComponentSupport;
 import net.shibboleth.utilities.java.support.component.InitializableComponent;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import se.swedenconnect.opensaml.saml2.assertion.validation.AbstractAssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidator;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AuthnStatementValidator;
-import se.swedenconnect.opensaml.saml2.metadata.PeerMetadataResolver;
 import se.swedenconnect.opensaml.saml2.response.replay.MessageReplayChecker;
 import se.swedenconnect.opensaml.saml2.response.replay.MessageReplayException;
 import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidationException;
@@ -80,6 +90,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /** Logging instance. */
   private final Logger log = LoggerFactory.getLogger(ResponseProcessorImpl.class);
+
+  /** Metadata resolver for finding IdP and SP metadata. */
+  protected MetadataResolver metadataResolver;
 
   /** The decrypter instance. */
   protected SAMLObjectDecrypter decrypter;
@@ -111,11 +124,14 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   /** Is this component initialized? */
   private boolean isInitialized = false;
 
+  /** A cache for the SP metadata. */
+  private Map<String, EntityDescriptor> spMetadataCache;
+
   /** {@inheritDoc} */
   @Override
   public ResponseProcessingResult processSamlResponse(final String samlResponse, final String relayState,
-      final ResponseProcessingInput input, final PeerMetadataResolver peerMetadataResolver,
-      final ValidationContext validationContext) throws ResponseStatusErrorException, ResponseProcessingException {
+      final ResponseProcessingInput input, final ValidationContext validationContext)
+      throws ResponseStatusErrorException, ResponseProcessingException {
 
     try {
       // Step 1: Decode the SAML response message.
@@ -129,7 +145,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       // The IdP metadata is required for all steps below ...
       //
       final String issuer = Optional.ofNullable(response.getIssuer()).map(Issuer::getValue).orElse(null);
-      final EntityDescriptor idpMetadata = issuer != null ? peerMetadataResolver.getMetadata(issuer) : null;
+      final EntityDescriptor idpMetadata = issuer != null
+          ? this.getMetadata(issuer, IDPSSODescriptor.DEFAULT_ELEMENT_NAME)
+          : null;
 
       // Step 2: Validate the Response (including its signature).
       //
@@ -189,6 +207,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   /** {@inheritDoc} */
   @Override
   public void initialize() throws ComponentInitializationException {
+    if (this.metadataResolver == null) {
+      throw new ComponentInitializationException("Property 'metadataResolver' must be assigned");
+    }
     if (this.requireEncryptedAssertions && this.decrypter == null) {
       throw new ComponentInitializationException("Property 'decrypter' must be assigned");
     }
@@ -217,7 +238,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       this.responseValidator = this.createResponseValidator(signatureTrustEngine, signatureProfileValidator);
       if (this.responseValidator == null) {
         throw new ComponentInitializationException("createResponseValidator must not return null");
-      }      
+      }
       this.assertionValidator = this.createAssertionValidator(signatureTrustEngine, signatureProfileValidator);
       if (this.assertionValidator == null) {
         throw new ComponentInitializationException("createAssertionValidator must not return null");
@@ -226,7 +247,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       this.isInitialized = true;
     }
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public boolean isInitialized() {
@@ -256,8 +277,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * Sets up the assertion validator.
    * <p>
    * The default implementation creates a {@link AssertionValidator} instance. For use within the Swedish eID framework
-   * subclasses should create a {@code SwedishEidAssertionValidator} instance, see the swedish-eid-opensaml library
-   * (https://github.com/litsec/swedish-eid-opensaml).
+   * subclasses should create a {@code SwedishEidAssertionValidator} instance, see the opensaml-swedish-eid library
+   * (https://github.com/swedenconnect/opensaml-swedish-eid).
    * </p>
    * 
    * @param signatureTrustEngine
@@ -270,9 +291,13 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       final SignatureTrustEngine signatureTrustEngine, final SignaturePrevalidator signatureProfileValidator) {
 
     return new AssertionValidator(signatureTrustEngine, signatureProfileValidator,
-      Arrays.asList(new BearerSubjectConfirmationValidator()),
+      Arrays.asList(new BearerSubjectConfirmationValidator(), new HolderOfKeySubjectConfirmationValidator()),
       Arrays.asList(new AudienceRestrictionConditionValidator()),
       Arrays.asList(new AuthnStatementValidator()));
+  }
+
+  protected AbstractAssertionValidationParametersBuilder<?> getAssertionValidationParametersBuilder() {
+    return AssertionValidationParametersBuilder.builder();
   }
 
   /**
@@ -390,8 +415,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         || (relayStateInputOptional.isPresent() && input.getRelayState().equals(relayState));
 
     if (!relayStateMatch) {
-      final String msg = 
-          String.format("RelayState variable received with response (%s) does not match the sent one (%s)", 
+      final String msg =
+          String.format("RelayState variable received with response (%s) does not match the sent one (%s)",
             relayState, input.getRelayState());
       log.error("{} [{}]", msg, logId(response));
       throw new ResponseValidationException(msg);
@@ -425,29 +450,32 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     final AuthnRequest authnRequest = input.getAuthnRequest();
     final String entityID = Optional.ofNullable(authnRequest).map(AuthnRequest::getIssuer).map(Issuer::getValue).orElse(null);
 
-    final AssertionValidationParametersBuilder b = AssertionValidationParametersBuilder.builder()
+    final AbstractAssertionValidationParametersBuilder<?> builder = this.getAssertionValidationParametersBuilder();
+
+    if (validationContext != null) {
+      builder.addStaticParameters(validationContext.getStaticParameters());
+      builder.addDynamicParameters(validationContext.getDynamicParameters());
+    }
+
+    builder
       .strictValidation(this.responseValidationSettings.isStrictValidation())
       .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
       .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
       .signatureRequired(this.responseValidationSettings.isRequireSignedAssertions())
       .signatureValidationCriteriaSet(new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
+      .spMetadata(this.getSpMetadata(entityID))
+      .idpMetadata(idpMetadata)
       .receiveInstant(input.getReceiveInstant())
       .receiveUrl(input.getReceiveURL())
       .authnRequest(authnRequest)
       .expectedIssuer(idpMetadata.getEntityID())
       .responseIssueInstant(response.getIssueInstant().toEpochMilli())
       .validAudiences(entityID)
-      .validRecipients(input.getReceiveURL(), entityID);
+      .validRecipients(input.getReceiveURL(), entityID)
+      .validAddresses((String) input.getClientIpAddress())
+      .clientCertificate(input.getClientCertificate());
 
-    if (input.getClientIpAddress() != null) {
-      b.validAddresses(input.getClientIpAddress());
-    }
-
-    if (validationContext != null) {
-      b.addStaticParameters(validationContext.getStaticParameters());
-      b.addDynamicParameters(validationContext.getDynamicParameters());
-    }
-    final ValidationContext context = b.build();
+    final ValidationContext context = builder.build();
 
     final ValidationResult result = this.assertionValidator.validate(assertion, context);
     if (validationContext != null) {
@@ -467,12 +495,73 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   }
 
   /**
+   * Gets the metadata for the given entityID and role (type).
+   * 
+   * @param entityID
+   *          the entity ID
+   * @param role
+   *          the role
+   * @return the entity descriptor or null if no metadata is found
+   */
+  protected EntityDescriptor getMetadata(final String entityID, final QName role) {
+    if (entityID == null) {
+      return null;
+    }
+    try {
+      final CriteriaSet criteria = new CriteriaSet();
+      criteria.add(new EntityIdCriterion(entityID));
+      final EntityDescriptor ed = this.metadataResolver.resolveSingle(criteria);
+      if (role != null && ed != null) {
+        if (ed.getRoleDescriptors(role).isEmpty()) {
+          return null;
+        }
+      }
+      return ed;
+    }
+    catch (final ResolverException e) {
+      log.error("Failure when trying to obtain metadata for '{}'", entityID, e);
+      return null;
+    }
+  }
+
+  /**
+   * Gets the SAML metadata for a given SP.
+   * 
+   * @param entityID
+   *          the SP entityID
+   * @return the SP metadata or null if none is found
+   */
+  protected EntityDescriptor getSpMetadata(final String entityID) {
+    if (this.spMetadataCache != null && this.spMetadataCache.containsKey(entityID)) {
+      return this.spMetadataCache.get(entityID);
+    }
+    final EntityDescriptor spMetadata = this.getMetadata(entityID, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    if (this.spMetadataCache == null) {
+      this.spMetadataCache = new HashMap<>();
+    }
+    this.spMetadataCache.put(entityID, spMetadata);
+    return spMetadata;
+  }
+
+  /**
+   * Assigns the metadata resolver to use.
+   * 
+   * @param metadataResolver
+   *          the metadata resolver
+   */
+  public void setMetadataResolver(final MetadataResolver metadataResolver) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.metadataResolver = metadataResolver;
+  }
+
+  /**
    * Assigns the decrypter instance.
    * 
    * @param decrypter
    *          the decrypter
    */
   public void setDecrypter(final SAMLObjectDecrypter decrypter) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
     this.decrypter = decrypter;
   }
 
@@ -483,6 +572,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    *          message replay checker
    */
   public void setMessageReplayChecker(final MessageReplayChecker messageReplayChecker) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
     this.messageReplayChecker = messageReplayChecker;
   }
 
@@ -493,6 +583,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    *          validation settings
    */
   public void setResponseValidationSettings(final ResponseValidationSettings responseValidationSettings) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
     this.responseValidationSettings = responseValidationSettings;
   }
 
@@ -503,6 +594,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    *          boolean
    */
   public void setRequireEncryptedAssertions(boolean requireEncryptedAssertions) {
+    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
     this.requireEncryptedAssertions = requireEncryptedAssertions;
   }
 
@@ -515,7 +607,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       Optional.ofNullable(response.getID()).orElse("<empty>"),
       Optional.ofNullable(assertion.getID()).orElse("<empty>"));
   }
-  
+
   /**
    * Returns the given SAML object in its "pretty print" XML string form.
    * 

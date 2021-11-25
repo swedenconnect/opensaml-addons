@@ -35,7 +35,7 @@ public class ScopeUtilsTest extends OpenSAMLTestBase {
     Assert.assertFalse(
       ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "example.com"));
     Assert.assertFalse(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), null));
+      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), (String)null));
     Assert.assertFalse(
       ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), ""));
     Assert.assertTrue(

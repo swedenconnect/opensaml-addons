@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
 
+import java.util.Collections;
+
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 import org.opensaml.saml.saml2.core.AuthnRequest;
@@ -54,6 +56,10 @@ public abstract class AbstractResponseValidationParametersBuilder<T extends Abst
    * @return the builder
    */
   public T expectedIssuer(final String expectedIssuer) {
+    if (expectedIssuer != null) {
+      this.addStaticParameterIfMissing(
+        SAML2AssertionValidationParameters.VALID_ISSUERS, Collections.singleton(expectedIssuer)); 
+    }
     return this.staticParameter(CoreValidatorParameters.EXPECTED_ISSUER, expectedIssuer);
   }
 

@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
+import java.security.cert.X509Certificate;
 import java.time.Instant;
 
 import org.opensaml.saml.saml2.core.AuthnRequest;
@@ -61,5 +62,12 @@ public interface ResponseProcessingInput {
    * @return the client IP address of null if no check should be made
    */
   String getClientIpAddress();
+
+  /**
+   * If the Holder-of-key WebSSO profile is in use, the client presented certificate is required.
+   * 
+   * @return the client certificate, or null if none is available
+   */
+  X509Certificate getClientCertificate();
 
 }

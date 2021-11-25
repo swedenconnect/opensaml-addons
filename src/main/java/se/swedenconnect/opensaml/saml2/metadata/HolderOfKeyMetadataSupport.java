@@ -37,7 +37,7 @@ public class HolderOfKeyMetadataSupport {
 
   /** The QName for the HoK ProtocolBinding attribute. */
   public static final QName HOK_PROTOCOL_BINDING_ATTRIBUTE = new QName(HOK_WEBSSO_PROFILE_URI, "ProtocolBinding", "hoksso");
-  
+
   /**
    * Given an {@link IDPSSODescriptor} element the method locates all {@code SingleSignOnService} elements that have a
    * {@code Binding} attribute set to {@value HOK_WEBSSO_PROFILE_URI}, i.e., a service element for Holder-of-key.
@@ -73,6 +73,17 @@ public class HolderOfKeyMetadataSupport {
   }
 
   /**
+   * Predicate that tells if the supplied {@code SingleSignOnService} is a HoK endpoint.
+   * 
+   * @param sso
+   *          the SingleSignOnService to test
+   * @return true if the supplied object is a HoK endpoint and false otherwise
+   */
+  public static boolean isHoKSingleSignOnService(final SingleSignOnService sso) {
+    return HOK_WEBSSO_PROFILE_URI.equals(sso.getBinding());
+  }
+
+  /**
    * Given an {@link SPSSODescriptor} element the method locates all {@code AssertionConsumerService} elements that have
    * a {@code Binding} attribute set to {@value HOK_WEBSSO_PROFILE_URI}, i.e., an endpoint for Holder-of-key.
    * 
@@ -104,6 +115,17 @@ public class HolderOfKeyMetadataSupport {
       }
     }
     return null;
+  }
+  
+  /**
+   * Predicate that tells if the supplied {@code AssertionConsumerService} is a HoK endpoint.
+   * 
+   * @param acs
+   *          the AssertionConsumerService to test
+   * @return true if the supplied object is a HoK endpoint and false otherwise
+   */
+  public static boolean isHoKAssertionConsumerService(final AssertionConsumerService acs) {
+    return HOK_WEBSSO_PROFILE_URI.equals(acs.getBinding());
   }
 
   private HolderOfKeyMetadataSupport() {

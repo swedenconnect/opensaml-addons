@@ -165,9 +165,10 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
       if (this.validity == null || this.cacheDuration == null) {
         try {
           final XMLObject providerMetadata = provider.getMetadata();
-          final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();
+          final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();          
           if (calculatedValidUntil == null 
-              || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil))) {
+              || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil) 
+              && providerValidUntil.isAfter(Instant.now()))) {
             calculatedValidUntil = providerValidUntil;
           }
           final Duration providerCacheDuration = ((CacheableSAMLObject) providerMetadata).getCacheDuration();
