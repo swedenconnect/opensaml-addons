@@ -63,8 +63,8 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
  * </p>
  * <ul>
  * <li>The static parameters defined for {@link AbstractSignableObjectValidator}.</li>
- * <li>{@link CoreValidatorParameters#SP_METADATA}</li> Required. The SP metadata.</li>
- * <li>{@link CoreValidatorParameters#IDP_METADATA}</li> Required. The IdP metadata.</li>
+ * <li>{@link CoreValidatorParameters#SP_METADATA}: Required. The SP metadata.</li>
+ * <li>{@link CoreValidatorParameters#IDP_METADATA}: Required. The IdP metadata.</li>
  * <li>{@link CoreValidatorParameters#STRICT_VALIDATION}: Optional. If not supplied, defaults to 'false'. Tells whether
  * strict validation should be performed.</li>
  * <li>{@link SAML2AssertionValidationParameters#CLOCK_SKEW}: Optional. Gives the number of milliseconds that is the
