@@ -15,6 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Abstract base class for authentication request generator input.
  * 
@@ -22,10 +25,30 @@ package se.swedenconnect.opensaml.saml2.request;
  */
 public class AbstractAuthnRequestGeneratorInput extends AbstractRequestGeneratorInput implements AuthnRequestGeneratorInput {
 
+  /** The requirement for Holder of key. */
+  private HokRequirement hokRequirement;
+  
+  /** {@inheritDoc} */
+  @Override
+  public List<String> getRequestedAuthnContextClassRefUris() {
+    // TODO
+    return null;
+  }
+  
   /** {@inheritDoc} */
   @Override
   public HokRequirement getHokRequirement() {
-    return HokRequirement.DONT_USE;
+    return Optional.ofNullable(this.hokRequirement).orElse(HokRequirement.DONT_USE);
+  }
+
+  /**
+   * Assigns the requirement for using holder-of-key.
+   * 
+   * @param hokRequirement
+   *          the requirement
+   */
+  public void setHokRequirement(final HokRequirement hokRequirement) {
+    this.hokRequirement = hokRequirement;
   }
 
 }

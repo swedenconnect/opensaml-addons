@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
+import java.util.List;
+
 /**
  * Extends the {@link RequestGeneratorInput} interface with input that are specific for building an
  * {@code AuthnRequest}.
@@ -29,6 +31,13 @@ public interface AuthnRequestGeneratorInput extends RequestGeneratorInput {
   public enum HokRequirement {
     REQUIRED, IF_AVAILABLE, DONT_USE
   };
+
+  /**
+   * Gets the requested authentication context class ref URI:s.
+   * 
+   * @return a list of URI:s, or null/empty list if no specific requirement is set
+   */
+  List<String> getRequestedAuthnContextClassRefUris();
 
   /**
    * Gets the SP requirement for using the Holder-of-key profile.
