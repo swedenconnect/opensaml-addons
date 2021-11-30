@@ -279,8 +279,9 @@ public interface AuthnRequestGeneratorContext {
   public enum HokRequirement {
 
     /**
-     * The SP will always use HoK - A call to {@link #generateAuthnRequest(String, String)} for an IdP that does not
-     * support this profile will fail.
+     * The SP will always use HoK - A call to
+     * {@link AuthnRequestGenerator#generateAuthnRequest(String, String, AuthnRequestGeneratorContext)} for an IdP that
+     * does not support this profile will fail.
      */
     REQUIRED,
 
