@@ -283,6 +283,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
   /**
    * Gets the IdP metadata for the given entityID.
    * 
+   * @param idpEntityID
+   *          the entityID for the IdP
    * @return the metadata or null if no metadata could be found
    */
   protected abstract EntityDescriptor getIdpMetadata(final String idpEntityID);
