@@ -16,14 +16,44 @@
 package se.swedenconnect.opensaml.saml2.request;
 
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.security.x509.X509Credential;
 
 /**
  * Interface for generating {@code AuthnRequest} messages.
  * 
  * @author Martin Lindström (martin@idsec.se)
- *
- * @param <I>
- *          request input type
  */
-public interface AuthnRequestGenerator<I extends AuthnRequestGeneratorInput> extends RequestGenerator<AuthnRequest, I> {
+public interface AuthnRequestGenerator {
+
+  /**
+   * Generates a SAML authentication request message.
+   * 
+   * @param idpEntityID
+   *          the entityID of the IdP that we should send the request to
+   * @param relayState
+   *          the RelayState to include (may be null)
+   * @param context
+   *          the generator context (may be null)
+   * @return a request object
+   * @throws RequestGenerationException
+   *           for errors during request generation
+   */
+  RequestHttpObject<AuthnRequest> generateAuthnRequest(final String idpEntityID, final String relayState, 
+      final AuthnRequestGeneratorContext context)
+      throws RequestGenerationException;
+
+  /**
+   * Gets the entityID for the service provider that this generator services.
+   * 
+   * @return the SP entityID
+   */
+  String getSpEntityID();
+
+  /**
+   * Gets the signing credential to be used when signing the {@link AuthnRequest} messages.
+   * 
+   * @return the signing credential, or null if no signing should be performed
+   */
+  X509Credential getSignCredential();
+
 }
