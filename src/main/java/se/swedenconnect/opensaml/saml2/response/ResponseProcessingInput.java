@@ -30,16 +30,20 @@ public interface ResponseProcessingInput {
   /**
    * Returns the authentication request message that corresponds to the response message being processed.
    * 
+   * @param id
+   *          the ID of the authentication request
    * @return the AuthnRequest message or null if no message is available
    */
-  AuthnRequest getAuthnRequest();
+  AuthnRequest getAuthnRequest(final String id);
 
   /**
    * Returns the RelayState that was included in the request (or {@code null} if none was sent).
    * 
+   * @param id
+   *          the ID of the authentication request
    * @return the RelayState variable or null
    */
-  String getRelayState();
+  String getRequestRelayState(final String id);
 
   /**
    * Returns the URL on which the response message was received.

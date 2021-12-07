@@ -57,6 +57,8 @@ import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngin
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
+
 import net.shibboleth.utilities.java.support.codec.Base64Support;
 import net.shibboleth.utilities.java.support.codec.DecodingException;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
@@ -344,7 +346,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   protected void validateResponse(final Response response, final String relayState, final ResponseProcessingInput input,
       final EntityDescriptor idpMetadata, final ValidationContext validationContext) throws ResponseValidationException {
 
-    if (input.getAuthnRequest() == null) {
+    final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo()); 
+    if (authnRequest == null) {
       final String msg = String.format("No AuthnRequest available when processing Response [%s]", logId(response));
       log.error("{}", msg);
       throw new ResponseValidationException(msg);
@@ -364,7 +367,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       .expectedIssuer(idpMetadata.getEntityID())
       .receiveInstant(input.getReceiveInstant())
       .receiveUrl(input.getReceiveURL())
-      .authnRequest(input.getAuthnRequest());
+      .authnRequest(authnRequest);
 
     if (validationContext != null) {
       b.addStaticParameters(validationContext.getStaticParameters());
@@ -404,20 +407,15 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   protected void validateRelayState(final Response response, final String relayState, final ResponseProcessingInput input)
       throws ResponseValidationException {
 
-    Optional<String> relayStateOptional = relayState == null || relayState.trim().length() == 0 ? Optional.empty()
-        : Optional.of(relayState);
-    Optional<String> relayStateInputOptional = input.getRelayState() == null || input.getRelayState().trim().length() == 0
-        ? Optional.empty()
-        : Optional.of(input.getRelayState());
-
-    final boolean relayStateMatch = (!relayStateOptional.isPresent() && !relayStateInputOptional.isPresent())
-        || (relayStateOptional.isPresent() && relayState.equals(input.getRelayState()))
-        || (relayStateInputOptional.isPresent() && input.getRelayState().equals(relayState));
+    final String requestRelayState = Optional.ofNullable(input.getRequestRelayState(response.getInResponseTo()))
+        .map(String::trim).filter(r -> !r.isEmpty()).orElse(null);    
+    final String _relayState = Optional.ofNullable(relayState).map(String::trim).filter(r -> !r.isEmpty()).orElse(null);         
+    final boolean relayStateMatch = Objects.equal(requestRelayState, _relayState); 
 
     if (!relayStateMatch) {
       final String msg =
           String.format("RelayState variable received with response (%s) does not match the sent one (%s)",
-            relayState, input.getRelayState());
+            relayState, requestRelayState);
       log.error("{} [{}]", msg, logId(response));
       throw new ResponseValidationException(msg);
     }
@@ -447,7 +445,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Assertion");
     }
 
-    final AuthnRequest authnRequest = input.getAuthnRequest();
+    final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
     final String entityID = Optional.ofNullable(authnRequest).map(AuthnRequest::getIssuer).map(Issuer::getValue).orElse(null);
 
     final AbstractAssertionValidationParametersBuilder<?> builder = this.getAssertionValidationParametersBuilder();
