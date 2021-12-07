@@ -51,7 +51,7 @@ public class InMemoryReplayChecker implements MessageReplayChecker {
       this.cache.put(id, replayCacheExpiration + System.currentTimeMillis());
     }
     else {
-      if (System.currentTimeMillis() > e) {
+      if (System.currentTimeMillis() < e) {
         this.cache.remove(id);
         String msg = String.format("Replay check of ID '%s' failed", id);
         log.warn(msg);
