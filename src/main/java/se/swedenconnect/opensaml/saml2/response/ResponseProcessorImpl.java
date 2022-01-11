@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
       // And finally, build the result.
       //
-      return new ResponseProcessingResultImpl(assertion);
+      return new ResponseProcessingResultImpl(response, assertion);
     }
     catch (MessageReplayException e) {
       throw new ResponseProcessingException("Message replay: " + e.getMessage(), e);

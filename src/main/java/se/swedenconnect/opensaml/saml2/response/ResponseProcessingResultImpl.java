@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@ package se.swedenconnect.opensaml.saml2.response;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Subject;
 
 /**
@@ -32,6 +34,15 @@ import org.opensaml.saml.saml2.core.Subject;
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ResponseProcessingResultImpl implements ResponseProcessingResult {
+  
+  /** The response ID. */
+  private final String responseId;
+  
+  /** The InResponseTo attribute of the response. */
+  private final String inResponseTo;
+  
+  /** The issue instant. */
+  private final Instant issueInstant;
 
   /** The assertion. */
   private final Assertion assertion;
@@ -39,11 +50,34 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   /**
    * Constructor.
    * 
+   * @param response
+   *          the Response
    * @param assertion
-   *          the {@code Assertion}
+   *          the Assertion
    */
-  public ResponseProcessingResultImpl(final Assertion assertion) {
-    this.assertion = assertion;
+  public ResponseProcessingResultImpl(final Response response, final Assertion assertion) {
+    this.responseId = Optional.ofNullable(response).map(Response::getID).orElseThrow(() -> new NullPointerException("response is required"));
+    this.inResponseTo = Optional.ofNullable(response).map(Response::getInResponseTo).orElseThrow(() -> new NullPointerException("response is required"));
+    this.issueInstant = Optional.ofNullable(response).map(Response::getIssueInstant).orElseThrow(() -> new NullPointerException("response is required"));
+    this.assertion = Objects.requireNonNull(assertion, "assertion is required");
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getResponseId() {
+    return this.responseId;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getInResponseTo() {
+    return this.inResponseTo;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Instant getIssueInstant() {
+    return this.issueInstant;
   }
 
   /** {@inheritDoc} */
@@ -77,9 +111,9 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   /** {@inheritDoc} */
   @Override
   public Instant getAuthnInstant() {
-    
+
     Instant authnInstant = this.assertion.getAuthnStatements().get(0).getAuthnInstant();
-    
+
     // We have already checked the validity of the authentication instant, but if it is
     // after the current time it means that it is within the allowed clock skew. If so,
     // we set it to the current time (it's the best we can do).
@@ -87,7 +121,7 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
     if (authnInstant.isAfter(Instant.now())) {
       return Instant.now();
     }
-    
+
     return authnInstant;
   }
 
