@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,13 @@ public class ResponseStatusErrorException extends Exception {
   private static final long serialVersionUID = -8050896611037764108L;
 
   /** The SAML Status. */
-  private Status status;
+  private final Status status;
 
   /** The Response ID. */
-  private String responseId;
+  private final String responseId;
+  
+  /** The entityID of the issuer of the response. */
+  private final String issuer;
 
   /**
    * Constructor taking the error status and the response ID.
@@ -41,12 +44,15 @@ public class ResponseStatusErrorException extends Exception {
    *          status
    * @param responseId
    *          the response ID
+   * @param issuer
+   *          the issuer of the response
    */
-  public ResponseStatusErrorException(final Status status, final String responseId) {
+  public ResponseStatusErrorException(final Status status, final String responseId, final String issuer) {
     super(statusToString(status));
     this.status = status;
     this.responseId = responseId;
-    
+    this.issuer = issuer;
+
     if (StatusCode.SUCCESS.equals(status.getStatusCode().getValue())) {
       throw new IllegalArgumentException("Status is success - can not throw ResponseStatusErrorException");
     }
@@ -68,6 +74,15 @@ public class ResponseStatusErrorException extends Exception {
    */
   public String getResponseId() {
     return this.responseId;
+  }
+  
+  /**
+   * Gets the issuer of the response.
+   * 
+   * @return the issuer entityID
+   */
+  public String getIssuer() {
+    return this.issuer;
   }
 
   /**

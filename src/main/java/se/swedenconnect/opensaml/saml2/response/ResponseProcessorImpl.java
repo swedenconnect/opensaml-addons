@@ -164,7 +164,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       if (!StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
         log.info("Authentication failed with status '{}' [{}]",
           ResponseStatusErrorException.statusToString(response.getStatus()), logId(response));
-        throw new ResponseStatusErrorException(response.getStatus(), response.getID());
+        throw new ResponseStatusErrorException(response.getStatus(), response.getID(), issuer);
       }
 
       // Step 5. Verify that the relay state matches the request.
