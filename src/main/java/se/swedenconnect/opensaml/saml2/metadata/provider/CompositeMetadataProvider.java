@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Litsec AB
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,15 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
     this.metadataProviders = metadataProviders;
   }
 
+  /**
+   * Gets the underlying providers.
+   * 
+   * @return a list of the underlying metadata providers
+   */
+  public List<MetadataProvider> getProviders() {
+    return this.metadataProviders;
+  }
+
   /** {@inheritDoc} */
   @Override
   public String getID() {
@@ -165,14 +174,14 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
       if (this.validity == null || this.cacheDuration == null) {
         try {
           final XMLObject providerMetadata = provider.getMetadata();
-          final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();          
-          if (calculatedValidUntil == null 
-              || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil) 
-              && providerValidUntil.isAfter(Instant.now()))) {
+          final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();
+          if (calculatedValidUntil == null
+              || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil)
+                  && providerValidUntil.isAfter(Instant.now()))) {
             calculatedValidUntil = providerValidUntil;
           }
           final Duration providerCacheDuration = ((CacheableSAMLObject) providerMetadata).getCacheDuration();
-          if (calculatedCacheDuration == null 
+          if (calculatedCacheDuration == null
               || (providerCacheDuration != null && providerCacheDuration.compareTo(calculatedCacheDuration) < 1)) {
             calculatedCacheDuration = providerCacheDuration;
           }
