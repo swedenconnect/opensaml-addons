@@ -39,7 +39,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /** The XML element that is the metadata. */
   private Element element;
-  
+
   /** The identifier for the provider. */
   private String id;
 
@@ -82,17 +82,27 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
       this.element = XMLObjectSupport.marshall(entitiesDescriptor);
     }
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public String getID() {
     if (this.id == null) {
       this.id = this.element.getAttribute("ID");
-      if (this.id == null) {
+      if (this.id == null || this.id.trim().length() == 0) {
         this.id = this.toString();
       }
     }
     return this.id;
+  }
+
+  /**
+   * Assigns the ID for the provider.
+   * 
+   * @param id
+   *          the ID
+   */
+  public void setID(final String id) {
+    this.id = id;
   }
 
   /** {@inheritDoc} */
@@ -103,7 +113,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /** {@inheritDoc} */
   @Override
-  protected void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization, 
+  protected void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization,
       final MetadataFilter filter) {
     this.metadataResolver = new DOMMetadataResolver(this.element);
     this.metadataResolver.setRequireValidMetadata(requireValidMetadata);
