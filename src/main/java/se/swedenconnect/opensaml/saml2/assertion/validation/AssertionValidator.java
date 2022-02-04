@@ -364,9 +364,17 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    */
   protected ValidationResult validateHolderOfKeyRequirement(final Assertion assertion, final ValidationContext context) {
 
+    // First see if the caller has informed us about the HoK status.
+    // In that case we are done.
+    //
+    if (Optional.ofNullable(context.getStaticParameters().get(HOK_PROFILE_ACTIVE)).map(Boolean.class::cast).orElse(null) != null) {
+      context.getDynamicParameters().put(HOK_PROFILE_ACTIVE, (Boolean) context.getStaticParameters().get(HOK_PROFILE_ACTIVE));
+      return ValidationResult.VALID;
+    }
+    
     Boolean hokActive = Boolean.FALSE;
 
-    try {
+    try {            
       final String receiveUrl = (String) context.getStaticParameters().get(CoreValidatorParameters.RECEIVE_URL);
       if (receiveUrl == null) {
         final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
@@ -514,15 +522,25 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
             return ValidationResult.VALID;
           }
           else {
-            log.info("Validation of SubjectConfirmation with method '{}' failed - {}", confirmation.getMethod(),
-              context.getValidationFailureMessage());
+            if (context.getValidationFailureMessage() == null) {
+              context.setValidationFailureMessage(
+                String.format("Validation of SubjectConfirmation with method '%s' failed", confirmation.getMethod()));
+              log.info("{}", context.getValidationFailureMessage());
+            }
+            else {
+              log.info("Validation of SubjectConfirmation with method '{}' failed - {}", confirmation.getMethod(),
+                context.getValidationFailureMessage());
+            }
             if (hokProfileActive) {
               return ValidationResult.INVALID;
             }
           }
         }
-        catch (AssertionValidationException e) {
+        catch (Exception e) {
           log.warn("Error while executing subject confirmation validation " + validator.getClass().getName(), e);
+          final String msg = String.format("Error during validation of subject confirmation data - {}", e.getMessage());
+          context.setValidationFailureMessage(msg);
+          return ValidationResult.INVALID;
         }
       }
       else {
@@ -530,7 +548,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       }
     }
 
-    String msg = String.format("No subject confirmation methods were met for assertion with ID '%s'", assertion.getID());
+    final String msg = String.format("No subject confirmation methods were met for assertion with ID '%s'", assertion.getID());
     log.debug(msg);
     context.setValidationFailureMessage(msg);
     return ValidationResult.INVALID;

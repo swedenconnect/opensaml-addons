@@ -68,6 +68,7 @@ import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AbstractAssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidator;
@@ -446,6 +447,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     }
 
     final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
+    if (authnRequest == null) {
+      log.warn("No AuthnRequest available for ID: {}", response.getInResponseTo());
+    }
     final String entityID = Optional.ofNullable(authnRequest).map(AuthnRequest::getIssuer).map(Issuer::getValue).orElse(null);
 
     final AbstractAssertionValidationParametersBuilder<?> builder = this.getAssertionValidationParametersBuilder();
@@ -460,8 +464,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
       .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
       .signatureRequired(this.responseValidationSettings.isRequireSignedAssertions())
-      .signatureValidationCriteriaSet(new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
-      .spMetadata(this.getSpMetadata(entityID))
+      .signatureValidationCriteriaSet(new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))      
       .idpMetadata(idpMetadata)
       .receiveInstant(input.getReceiveInstant())
       .receiveUrl(input.getReceiveURL())
@@ -472,6 +475,11 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       .validRecipients(input.getReceiveURL(), entityID)
       .validAddresses((String) input.getClientIpAddress())
       .clientCertificate(input.getClientCertificate());
+    
+    // TODO: We should really make sure that we honor all passed in validation context settings
+    if (validationContext == null || validationContext.getStaticParameters().get(CoreValidatorParameters.SP_METADATA) == null) {
+      builder.spMetadata(this.getSpMetadata(entityID));
+    }
 
     final ValidationContext context = builder.build();
 
@@ -530,6 +538,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * @return the SP metadata or null if none is found
    */
   protected EntityDescriptor getSpMetadata(final String entityID) {
+    if (entityID == null) {
+      return null;
+    }
     if (this.spMetadataCache != null && this.spMetadataCache.containsKey(entityID)) {
       return this.spMetadataCache.get(entityID);
     }
