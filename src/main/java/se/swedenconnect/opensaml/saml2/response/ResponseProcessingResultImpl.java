@@ -90,9 +90,9 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   @Override
   public List<Attribute> getAttributes() {
     try {
-      return Collections.unmodifiableList(this.assertion.getAttributeStatements().get(0).getAttributes());
+      return Collections.unmodifiableList(this.assertion.getAttributeStatements().get(0).getAttributes());      
     }
-    catch (NullPointerException e) {
+    catch (NullPointerException | IndexOutOfBoundsException e) {
       return Collections.emptyList();
     }
   }
