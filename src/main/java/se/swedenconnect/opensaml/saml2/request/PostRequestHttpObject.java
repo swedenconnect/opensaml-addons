@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import org.w3c.dom.Element;
 
 import net.shibboleth.utilities.java.support.codec.Base64Support;
 import net.shibboleth.utilities.java.support.codec.EncodingException;
-import net.shibboleth.utilities.java.support.codec.HTMLEncoder;
 import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
 
@@ -146,20 +145,19 @@ public class PostRequestHttpObject<T extends RequestAbstractType> extends HTTPPo
       final String encodedMessage = Base64Support.encode(messageXML.getBytes("UTF-8"), Base64Support.UNCHUNKED);
       this.postParameters.put("SAMLRequest", encodedMessage);
     }
-    catch (UnsupportedEncodingException e) {
+    catch (final UnsupportedEncodingException e) {
       logger.error("UTF-8 encoding is not supported, this VM is not Java compliant.");
       throw new MessageEncodingException("Unable to encode message, UTF-8 encoding is not supported");
     }
-    catch (EncodingException e) {
+    catch (final EncodingException e) {
       throw new MessageEncodingException("Unable to encode message", e);
     }
 
     // Assign RelayState
     //
     if (SAMLBindingSupport.checkRelayState(relayState)) {
-      final String encodedRelayState = HTMLEncoder.encodeForHTMLAttribute(relayState);
-      logger.debug("Setting RelayState parameter to: '{}', encoded as '{}'", relayState, encodedRelayState);
-      this.postParameters.put("RelayState", encodedRelayState);
+      logger.debug("Setting RelayState parameter to: '{}'", relayState);
+      this.postParameters.put("RelayState", relayState);
     }
 
     // HTTP headers

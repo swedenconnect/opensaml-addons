@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.opensaml.saml.saml2.core.RequestAbstractType;
 /**
  * Defines an interface that represents an object that holds data necessary for the SP application to transmit
  * a request message to an IdP.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface RequestHttpObject<T extends RequestAbstractType> {
@@ -31,10 +31,10 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
    * Returns the complete URL that the SP application should use when the user agent is sent to the Identity Provider.
    * <p>
    * For a redirect, this URL could look something like: {@code https://www.theidp.com/auth?SAMLRequest=<encoded request>&RelayState=abcd}.
-   * 
+   *
    * </p>
    * <b>Note:</b> Additional query parameters may be added to the URL by the using system.
-   * 
+   *
    * @return the URL to use when sending the user to the Identity Provider
    */
   String getSendUrl();
@@ -42,7 +42,7 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
   /**
    * Returns the HTTP method that should be used to send the request, via the user agent, to the Identity Provider.
    * Possible values for this implementation is "GET" (redirect) and "POST".
-   * 
+   *
    * @return the HTTP method to use
    */
   String getMethod();
@@ -53,23 +53,26 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
    * <p>
    * Note: for the "GET" method this method returns {@code null}.
    * </p>
-   * 
+   * <p>
+   * The parameter values are not URL-encoded.
+   * </p>
+   *
    * @return a Map holding the POST body
    */
   Map<String, String> getRequestParameters();
 
   /**
    * Returns a mapping of header names and values that should be used when sending the request.
-   * 
+   *
    * @return HTTP headers
    */
   Map<String, String> getHttpHeaders();
-  
+
   /**
    * Returns the actual request (for easy access to its elements).
-   * 
+   *
    * @return the request
    */
   T getRequest();
-  
+
 }
