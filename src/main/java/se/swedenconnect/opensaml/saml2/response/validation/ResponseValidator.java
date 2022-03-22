@@ -34,6 +34,9 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.shibboleth.utilities.java.support.net.URIComparator;
+import net.shibboleth.utilities.java.support.net.URIException;
+import net.shibboleth.utilities.java.support.net.impl.BasicURLComparator;
 import se.swedenconnect.opensaml.common.validation.AbstractSignableObjectValidator;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport;
@@ -42,38 +45,31 @@ import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationR
 /**
  * Response validator that ensures that a {@code Response} element is valid according to the 2.0 SAML Core specification
  * and makes checks based on the supplied validation context parameters described below.
- * 
+ *
  * <p>
  * Supports the following {@link ValidationContext} static parameters:
  * </p>
  * <ul>
  * <li>The static parameters defined for {@link AbstractSignableObjectValidator}.</li>
  * <li>{@link CoreValidatorParameters#STRICT_VALIDATION}: Optional. If not supplied, defaults to 'false'. Tells whether
- * strict validation should be performed.
- * </li>
- * <li>{@link SAML2AssertionValidationParameters#CLOCK_SKEW}: Optional. Gives the duration that is the
- * maximum allowed clock skew. If not given {@link SAML20AssertionValidator#DEFAULT_CLOCK_SKEW} is used.
- * </li>
+ * strict validation should be performed.</li>
+ * <li>{@link SAML2AssertionValidationParameters#CLOCK_SKEW}: Optional. Gives the duration that is the maximum allowed
+ * clock skew. If not given {@link SAML20AssertionValidator#DEFAULT_CLOCK_SKEW} is used.</li>
  * <li>{@link CoreValidatorParameters#MAX_AGE_MESSAGE}: Optional. Gives the maximum age (difference between issuance
- * time and the validation time). If not given, the {@link #DEFAULT_MAX_AGE_RECEIVED_MESSAGE} is used.
- * </li>
+ * time and the validation time). If not given, the {@link #DEFAULT_MAX_AGE_RECEIVED_MESSAGE} is used.</li>
  * <li>{@link CoreValidatorParameters#RECEIVE_INSTANT}: Optional. Gives the timestamp (milliseconds since epoch) for
- * when the response message was received. If not given the current time is used.
- * </li>
+ * when the response message was received. If not given the current time is used.</li>
  * <li>{@link CoreValidatorParameters#AUTHN_REQUEST}: Optional. If supplied will be used in a number of validations when
  * information from the corresponding {@code AuthnRequest} is needed. If not supplied, other, more detailed parameters
- * must be given.
- * </li>
+ * must be given.</li>
  * <li>{@link CoreValidatorParameters#AUTHN_REQUEST_ID}: Required if the {@link CoreValidatorParameters#AUTHN_REQUEST}
- * is not assigned. Is used when validating the {@code InResponseTo} attribute of the response.
- * </li>
+ * is not assigned. Is used when validating the {@code InResponseTo} attribute of the response.</li>
  * <li>{@link CoreValidatorParameters#RECEIVE_URL}: Required. A String holding the URL on which we received the response
- * message. Is used when the {@code Destination} attribute is validated.
- * </li>
+ * message. Is used when the {@code Destination} attribute is validated.</li>
  * <li>{@link CoreValidatorParameters#EXPECTED_ISSUER}: Optional. If set, is used when the issuer of the response is
  * validated.</li>
  * </ul>
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class ResponseValidator extends AbstractSignableObjectValidator<Response> {
@@ -81,9 +77,12 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /** Class logger. */
   private final Logger log = LoggerFactory.getLogger(ResponseValidator.class);
 
+  /** The URI comparator used when checking URL:s against each other. */
+  private URIComparator uriComparator = new BasicURLComparator();
+
   /**
    * Constructor.
-   * 
+   *
    * @param trustEngine
    *          the trust used to validate the object's signature
    * @param signaturePrevalidator
@@ -91,6 +90,19 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    */
   public ResponseValidator(final SignatureTrustEngine trustEngine, final SignaturePrevalidator signaturePrevalidator) {
     super(trustEngine, signaturePrevalidator);
+  }
+
+  /**
+   * Assigns a custom {@link URIComparator} to be used when checking URL:s against eachother. The default is
+   * {@link BasicURLComparator}.
+   *
+   * @param uriComparator
+   *          the customized URIComparator
+   */
+  public void setUriComparator(final URIComparator uriComparator) {
+    if (uriComparator != null) {
+      this.uriComparator = uriComparator;
+    }
   }
 
   /** {@inheritDoc} */
@@ -119,7 +131,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
 
   /**
    * Validates that the {@code Response} object has an ID attribute.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -136,7 +148,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
 
   /**
    * Validates that the {@code Response} object has a valid Version attribute.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -153,7 +165,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
 
   /**
    * Validates that the {@code Response} object has a {@code Status} attribute.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -174,7 +186,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Validates that the {@code Response} object has a IssueInstant attribute and that it is not too old given the
    * {@link CoreValidatorParameters#MAX_AGE_MESSAGE} and {@link CoreValidatorParameters#RECEIVE_INSTANT} context
    * parameters.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -187,9 +199,9 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       return ValidationResult.INVALID;
     }
 
-    final Instant receiveInstant = getReceiveInstant(context); 
+    final Instant receiveInstant = getReceiveInstant(context);
     final Instant issueInstant = response.getIssueInstant();
-    
+
     final Duration maxAgeResponse = getMaxAgeReceivedMessage(context);
     final Duration allowedClockSkew = getAllowedClockSkew(context);
 
@@ -198,7 +210,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     //
     if (Duration.between(receiveInstant, issueInstant).compareTo(maxAgeResponse.plus(allowedClockSkew)) > 0) {
       final String msg = String.format("Received Response message is too old - issue-instant: %s - receive-time: %s",
-        response.getIssueInstant(), receiveInstant); 
+        response.getIssueInstant(), receiveInstant);
       context.setValidationFailureMessage(msg);
       return ValidationResult.INVALID;
     }
@@ -208,7 +220,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     //
     if (Duration.between(issueInstant, receiveInstant).compareTo(allowedClockSkew) > 0) {
       final String msg = String.format("Issue-instant of Response message (%s) is newer than receive time (%s) - Non accepted clock skew",
-        response.getIssueInstant(), receiveInstant); 
+        response.getIssueInstant(), receiveInstant);
       context.setValidationFailureMessage(msg);
       return ValidationResult.INVALID;
     }
@@ -220,7 +232,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Ensures that the {@code InResponseTo} attribute is present and that it matches the ID of the {@code AuthnRequest}.
    * The ID is found in the {@code context} parameter under the key {@link CoreValidatorParameters#AUTHN_REQUEST_ID} or
    * from the object stored under {@link CoreValidatorParameters#AUTHN_REQUEST}.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -258,7 +270,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Ensures that the {@code Destination} attribute is present and matches the URL on which we received the message.
    * This value is found in the context under the {@link CoreValidatorParameters#RECEIVE_URL} key.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -270,11 +282,22 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       context.setValidationFailureMessage("Missing Destination attribute in Response");
       return ValidationResult.INVALID;
     }
+
     final String receiveUrl = (String) context.getStaticParameters().get(CoreValidatorParameters.RECEIVE_URL);
     if (receiveUrl != null) {
-      if (!response.getDestination().equals(receiveUrl)) {
-        final String msg = String.format("Destination attribute (%s) of Response does not match URL on which response was received (%s)",
-          response.getDestination(), receiveUrl);
+      try {
+        if (!this.uriComparator.compare(response.getDestination(), receiveUrl)) {
+          final String msg = String.format(
+            "Destination attribute (%s) of Response does not match URL on which response was received (%s)",
+            response.getDestination(), receiveUrl);
+          context.setValidationFailureMessage(msg);
+          return ValidationResult.INVALID;
+        }
+      }
+      catch (final URIException e) {
+        final String msg = String.format(
+          "Error when comparing Destination attribute (%s) with URL on which the response was received (%s) - %s",
+          response.getDestination(), receiveUrl, e.getMessage(), e);
         context.setValidationFailureMessage(msg);
         return ValidationResult.INVALID;
       }
@@ -290,7 +313,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Validates the {@code Consent} attribute. The default implementation returns {@link ValidationResult#VALID} since
    * the attribute is optional according to the SAML 2.0 Core specifications.
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -304,7 +327,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Ensures that the {@code Issuer} element is present and matches the expected issuer (if set in the context under the
    * {@link CoreValidatorParameters#EXPECTED_ISSUER} key).
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -339,7 +362,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * <li>If status is success - At least of assertion (or encrypted assertion) is present.</li>
    * <li>Else - No assertions are present.</li>
    * </ul>
-   * 
+   *
    * @param response
    *          the response
    * @param context
@@ -365,7 +388,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Validates the {@code Extensions} element. The default implementation returns {@link ValidationResult#VALID} since
    * the element is optional according to the SAML 2.0 Core specifications.
-   * 
+   *
    * @param response
    *          the response
    * @param context
