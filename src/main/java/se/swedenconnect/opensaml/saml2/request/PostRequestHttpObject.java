@@ -20,11 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.encoder.MessageEncodingException;
 import org.opensaml.saml.common.binding.SAMLBindingSupport;
 import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.binding.encoding.impl.HTTPPostEncoder;
 import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.x509.X509Credential;
@@ -51,7 +52,7 @@ import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
  * @param <T>
  *          the type of the request
  */
-public class PostRequestHttpObject<T extends RequestAbstractType> extends HTTPPostEncoder implements RequestHttpObject<T> {
+public class PostRequestHttpObject<T extends RequestAbstractType> implements RequestHttpObject<T> {
 
   /** Logging instance. */
   private static final Logger logger = LoggerFactory.getLogger(PostRequestHttpObject.class);
@@ -138,7 +139,13 @@ public class PostRequestHttpObject<T extends RequestAbstractType> extends HTTPPo
     }
 
     logger.trace("Marshalling and Base64 encoding SAML message");
-    final Element domMessage = this.marshallMessage((XMLObject) context.getMessage());
+    final Element domMessage;
+    try {
+      domMessage = XMLObjectSupport.marshall((XMLObject) context.getMessage());
+    }
+    catch (MarshallingException e) {
+      throw new MessageEncodingException("Error marshalling SAML message", e);
+    }
 
     try {
       final String messageXML = SerializeSupport.nodeToString(domMessage);
