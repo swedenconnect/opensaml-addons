@@ -18,6 +18,7 @@ package se.swedenconnect.opensaml;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -28,29 +29,26 @@ import org.springframework.core.io.Resource;
 
 /**
  * Class for supporting test cases that need a web server.
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class TestWebServer {
 
   /** The web server. */
-  private Server server;
+  private final Server server;
 
   /** The URL that is exposed by the web server. */
   private String url;
 
   /**
    * Constructor setting up the web server.
-   * 
-   * @param resourceProvider
-   *          the provider handling the data
-   * @param keyStorePath
-   *          the path to the keystore holding the private key for the web server (may be null)
-   * @param keyStorePassword
-   *          the password for the keystore
+   *
+   * @param handler the handler
+   * @param keyStorePath the path to the keystore holding the private key for the web server (may be null)
+   * @param keyStorePassword the password for the keystore
    */
-  public TestWebServer(ResourceProvider resourceProvider, String keyStorePath, String keyStorePassword) {
-    QueuedThreadPool serverThreads = new QueuedThreadPool();
+  public TestWebServer(final Handler handler, final String keyStorePath, final String keyStorePassword) {
+    final QueuedThreadPool serverThreads = new QueuedThreadPool();
     serverThreads.setName("server");
     this.server = new Server(serverThreads);
 
@@ -64,17 +62,28 @@ public class TestWebServer {
       contextFactory.setProtocol("TLS");
     }
 
-    ServerConnector connector = new ServerConnector(this.server, contextFactory);
+    final ServerConnector connector = new ServerConnector(this.server, contextFactory);
     connector.setHost("localhost");
     this.server.addConnector(connector);
-    server.setHandler(new ResourceHandler(resourceProvider));
+    this.server.setHandler(handler);
+  }
+
+  /**
+   * Constructor setting up the web server.
+   *
+   * @param resourceProvider the provider handling the data
+   * @param keyStorePath the path to the keystore holding the private key for the web server (may be null)
+   * @param keyStorePassword the password for the keystore
+   */
+  public TestWebServer(final ResourceProvider resourceProvider, final String keyStorePath,
+      final String keyStorePassword) {
+    this(new ResourceHandler(resourceProvider), keyStorePath, keyStorePassword);
   }
 
   /**
    * Starts the metadata service.
-   * 
-   * @throws Exception
-   *           if the server fails to start
+   *
+   * @throws Exception if the server fails to start
    */
   public void start() throws Exception {
     this.server.start();
@@ -83,9 +92,8 @@ public class TestWebServer {
 
   /**
    * Stops the metadata service.
-   * 
-   * @throws Exception
-   *           if the service fails to stop
+   *
+   * @throws Exception if the service fails to stop
    */
   public void stop() throws Exception {
     if (this.server != null && this.server.isStarted() && !this.server.isStopped()) {
@@ -95,7 +103,7 @@ public class TestWebServer {
 
   /**
    * Returns the URL for the server
-   * 
+   *
    * @return the URL
    */
   public String getUrl() {
@@ -115,15 +123,16 @@ public class TestWebServer {
    */
   public static class ResourceHandler extends AbstractHandler {
 
-    private ResourceProvider resourceProvider;
+    private final ResourceProvider resourceProvider;
 
-    public ResourceHandler(ResourceProvider resourceProvider) {
+    public ResourceHandler(final ResourceProvider resourceProvider) {
       this.resourceProvider = resourceProvider;
     }
 
     @Override
-    public void handle(String target, Request baseRequest, jakarta.servlet.http.HttpServletRequest request,
-        jakarta.servlet.http.HttpServletResponse response) throws IOException, jakarta.servlet.ServletException {
+    public void handle(final String target, final Request baseRequest,
+        final jakarta.servlet.http.HttpServletRequest request,
+        final jakarta.servlet.http.HttpServletResponse response) throws IOException, jakarta.servlet.ServletException {
 
       response.getOutputStream().write(IOUtils.toByteArray(this.resourceProvider.getResource().getInputStream()));
       baseRequest.setHandled(true);
