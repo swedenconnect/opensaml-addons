@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.4</version>
+  <version>1.2.5-SNAPSHOT</version>
 
   <name>Sweden Connect :: OpenSAML 4.X utility extensions</name>
   <description>OpenSAML 4.X utility extension library</description>
@@ -45,7 +45,6 @@
     <java.version>11</java.version>
 
     <opensaml.min.version>4.1.0</opensaml.min.version>
-    <shibboleth.min.version>4.1.0</shibboleth.min.version>
     <junit.version>4.13.2</junit.version>
     <slf4j.version>1.7.36</slf4j.version>
   </properties>
@@ -122,13 +121,13 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-core</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
     
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-security-api</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
       <exclusions>
         <!-- Older versions than other OpenSAML deps ... -->
         <exclusion>
@@ -145,7 +144,7 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-saml-api</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
       <exclusions>
         <!-- Older versions than other OpenSAML deps ... -->
         <exclusion>
@@ -162,7 +161,7 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-saml-impl</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
       <exclusions>
         <!-- Older versions than other OpenSAML deps ... -->
         <exclusion>
@@ -183,31 +182,31 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-security-impl</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
     
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-xmlsec-api</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
         
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-xmlsec-impl</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
     
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-messaging-api</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
     
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-storage-api</artifactId>
-      <version>[${opensaml.min.version},)</version>
+      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
         
     <dependency>
@@ -238,6 +237,12 @@
       <artifactId>credentials-support</artifactId>
       <version>[1.2.1,)</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.cryptacular</groupId>
+          <artifactId>cryptacular</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
      
     <dependency>

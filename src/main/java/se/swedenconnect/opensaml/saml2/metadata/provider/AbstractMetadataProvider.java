@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2022 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
    * @param metadata
    *          metadata object
    */
-  private synchronized void setMetadata(final XMLObject metadata) {
+  protected synchronized void setMetadata(final XMLObject metadata) {
     this.metadata = metadata;
     this.downloadTime = Instant.now();
   }
@@ -327,7 +327,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
    */
   public void setFailFastInitialization(final boolean failFast) {
     ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-    failFastInitialization = failFast;
+    this.failFastInitialization = failFast;
   }
 
   /**
