@@ -44,7 +44,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>11</java.version>
 
-    <opensaml.min.version>4.1.0</opensaml.min.version>
+    <opensaml.min.version>4.2.0</opensaml.min.version>
     <junit.version>4.13.2</junit.version>
     <slf4j.version>1.7.36</slf4j.version>
   </properties>
@@ -86,11 +86,34 @@
       </dependency>
       
       <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>[1.70,)</version>
-        <type>jar</type>
-        <scope>compile</scope>
+        <groupId>org.cryptacular</groupId>
+        <artifactId>cryptacular</artifactId>
+        <version>1.2.5</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.santuario</groupId>
+        <artifactId>xmlsec</artifactId>
+        <version>2.3.2</version>
+        <exclusions>
+          <!-- Version included has reported vulnerabilities -->
+          <exclusion>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
+      <dependency>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>6.4.0</version>
       </dependency>
     
     </dependencies>
@@ -103,104 +126,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-    </dependency>
-      
+          
     <!-- OpenSAML -->
     <dependency>
       <groupId>se.swedenconnect.opensaml</groupId>
       <artifactId>opensaml-security-ext</artifactId>
-      <version>[3.1.0,)</version>
+      <version>[3.1.2,)</version>
       <type>jar</type>
       <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-core</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-security-api</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-      <exclusions>
-        <!-- Older versions than other OpenSAML deps ... -->
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpcore</artifactId>
-        </exclusion>
-      </exclusions>     
-    </dependency>    
-
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-saml-api</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-      <exclusions>
-        <!-- Older versions than other OpenSAML deps ... -->
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>        
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-saml-impl</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-      <exclusions>
-        <!-- Older versions than other OpenSAML deps ... -->
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpcore</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity-engine-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-        
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-security-impl</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-xmlsec-api</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-    </dependency>
-        
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-xmlsec-impl</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-messaging-api</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
     </dependency>
     
     <dependency>
@@ -222,7 +155,7 @@
       <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>    
-    
+        
     <!-- For testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -235,14 +168,8 @@
     <dependency>
       <groupId>se.swedenconnect.security</groupId>
       <artifactId>credentials-support</artifactId>
-      <version>[1.2.1,)</version>
+      <version>[1.2.5,)</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.cryptacular</groupId>
-          <artifactId>cryptacular</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
      
     <dependency>
