@@ -38,4 +38,4 @@ See <https://github.com/swedenconnect/opensaml-security-ext>.
         
 ---
 
-Copyright &copy; 2016-2022, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2016-2023, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
