@@ -39,12 +39,12 @@ import net.shibboleth.utilities.java.support.resolver.ResolverException;
 /**
  * A {@link MetadataProvider} that supports the <a href="https://www.ietf.org/id/draft-young-md-query-17.html">MDQ
  * specification</a>.
- * 
+ *
  * <p>
- * Note that {@link #getMetadata()}, {@link #getServiceProviders()} and {@link #getIdentityProviders()} will only
- * return those entities that have been fetched from the server using {@link #getEntityDescriptor(String)}.
+ * Note that {@link #getMetadata()}, {@link #getServiceProviders()} and {@link #getIdentityProviders()} will only return
+ * those entities that have been fetched from the server using {@link #getEntityDescriptor(String)}.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class MDQMetadataProvider extends AbstractMetadataProvider {
@@ -58,10 +58,10 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   /**
    * Constructor setting up a {@link MetadataProvider} that uses the MDQ protocol to download metadata for requested
    * entities.
-   * 
+   *
    * @param metadataBaseUrl the base metadata URL (must not end with a /)
-   * @param httpClient the {@link HTTPClient} instance to use, if null,
-   *          {@link HTTPMetadataProvider#createDefaultHttpClient()} is used to create a default client
+   * @param httpClient the HTTP client instance to use, if null, {@link HTTPMetadataProvider#createDefaultHttpClient()}
+   *          is used to create a default client
    * @param cacheBaseDir the base directory where caches will be stored, if null, the caches are kept in memory
    * @throws ResolverException for failures setting up the underlying {@link MetadataResolver}
    */
