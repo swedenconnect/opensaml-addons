@@ -55,17 +55,26 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
    * the bean may now change, add or delete, the elements and attributes of the template object using the assignment
    * methods of the builder.
    * 
-   * @param resource
-   *          the template resource
-   * @throws IOException
-   *           if the resource can not be read
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws XMLParserException
-   *           for XML parsing errors
+   * @param resource the template resource
+   * @throws IOException if the resource can not be read
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws XMLParserException for XML parsing errors
    */
-  public EntityDescriptorBuilder(final InputStream resource) throws XMLParserException, UnmarshallingException, IOException {
+  public EntityDescriptorBuilder(final InputStream resource)
+      throws XMLParserException, UnmarshallingException, IOException {
     super(resource);
+
+    // Remove signature
+    this.object().setSignature(null);
+  }
+
+  /**
+   * Maps to {@link #EntityDescriptorBuilder(EntityDescriptor, boolean)} where {@code clone} is {@code true}.
+   * 
+   * @param template the template
+   */
+  public EntityDescriptorBuilder(final EntityDescriptor template) {
+    this(template, true);
 
     // Remove signature
     this.object().setSignature(null);
@@ -75,15 +84,11 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
    * Constructor setting up the builder with a template {@code EntityDescriptor}. Users of the bean may now change, add
    * or delete, the elements and attributes of the template object using the assignment methods of the builder.
    * 
-   * @param template
-   *          the template
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws MarshallingException
-   *           for marshalling errors
+   * @param template the template
+   * @param clone whether the template object should be cloned
    */
-  public EntityDescriptorBuilder(final EntityDescriptor template) throws UnmarshallingException, MarshallingException {
-    super(template);
+  public EntityDescriptorBuilder(final EntityDescriptor template, final boolean clone) {
+    super(template, clone);
 
     // Remove signature
     this.object().setSignature(null);
@@ -92,8 +97,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the entityID for the {@code EntityDescriptor}.
    * 
-   * @param entityID
-   *          the entityID
+   * @param entityID the entityID
    * @return the builder
    */
   public EntityDescriptorBuilder entityID(final String entityID) {
@@ -113,40 +117,42 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied input stream.
    * 
-   * @param resource
-   *          the template resource
+   * @param resource the template resource
    * @return an EntityDescriptorBuilder instance
-   * @throws IOException
-   *           if the resource can not be read
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws XMLParserException
-   *           for XML parsing errors
+   * @throws IOException if the resource can not be read
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws XMLParserException for XML parsing errors
    */
-  public static EntityDescriptorBuilder builder(final InputStream resource) throws XMLParserException, UnmarshallingException, IOException {
+  public static EntityDescriptorBuilder builder(final InputStream resource)
+      throws XMLParserException, UnmarshallingException, IOException {
     return new EntityDescriptorBuilder(resource);
   }
 
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied template.
    * 
-   * @param template
-   *          the template
+   * @param template the template
    * @return an EntityDescriptorBuilder instance
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws MarshallingException
-   *           for marshalling errors
    */
-  public static EntityDescriptorBuilder builder(final EntityDescriptor template) throws UnmarshallingException, MarshallingException {
+  public static EntityDescriptorBuilder builder(final EntityDescriptor template) {
     return new EntityDescriptorBuilder(template);
   }
+  
+  /**
+   * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied template.
+   * 
+   * @param template the template
+   * @param clone whether the template object should be cloned
+   * @return an EntityDescriptorBuilder instance
+   */
+  public static EntityDescriptorBuilder builder(final EntityDescriptor template, final boolean clone) {
+    return new EntityDescriptorBuilder(template, clone);
+  }  
 
   /**
    * Assigns the ID attribute for the {@code EntityDescriptor}.
    * 
-   * @param id
-   *          the ID
+   * @param id the ID
    * @return the builder
    */
   public EntityDescriptorBuilder id(final String id) {
@@ -157,8 +163,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the cacheDuration attribute for the {@code EntityDescriptor}.
    * 
-   * @param cacheDuration
-   *          the cache duration (in milliseconds)
+   * @param cacheDuration the cache duration (in milliseconds)
    * @return the builder
    */
   public EntityDescriptorBuilder cacheDuration(final Long cacheDuration) {
@@ -169,8 +174,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the cacheDuration attribute for the {@code EntityDescriptor}.
    * 
-   * @param cacheDuration
-   *          the cache duration
+   * @param cacheDuration the cache duration
    * @return the builder
    */
   public EntityDescriptorBuilder cacheDuration(final Duration cacheDuration) {
@@ -181,8 +185,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the valid until time.
    * 
-   * @param time
-   *          valid until
+   * @param time valid until
    * @return the builder
    */
   public EntityDescriptorBuilder validUntil(final Instant time) {
@@ -193,20 +196,33 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns metadata extensions.
    * 
-   * @param extensions
-   *          the metadata extensions.
+   * @param extensions the metadata extensions.
    * @return the builder
    */
   public EntityDescriptorBuilder extensions(final Extensions extensions) {
     this.object().setExtensions(extensions);
     return this;
   }
+  
+  /**
+   * Based on the contents of this object, an {@link ExtensionsBuilder} is returned. If the object holds an
+   * {@link Extensions} object, this is fed to the builder (but not cloned).
+   * 
+   * @return an {@link ExtensionsBuilder}
+   */
+  public ExtensionsBuilder getExtensionsBuilder() {
+    if (this.object().getExtensions() != null) {
+      return new ExtensionsBuilder(this.object().getExtensions(), false);
+    }
+    else {
+      return new ExtensionsBuilder();
+    }
+  }  
 
   /**
    * Adds the supplied SSO descriptors.
    * 
-   * @param roleDescriptors
-   *          the SSO descriptors to add
+   * @param roleDescriptors the SSO descriptors to add
    * @return the builder
    */
   public EntityDescriptorBuilder roleDescriptors(final List<RoleDescriptor> roleDescriptors) {
@@ -220,16 +236,15 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
-      }  
-    }    
+      }
+    }
     return this;
   }
 
   /**
    * See {@link #roleDescriptors(List)}.
    * 
-   * @param roleDescriptors
-   *          the SSO descriptors to add
+   * @param roleDescriptors the SSO descriptors to add
    * @return the builder
    */
   public EntityDescriptorBuilder roleDescriptors(final RoleDescriptor... roleDescriptors) {
@@ -239,8 +254,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Adds one SSO descriptor (which is the most common case).
    * 
-   * @param ssoDescriptor
-   *          the descriptor to add
+   * @param ssoDescriptor the descriptor to add
    * @return the builder
    */
   public EntityDescriptorBuilder ssoDescriptor(final SSODescriptor ssoDescriptor) {
@@ -250,8 +264,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the {@code Organization} element to the entity descriptor.
    * 
-   * @param organization
-   *          the organization (will be cloned before assignment)
+   * @param organization the organization (will be cloned before assignment)
    * @return the builder
    */
   public EntityDescriptorBuilder organization(final Organization organization) {
@@ -267,8 +280,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Assigns the {@code ContactPerson} elements to the entity descriptor.
    * 
-   * @param contactPersons
-   *          the contact person elements (will be cloned before assignment)
+   * @param contactPersons the contact person elements (will be cloned before assignment)
    * @return the builder
    */
   public EntityDescriptorBuilder contactPersons(final List<ContactPerson> contactPersons) {
@@ -289,8 +301,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * @see #contactPersons(List)
    * 
-   * @param contactPersons
-   *          the contact person elements (will be cloned before assignment)
+   * @param contactPersons the contact person elements (will be cloned before assignment)
    * @return the builder
    */
   public EntityDescriptorBuilder contactPersons(final ContactPerson... contactPersons) {

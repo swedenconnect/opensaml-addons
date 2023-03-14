@@ -38,6 +38,21 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
   public IDPSSODescriptorBuilder() {
     super();
   }
+  
+  /**
+   * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
+   * elements and attributes of the template object using the assignment methods of the builder.
+   * <p>
+   * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
+   * modifications will have no effect on the passed object.
+   * </p>
+   * 
+   * @param template the template object
+   * @param clone whether the template object should be cloned
+   */
+  public IDPSSODescriptorBuilder(final IDPSSODescriptor template, final boolean clone) {
+    super(template, clone);
+  }  
 
   /**
    * Utility method that creates a {@code IDPSSODescriptorBuilder} instance.
