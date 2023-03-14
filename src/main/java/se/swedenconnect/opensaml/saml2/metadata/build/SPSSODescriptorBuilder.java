@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,21 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
   public SPSSODescriptorBuilder() {
     super();
   }
+  
+  /**
+   * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
+   * elements and attributes of the template object using the assignment methods of the builder.
+   * <p>
+   * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
+   * modifications will have no effect on the passed object.
+   * </p>
+   * 
+   * @param template the template object
+   * @param clone whether the template object should be cloned
+   */
+  public SPSSODescriptorBuilder(final SPSSODescriptor template, final boolean clone) {
+    super(template, clone);
+  }  
 
   /**
    * Utility method that creates a {@code SPSSODescriptorBuilder} instance.

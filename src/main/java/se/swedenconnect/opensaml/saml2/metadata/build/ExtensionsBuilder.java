@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,21 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   }
 
   /**
+   * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
+   * elements and attributes of the template object using the assignment methods of the builder.
+   * <p>
+   * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
+   * modifications will have no effect on the passed object.
+   * </p>
+   * 
+   * @param template the template object
+   * @param clone whether the template object should be cloned
+   */
+  public ExtensionsBuilder(final Extensions template, final boolean clone) {
+    super(template, clone);
+  }
+
+  /**
    * Creates a builder instance.
    * 
    * @return a builder instance
@@ -52,8 +67,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   /**
    * Adds the extensions (overwrites any previous extensions).
    * 
-   * @param extensions
-   *          the extension objects
+   * @param extensions the extension objects
    * @return the builder
    */
   public ExtensionsBuilder extensions(final List<XMLObject> extensions) {
@@ -75,8 +89,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   /**
    * See {@link #extensions(List)}.
    * 
-   * @param extensions
-   *          the extension objects
+   * @param extensions the extension objects
    * @return the builder
    */
   public ExtensionsBuilder extensions(final XMLObject... extensions) {
@@ -86,8 +99,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   /**
    * Adds one, or more, extensions to this {@code Extensions} object.
    * 
-   * @param extension
-   *          the extension(s) to add
+   * @param extension the extension(s) to add
    * @return the builder
    */
   public ExtensionsBuilder extension(final XMLObject... extension) {
