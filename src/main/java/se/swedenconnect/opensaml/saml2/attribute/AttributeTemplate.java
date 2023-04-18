@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.attribute;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.opensaml.saml.saml2.core.Attribute;
@@ -28,7 +29,9 @@ import org.opensaml.saml.saml2.core.Attribute;
  * 
  * @author Martin Lindström (martin@idsec.se)
  */
-public class AttributeTemplate {
+public class AttributeTemplate implements Serializable {
+
+  private static final long serialVersionUID = 1903081114009014914L;
 
   /** The attribute name. */
   private String name;
