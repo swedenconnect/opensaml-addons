@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.6-SNAPSHOT</version>
+  <version>1.2.6</version>
 
   <name>Sweden Connect :: OpenSAML 4.X utility extensions</name>
   <description>OpenSAML 4.X utility extension library</description>
@@ -323,7 +323,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.8</version>
+            <version>1.6.13</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
