@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,12 @@ public class PostRequestHttpObject<T extends RequestAbstractType> implements Req
   @Override
   public String getSendUrl() {
     return this.sendUrl;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getDestinationUrl() {
+    return this.getSendUrl();
   }
 
   /** {@inheritDoc} */
