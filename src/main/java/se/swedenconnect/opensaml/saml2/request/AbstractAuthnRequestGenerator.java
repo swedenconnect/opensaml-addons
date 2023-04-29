@@ -118,7 +118,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     // If the hok-requirement states that HoK must be used, we ensure that the SP
     // has an AssertionConsumerService endpoint dedicated for this.
     //
-    if (HokRequirement.REQUIRED.equals(context.getHokRequirement())) {
+    if (HokRequirement.REQUIRED.equals(generatorContext.getHokRequirement())) {
       if (HolderOfKeyMetadataSupport.getHokAssertionConsumerServices(spDescriptor).isEmpty()) {
         throw new RequestGenerationException(
           "Context Holder-of-key requirement states that HoK must be used, but SP does not "
