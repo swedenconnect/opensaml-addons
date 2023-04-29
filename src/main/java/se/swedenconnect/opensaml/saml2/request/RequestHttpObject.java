@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.util.Map;
 import org.opensaml.saml.saml2.core.RequestAbstractType;
 
 /**
- * Defines an interface that represents an object that holds data necessary for the SP application to transmit
- * a request message to an IdP.
+ * Defines an interface that represents an object that holds data necessary for the SP application to transmit a request
+ * message to an IdP.
  *
  * @author Martin Lindström (martin@idsec.se)
  */
@@ -30,7 +30,8 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
   /**
    * Returns the complete URL that the SP application should use when the user agent is sent to the Identity Provider.
    * <p>
-   * For a redirect, this URL could look something like: {@code https://www.theidp.com/auth?SAMLRequest=<encoded request>&RelayState=abcd}.
+   * For a redirect, this URL could look something like:
+   * {@code https://www.theidp.com/auth?SAMLRequest=<encoded request>&RelayState=abcd}.
    *
    * </p>
    * <b>Note:</b> Additional query parameters may be added to the URL by the using system.
@@ -38,6 +39,14 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
    * @return the URL to use when sending the user to the Identity Provider
    */
   String getSendUrl();
+
+  /**
+   * Returns the URL to where we are sending the request. If the method is "POST", this will be the same value as for
+   * {@link #getSendUrl()}, and if the method is "GET", the value is just the destination and not the query parameters.
+   * 
+   * @return the destination URL
+   */
+  String getDestinationUrl();
 
   /**
    * Returns the HTTP method that should be used to send the request, via the user agent, to the Identity Provider.
@@ -51,13 +60,13 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
    * If the {@link #getMethod()} returns "POST" the request should be posted to the Identity Provider. The request
    * parameters are represented using a Map where the entries represent parameter names and values.
    * <p>
-   * Note: for the "GET" method this method returns {@code null}.
+   * Note: for the "GET" method this method returns the query parameters that are part of {@link #getSendUrl()}.
    * </p>
    * <p>
    * The parameter values are not URL-encoded.
    * </p>
    *
-   * @return a Map holding the POST body
+   * @return a Map holding the request parameters (POST body or query parameters)
    */
   Map<String, String> getRequestParameters();
 
