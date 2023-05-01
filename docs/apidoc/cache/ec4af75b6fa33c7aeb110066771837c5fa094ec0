@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://idp.svelegtest.se/idp">
+    <Extensions>
+      <mdattr:EntityAttributes xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute">
+        <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Name="urn:oasis:names:tc:SAML:attribute:assurance-certification" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa2</saml:AttributeValue>
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa3</saml:AttributeValue>
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa4</saml:AttributeValue>
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa2-sigmessage</saml:AttributeValue>
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa3-sigmessage</saml:AttributeValue>
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/loa/1.0/loa4-sigmessage</saml:AttributeValue>
+        </saml:Attribute>
+        <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">http://id.elegnamnden.se/ec/1.0/loa3-pnr</saml:AttributeValue>
+        </saml:Attribute>
+      </mdattr:EntityAttributes>
+    </Extensions>
+    <IDPSSODescriptor protocolSupportEnumeration="urn:mace:shibboleth:1.0 urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+      <Extensions>
+        <shibmd:Scope xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" regexp="false">3xasecurity.com</shibmd:Scope>
+        <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+          <mdui:DisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">The e-Identification Board Test Identity Provider</mdui:DisplayName>
+          <mdui:DisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">E-legitimationsnämndens Legitimeringstjänst för test</mdui:DisplayName>
+          <mdui:Description xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Reference Identity Provider for Sveleg test federation</mdui:Description>
+          <mdui:Description xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">Referens-Legitimeringstjänst för Sveleg testfederation</mdui:Description>
+          <mdui:Logo height="100" width="114">https://eid.svelegtest.se/logos/elegnamnden_114x100.png</mdui:Logo>
+          <mdui:Logo height="90" width="160">https://eid.svelegtest.se/logos/elegnamnden_logo_160x90.png</mdui:Logo>
+          <mdui:Logo height="16" width="16">https://eid.svelegtest.se/logos/elegnamnden_notext_16x16.png</mdui:Logo>
+          <mdui:Logo height="67" width="68">https://eid.svelegtest.se/logos/elegnamnden_notext_68x67.png</mdui:Logo>
+        </mdui:UIInfo>
+      </Extensions>
+      <KeyDescriptor>
+        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:X509Data>
+            <ds:X509Certificate>MIIDLzCCAhegAwIBAgIUOXC93JQjfJ97xkxHXS3KnxBO2GMwDQYJKoZIhvcNAQEF
+              BQAwHDEaMBgGA1UEAxMRaWRwLnN2ZWxlZ3Rlc3Quc2UwHhcNMTQwNTIxMTgxMjU1
+              WhcNMzQwNTIxMTgxMjU1WjAcMRowGAYDVQQDExFpZHAuc3ZlbGVndGVzdC5zZTCC
+              ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ33ZFIhbuHYokaoVj4dsS1/
+              PO+IaHC6xuYeTXN5pZT7FXHfuZKiFcEtH3VY6RfOXKqEnSvdZqo6RNFiw/TekraW
+              TWsS1K6MWhX46e8hQP1qkF4AswAASY+l8l11V/Vr7G0krH+OUziFlfRptm5732FT
+              TiVVjdKNdrkmERquiCTKjorJ2uY84064n/A6lmJzCvqYFPYQ4Is9t8/SU6zeFahJ
+              oZq4Jpke2tpbISQCt2Eh8WItj8ldWYUGxO5eDx1frguOCtAcBBTmO88iLN0snCkZ
+              4BwbferYY1uTrxHRH38umPuaLIt3EZJ5HZbrVu0nPDeEchDw5LJHyJQGtZfA1scC
+              AwEAAaNpMGcwRgYDVR0RBD8wPYIRaWRwLnN2ZWxlZ3Rlc3Quc2WGKGh0dHBzOi8v
+              aWRwLnN2ZWxlZ3Rlc3Quc2UvaWRwL3NoaWJib2xldGgwHQYDVR0OBBYEFM9N60Je
+              AXdMKWWgvK7ag7HpsJAUMA0GCSqGSIb3DQEBBQUAA4IBAQBmRYU4NkZeDpfncFF8
+              AwzXkXZgOr503RLpZBluWfemug7eoMsY7QdNKOnPRsMP2whuPmw5IDX60EbcJyzc
+              6SYOS55LGfaR5nCG1xRRidlHWlTwkNZSKaPlhGNicjabm2RmGeJPhhf/KLXLe1nc
+              paujSie60vkyjXQ2ZoI1YIb7aS/oQMzqqZkNneLHTLaheRRfkvS498LSYfc+RI+c
+              NJhZlXITyYBiOXPrkdwdK34cvGAlrgYhWw3FreQj+cf6Mk7C5ZIOqCkP4ErKP7Cj
+              izXeix4RL9kDg3gdRyfobwYCFFl5wn6m2ySNi3v4ANY3uNexJGzvNfGp1Tl3ZO02
+              h/g7
+            </ds:X509Certificate>
+          </ds:X509Data>
+        </ds:KeyInfo>
+      </KeyDescriptor>
+      <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+      <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+      <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.svelegtest.se/idp/profile/SAML2/Redirect/SSO"/>
+      <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.svelegtest.se/idp/profile/SAML2/POST/SSO"/>
+    </IDPSSODescriptor>
+    <Organization>
+      <OrganizationName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Swedish E-Identification Board</OrganizationName>
+      <OrganizationName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">E-legitimationsnämnden</OrganizationName>
+      <OrganizationDisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Swedish E-Identification
+        Board
+      </OrganizationDisplayName>
+      <OrganizationDisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">E-legitimationsnämnden</OrganizationDisplayName>
+      <OrganizationURL xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">http://www.elegnamnden.se</OrganizationURL>
+    </Organization>
+    <ContactPerson contactType="support">
+      <Company>E-legitimationsnämnden</Company>
+      <EmailAddress>stefan@aaa-sec.com</EmailAddress>
+    </ContactPerson>
+    <ContactPerson contactType="technical">
+      <Company>E-legitimationsnämnden</Company>
+      <EmailAddress>stefan@aaa-sec.com</EmailAddress>
+    </ContactPerson>
+  </EntityDescriptor>

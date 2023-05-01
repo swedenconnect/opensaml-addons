@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMLTooling xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:shibmd="urn:mace:shibboleth:metadata:1.0"
+  xmlns="http://www.opensaml.org/xmltooling-config" 
+  xsi:schemaLocation="http://www.opensaml.org/xmltooling-config ../../src/schema/xmltooling-config.xsd">
+
+  <ObjectProviders>
+
+    <!-- Scope provider -->
+    <ObjectProvider qualifiedName="shibmd:Scope">
+      <BuilderClass className="se.swedenconnect.opensaml.saml2.metadata.scope.impl.ScopeBuilder" />
+      <MarshallingClass className="se.swedenconnect.opensaml.saml2.metadata.scope.impl.ScopeMarshaller" />
+      <UnmarshallingClass className="se.swedenconnect.opensaml.saml2.metadata.scope.impl.ScopeUnmarshaller" />
+    </ObjectProvider>
+
+  </ObjectProviders>
+</XMLTooling>

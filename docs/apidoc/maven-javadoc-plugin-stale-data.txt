@@ -1,0 +1,210 @@
+/Library/Java/JavaVirtualMachines/jdk-11.0.17.jdk/Contents/Home/bin/javadoc
+@options
+@packages
+-classpath
+'/Users/martin/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/Users/martin/.m2/repository/se/swedenconnect/opensaml/opensaml-security-ext/3.1.2/opensaml-security-ext-3.1.2.jar:/Users/martin/.m2/repository/org/apache/santuario/xmlsec/2.3.3/xmlsec-2.3.3.jar:/Users/martin/.m2/repository/commons-codec/commons-codec/1.15/commons-codec-1.15.jar:/Users/martin/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar:/Users/martin/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar:/Users/martin/.m2/repository/com/fasterxml/woodstox/woodstox-core/6.5.1/woodstox-core-6.5.1.jar:/Users/martin/.m2/repository/org/codehaus/woodstox/stax2-api/4.2.1/stax2-api-4.2.1.jar:/Users/martin/.m2/repository/org/bouncycastle/bcprov-jdk18on/1.72/bcprov-jdk18on-1.72.jar:/Users/martin/.m2/repository/org/bouncycastle/bcutil-jdk18on/1.72/bcutil-jdk18on-1.72.jar:/Users/martin/.m2/repository/org/bouncycastle/bcpkix-jdk18on/1.72/bcpkix-jdk18on-1.72.jar:/Users/martin/.m2/repository/org/cryptacular/cryptacular/1.2.5/cryptacular-1.2.5.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-core/4.3.0/opensaml-core-4.3.0.jar:/Users/martin/.m2/repository/io/dropwizard/metrics/metrics-core/4.2.15/metrics-core-4.2.15.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-saml-api/4.3.0/opensaml-saml-api-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-messaging-api/4.3.0/opensaml-messaging-api-4.3.0.jar:/Users/martin/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-profile-api/4.3.0/opensaml-profile-api-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-soap-api/4.3.0/opensaml-soap-api-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-saml-impl/4.3.0/opensaml-saml-impl-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-soap-impl/4.3.0/opensaml-soap-impl-4.3.0.jar:/Users/martin/.m2/repository/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-security-api/4.3.0/opensaml-security-api-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-security-impl/4.3.0/opensaml-security-impl-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-xmlsec-api/4.3.0/opensaml-xmlsec-api-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-xmlsec-impl/4.3.0/opensaml-xmlsec-impl-4.3.0.jar:/Users/martin/.m2/repository/org/opensaml/opensaml-storage-api/4.3.0/opensaml-storage-api-4.3.0.jar:/Users/martin/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/Users/martin/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar:/Users/martin/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/Users/martin/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/Users/martin/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar:/Users/martin/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar:/Users/martin/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/Users/martin/.m2/repository/net/shibboleth/utilities/java-support/8.4.0/java-support-8.4.0.jar:/Users/martin/.m2/repository/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar:/Users/martin/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/src/main/java:/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2023 <a href="https://www.swedenconnect.se">Sweden Connect</a>. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'OpenSAML 4.x utility extensions - 1.2.7'
+-link
+'https://shibboleth.net/sites/release/java-opensaml/4.3.0/apidocs'
+-link
+'https://shibboleth.net/sites/release/java-support/8.4.0/apidocs'
+-link
+'https://docs.swedenconnect.se/opensaml-security-ext/javadoc/latest'
+-linkoffline
+'https://docs.oracle.com/en/java/javase/11/docs/api' '/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'OpenSAML 4.x utility extensions - 1.2.7'
+se.swedenconnect.opensaml.config
+se.swedenconnect.opensaml.config
+se.swedenconnect.opensaml.xmlsec
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.core.build
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response.replay
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.response.validation
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.attribute
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.assertion.validation
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.request
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.provider
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.metadata.scope.impl
+se.swedenconnect.opensaml.saml2.metadata.scope
+se.swedenconnect.opensaml.saml2.metadata.scope
+se.swedenconnect.opensaml.saml2.metadata.scope
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata.build
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.saml2.metadata
+se.swedenconnect.opensaml.common.utils
+se.swedenconnect.opensaml.common.utils
+se.swedenconnect.opensaml.common.utils
+se.swedenconnect.opensaml.common.builder
+se.swedenconnect.opensaml.common.builder
+se.swedenconnect.opensaml.common.builder
+se.swedenconnect.opensaml.common.builder
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+se.swedenconnect.opensaml.common.validation
+/Users/martin/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar = 1675087637262
+/Users/martin/.m2/repository/se/swedenconnect/opensaml/opensaml-security-ext/3.1.2/opensaml-security-ext-3.1.2.jar = 1675087683619
+/Users/martin/.m2/repository/org/apache/santuario/xmlsec/2.3.3/xmlsec-2.3.3.jar = 1682804633283
+/Users/martin/.m2/repository/commons-codec/commons-codec/1.15/commons-codec-1.15.jar = 1675087639444
+/Users/martin/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar = 1675087642662
+/Users/martin/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar = 1675087642689
+/Users/martin/.m2/repository/com/fasterxml/woodstox/woodstox-core/6.5.1/woodstox-core-6.5.1.jar = 1682804659923
+/Users/martin/.m2/repository/org/codehaus/woodstox/stax2-api/4.2.1/stax2-api-4.2.1.jar = 1675087642617
+/Users/martin/.m2/repository/org/bouncycastle/bcprov-jdk18on/1.72/bcprov-jdk18on-1.72.jar = 1675087647585
+/Users/martin/.m2/repository/org/bouncycastle/bcutil-jdk18on/1.72/bcutil-jdk18on-1.72.jar = 1675087644608
+/Users/martin/.m2/repository/org/bouncycastle/bcpkix-jdk18on/1.72/bcpkix-jdk18on-1.72.jar = 1675087643465
+/Users/martin/.m2/repository/org/cryptacular/cryptacular/1.2.5/cryptacular-1.2.5.jar = 1675087644285
+/Users/martin/.m2/repository/org/opensaml/opensaml-core/4.3.0/opensaml-core-4.3.0.jar = 1675087684558
+/Users/martin/.m2/repository/io/dropwizard/metrics/metrics-core/4.2.15/metrics-core-4.2.15.jar = 1675087683709
+/Users/martin/.m2/repository/org/opensaml/opensaml-saml-api/4.3.0/opensaml-saml-api-4.3.0.jar = 1675087684964
+/Users/martin/.m2/repository/org/opensaml/opensaml-messaging-api/4.3.0/opensaml-messaging-api-4.3.0.jar = 1675087684678
+/Users/martin/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar = 1675093906627
+/Users/martin/.m2/repository/org/opensaml/opensaml-profile-api/4.3.0/opensaml-profile-api-4.3.0.jar = 1675087684576
+/Users/martin/.m2/repository/org/opensaml/opensaml-soap-api/4.3.0/opensaml-soap-api-4.3.0.jar = 1675087684993
+/Users/martin/.m2/repository/org/opensaml/opensaml-saml-impl/4.3.0/opensaml-saml-impl-4.3.0.jar = 1675087685554
+/Users/martin/.m2/repository/org/opensaml/opensaml-soap-impl/4.3.0/opensaml-soap-impl-4.3.0.jar = 1675087685312
+/Users/martin/.m2/repository/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar = 1675093907429
+/Users/martin/.m2/repository/org/opensaml/opensaml-security-api/4.3.0/opensaml-security-api-4.3.0.jar = 1675087685354
+/Users/martin/.m2/repository/org/opensaml/opensaml-security-impl/4.3.0/opensaml-security-impl-4.3.0.jar = 1675087685377
+/Users/martin/.m2/repository/org/opensaml/opensaml-xmlsec-api/4.3.0/opensaml-xmlsec-api-4.3.0.jar = 1675087685441
+/Users/martin/.m2/repository/org/opensaml/opensaml-xmlsec-impl/4.3.0/opensaml-xmlsec-impl-4.3.0.jar = 1675087685740
+/Users/martin/.m2/repository/org/opensaml/opensaml-storage-api/4.3.0/opensaml-storage-api-4.3.0.jar = 1675087685775
+/Users/martin/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar = 1675087644534
+/Users/martin/.m2/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar = 1675087684045
+/Users/martin/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar = 1675087683595
+/Users/martin/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar = 1675087683597
+/Users/martin/.m2/repository/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar = 1675087683648
+/Users/martin/.m2/repository/com/google/errorprone/error_prone_annotations/2.11.0/error_prone_annotations-2.11.0.jar = 1675087683633
+/Users/martin/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar = 1675087683653
+/Users/martin/.m2/repository/net/shibboleth/utilities/java-support/8.4.0/java-support-8.4.0.jar = 1675087684895
+/Users/martin/.m2/repository/org/apache/commons/commons-lang3/3.12.0/commons-lang3-3.12.0.jar = 1675087639089
+/Users/martin/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar = 1675328330869
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/src/main/java = 1675328305244
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/generated-sources/annotations = 1682948390047
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/constant-values.html = 1682948397840
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/member-search-index.zip = 1682948397963
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/overview-tree.html = 1682948397934
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/index.html = 1682948397975
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/package-search-index.js = 1682948397959
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/jquery-ui.overrides.css = 1682948397980
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/package-search-index.zip = 1682948397960
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/type-search-index.zip = 1682948397961
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/serialized-form.html = 1682948397844
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/index-all.html = 1682948397966
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/allpackages-index.html = 1682948397971
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/deprecated-list.html = 1682948397972
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/member-search-index.js = 1682948397962
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/allclasses.html = 1682948397973
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/script.js = 1682948397978
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/stylesheet.css = 1682948397978
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/overview-summary.html = 1682948397976
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/help-doc.html = 1682948397977
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/element-list = 1682948397813
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/allclasses-index.html = 1682948397970
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/type-search-index.js = 1682948397961
+/Users/martin/dev/swedenconnect/opensaml/opensaml-addons/target/apidocs/search.js = 1682948397978
