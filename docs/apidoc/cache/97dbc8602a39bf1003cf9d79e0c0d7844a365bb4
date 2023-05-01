@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://sickelstatest.transportstyrelsen.se/extweb/" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+    <SPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+      <Extensions>
+        <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+          <mdui:DisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">Transportstyrelsen</mdui:DisplayName>
+          <mdui:DisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Swedish Transport Agency</mdui:DisplayName>
+          <mdui:Logo height="16" width="16" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">https://transportstyrelsen.se/favicon.ico</mdui:Logo>
+          <mdui:Description xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">Transportstyrelsen arbetar för att uppnå god tillgänglighet, hög kvalitet, säkra och
+            miljöanpassade transporter inom järnväg, luftfart, sjöfart och väg.</mdui:Description>
+          <mdui:Description xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">The Swedish Transport Agency is working to achieve good accessibility, high quality,
+            secure and environmentally aware rail, air, sea and road transport.</mdui:Description>
+        </mdui:UIInfo>
+      </Extensions>
+      <KeyDescriptor use="encryption">
+        <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+          <X509Data>
+            <X509Certificate>MIIC+jCCAeKgAwIBAgIQYQaMr1VBB5hLvzO5yYCxbjANBgkqhkiG9w0BAQsFADA5MTcwNQYDVQQDEy5BREZTIEVuY3J5cHRpb24gLSBzdHMtcHQudHJhbnNwb3J0c3R5cmVsc2VuLnNlMB4XDTE0MDgyMDA5MDIzOFoXDTE1MDgyMDA5MDIzOFowOTE3MDUGA1UEAxMuQURGUyBFbmNyeXB0aW9uIC0gc3RzLXB0LnRyYW5zcG9ydHN0eXJlbHNlbi5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJVbjxQAdIzmTgOojp5difAUJV1SCo5XoytmzG1eZBAybBItnq3loUUBkL3Xw2nbPxuCdzZ17gB4fQG+lEDGPc9HfRAsnB5rR/f6Iz+fKicdUSDWpEY/JHiJ5Ikmg8L1gHwM2zLxPxEQRvZR6+g+y7Z4T6tAekku+3ZUkawJcf2PNg0gs8g5Chc98M7CeKYdJgTKsrppj/cGiGNZEVoFDUARKng3TwNbG7/704zwA1M4zTsoRIcgZQ3rTmPbSBjg1zvnv5JDgdKvIfQ8OASkHvwVQlbqechlyS4dECBABx/m1kdIdVTUVH8KPnBdscjDcIVCym3mwhRW/fxOcfjpUO8CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAC1W9xSPmVN3MrP9a0fWbGLmolwpIs8xK34SrD7RkyJKQWKxIle0i+uRXTrae5YShgruFsuVdfDK8HKf2DF/+2vsfEan9Hkp+0wXUsZ3jPAyYhIeoQ/xeX3vBMTW/U8tN/8KBVUiWkUDW8Z7eb0qyLFb/ujmVEHaAHD1BA3OlQ3eIplAGKqGddchsN2peVQTP7tZlTqGUxbs1qaFyOeN+bc8tmip/q3FIgbxY0Qo2QYHR5lG/AYtJS5SYs2D1GM28gmRpIUUmQMxy6qRhnSe8doeB4nkFiBcnIF/qgxdFZkn3v5LCWz5j8i8vyT0k9Xy523g9z/6aeSrXGoTIL3g6bw==
+            </X509Certificate>
+          </X509Data>
+        </KeyInfo>
+      </KeyDescriptor>
+      <KeyDescriptor use="signing">
+        <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+          <X509Data>
+            <X509Certificate>MIIC9DCCAdygAwIBAgIQUTVjgmO3u7JPQstj5lfCYDANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEytBREZTIFNpZ25pbmcgLSBzdHMtcHQudHJhbnNwb3J0c3R5cmVsc2VuLnNlMB4XDTE0MDgyMDA5MDIzN1oXDTE1MDgyMDA5MDIzN1owNjE0MDIGA1UEAxMrQURGUyBTaWduaW5nIC0gc3RzLXB0LnRyYW5zcG9ydHN0eXJlbHNlbi5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALY0XbSUAfYLnlSRlx8wyEqOHnd0rg4rMcT3ukObsABEKCVWzF5SxbXOlZNBxYsU7esCkHHRCVL9/FhsFPyiST+mF+QTwqNdbR3EDngp6kk+Omla7EDtI8jIFDopfEDVqnfaiv49u5quPFNP1MDytFExiWnEelaQUq2myaTv91l8bqXm0pYGz4U8u4tCm09y0FAsyAUYpys90m9NUvRYGQjhqM0SD6obHXSF9J1pXTzu27xxgLqG/fBXV1DteH5FAr3ZbQ4dOYWLVxoCzH68nwlovxblqGHMvzqC8Kz4l3K9gOcNWSezXkfYO2ypECf73aLG7ToKY7MZ/vdXHRlIfp0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAg5o3B6LJVWovJXZKjivaYphN/NhxQGNxvaC0zPCh+IfJhVasD3KAqmIcrtCrNWlCnqYfpWKvOSqIqTmKTliZY3wnUBbeeYbc+Ihi3io3g33/eyIFcFBZsfrVqCY2rh1HQqOr2PAUKRkVD2rn3xkEZJWTV57oFNa4puXjv+rW7yp4px2O/WGNuTDsKAnlZ7bS0GK3c3CFj46HG4UO+HtiI46UHjVil2rjpS52XrX6t3RtlFTctROWg+CVRBvrKEBS1tzlYmTvsRuPEZXlh3dlZw3FDb1ztoeH8F1iTg2teLl7LIInw/p//LXmSECVjcwhM3R0JYA+YnetH56JtfGdDQ==
+            </X509Certificate>
+          </X509Data>
+        </KeyInfo>
+      </KeyDescriptor>
+      <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://sts-pt.transportstyrelsen.se/adfs/ls/"/>
+      <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://sts-pt.transportstyrelsen.se/adfs/ls/"/>
+      <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+      <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+      <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://sts-pt.transportstyrelsen.se/adfs/ls/" index="0" isDefault="true"/>
+      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://sts-pt.transportstyrelsen.se/adfs/ls/" index="1"/>
+      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://sts-pt.transportstyrelsen.se/adfs/ls/" index="2"/>
+    </SPSSODescriptor>
+    <md:Organization>
+      <md:OrganizationName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">Transportstyrelsen</md:OrganizationName>
+      <md:OrganizationDisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">Transportstyrelsen</md:OrganizationDisplayName>
+      <md:OrganizationURL xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="sv">http://www.transportstyrelsen.se</md:OrganizationURL>
+    </md:Organization>
+    <md:ContactPerson contactType="support">
+      <md:GivenName>Anders</md:GivenName>
+      <md:SurName>Sjöholm</md:SurName>
+      <md:EmailAddress>anders.sjoholm@transportstyrelsen.se</md:EmailAddress>
+    </md:ContactPerson>
+    <md:ContactPerson contactType="technical">
+      <md:GivenName>Ulf</md:GivenName>
+      <md:SurName>Söderqvist</md:SurName>
+      <md:EmailAddress>ulf.soderqvist@trafikverket.se</md:EmailAddress>
+    </md:ContactPerson>
+  </md:EntityDescriptor>

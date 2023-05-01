@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javadocOptions>
+  <docletArtifacts>
+    <docletArtifact />
+  </docletArtifacts>
+  <tagletArtifacts>
+    <tagletArtifact />
+  </tagletArtifacts>
+  <links>
+    <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/4.3.0/apidocs/</link>
+    <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/8.4.0/apidocs/</link>
+    <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/latest/</link>
+  </links>
+  <javadocResourcesDirectory>src/main/javadoc</javadocResourcesDirectory>
+</javadocOptions>
