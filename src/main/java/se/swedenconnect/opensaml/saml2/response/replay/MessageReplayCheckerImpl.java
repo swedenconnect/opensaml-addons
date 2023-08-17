@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.storage.ReplayCache;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Message replay checker implementation using OpenSAML's {@link ReplayCache} as an underlying cache.
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class MessageReplayCheckerImpl implements MessageReplayChecker {
@@ -46,7 +47,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
 
   /**
    * Constructor.
-   * 
+   *
    * @param replayCache
    *          the OpenSAML {@link ReplayCache} object to use
    * @param replayCacheName
@@ -80,6 +81,9 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
     else if (object instanceof Assertion) {
       id = ((Assertion) object).getID();
     }
+    else if (object instanceof RequestAbstractType) {
+      id = ((RequestAbstractType) object).getID();
+    }
     if (id == null) {
       throw new IllegalArgumentException("Unsupported object type");
     }
@@ -88,7 +92,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
 
   /**
    * Assigns the replay cache to use when checking against replay attacks.
-   * 
+   *
    * @param replayCache
    *          the cache
    */
@@ -98,7 +102,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
 
   /**
    * Assigns the name of the replay cache.
-   * 
+   *
    * @param replayCacheName
    *          the name
    */
@@ -108,7 +112,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
 
   /**
    * Assigns the number of milliseconds each stored ID should be kept in the cache. The default is 5 minutes.
-   * 
+   *
    * @param replayCacheExpiration
    *          number of millis
    */
@@ -118,5 +122,5 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
     }
     this.replayCacheExpiration = replayCacheExpiration;
   }
-  
+
 }
