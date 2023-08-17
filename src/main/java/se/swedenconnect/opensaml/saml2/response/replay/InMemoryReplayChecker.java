@@ -20,47 +20,50 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An in-memory based message replay checker implementation. This is mainly for testing and simple mock implementations.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class InMemoryReplayChecker implements MessageReplayChecker {
-  
+
   /** If the size exceeds MAX_SIZE we clean up the cache map. */
   private static final int MAX_SIZE = 1000;
-  
+
   /** Logging instance. */
   private final Logger log = LoggerFactory.getLogger(InMemoryReplayChecker.class);
-  
+
   /** Number of milliseconds to keep elements in the replay cache - default is 5 minutes. */
   private long replayCacheExpiration = 300 * 1000L;
-  
+
   /** The cache. */
-  private Map<String, Long> cache = new ConcurrentHashMap<>();
+  private final Map<String, Long> cache = new ConcurrentHashMap<>();
 
   /** {@inheritDoc} */
   @Override
   public synchronized void checkReplay(final String id) throws MessageReplayException {
-    Long e = this.cache.get(id);
+    final Long e = this.cache.get(id);
     if (e == null) {
-      this.cache.put(id, replayCacheExpiration + System.currentTimeMillis());
+      this.cache.put(id, this.replayCacheExpiration + System.currentTimeMillis());
     }
     else {
       if (System.currentTimeMillis() < e) {
-        this.cache.remove(id);
-        String msg = String.format("Replay check of ID '%s' failed", id);
-        log.warn(msg);
+        final String msg = String.format("Replay check of ID '%s' failed", id);
+        this.log.warn(msg);
         throw new MessageReplayException(msg);
       }
+      else {
+        this.cache.remove(id);
+      }
     }
-    log.debug("Message replay check of ID '{}' succeeded", id);
+    this.log.debug("Message replay check of ID '{}' succeeded", id);
     if (this.cache.size() > MAX_SIZE) {
-      long now = System.currentTimeMillis();
+      final long now = System.currentTimeMillis();
       this.cache.entrySet().removeIf(entry -> now > entry.getValue());
     }
   }
@@ -75,17 +78,19 @@ public class InMemoryReplayChecker implements MessageReplayChecker {
     else if (object instanceof Assertion) {
       id = ((Assertion) object).getID();
     }
+    else if (object instanceof RequestAbstractType) {
+      id = ((RequestAbstractType) object).getID();
+    }
     if (id == null) {
       throw new IllegalArgumentException("Unsupported object type");
     }
     this.checkReplay(id);
   }
-    
+
   /**
    * Assigns the number of milliseconds each stored ID should be kept in the cache. The default is 5 minutes.
-   * 
-   * @param replayCacheExpiration
-   *          number of millis
+   *
+   * @param replayCacheExpiration number of millis
    */
   public void setReplayCacheExpiration(final long replayCacheExpiration) {
     if (replayCacheExpiration < 0) {
@@ -93,5 +98,5 @@ public class InMemoryReplayChecker implements MessageReplayChecker {
     }
     this.replayCacheExpiration = replayCacheExpiration;
   }
-  
+
 }
