@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package se.swedenconnect.opensaml.saml2.request;
 
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.security.x509.X509Credential;
 
 /**
@@ -28,19 +29,26 @@ public interface AuthnRequestGenerator {
   /**
    * Generates a SAML authentication request message.
    * 
-   * @param idpEntityID
-   *          the entityID of the IdP that we should send the request to
-   * @param relayState
-   *          the RelayState to include (may be null)
-   * @param context
-   *          the generator context (may be null)
+   * @param idpEntityID the entityID of the IdP that we should send the request to
+   * @param relayState the RelayState to include (may be null)
+   * @param context the generator context (may be null)
    * @return a request object
-   * @throws RequestGenerationException
-   *           for errors during request generation
+   * @throws RequestGenerationException for errors during request generation
    */
-  RequestHttpObject<AuthnRequest> generateAuthnRequest(final String idpEntityID, final String relayState, 
-      final AuthnRequestGeneratorContext context)
-      throws RequestGenerationException;
+  RequestHttpObject<AuthnRequest> generateAuthnRequest(final String idpEntityID, final String relayState,
+      final AuthnRequestGeneratorContext context) throws RequestGenerationException;
+  
+  /**
+   * Generates a SAML authentication request message.
+   * 
+   * @param idp the metadata for the IdP that we should send the request to
+   * @param relayState the RelayState to include (may be null)
+   * @param context the generator context (may be null)
+   * @return a request object
+   * @throws RequestGenerationException for errors during request generation
+   */
+  RequestHttpObject<AuthnRequest> generateAuthnRequest(final EntityDescriptor idp, final String relayState,
+      final AuthnRequestGeneratorContext context) throws RequestGenerationException;  
 
   /**
    * Gets the entityID for the service provider that this generator services.

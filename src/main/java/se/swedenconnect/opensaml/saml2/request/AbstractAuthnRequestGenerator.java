@@ -97,8 +97,19 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
   @Override
   public RequestHttpObject<AuthnRequest> generateAuthnRequest(final String idpEntityID,
       final String relayState, final AuthnRequestGeneratorContext context) throws RequestGenerationException {
+    return this.generateAuthnRequest(this.getIdpMetadata(idpEntityID), relayState, context);
+  }
+  
+  /** {@inheritDoc} */
+  @Override
+  public RequestHttpObject<AuthnRequest> generateAuthnRequest(final EntityDescriptor idp,
+      final String relayState, final AuthnRequestGeneratorContext context) throws RequestGenerationException {
 
-    log.debug("Request to generate an AuthnRequest for {} ...", idpEntityID);
+    if (idp == null) {
+      throw new RequestGenerationException("No metadata is available for IdP");
+    }
+    
+    log.debug("Request to generate an AuthnRequest for {} ...", idp.getEntityID());
 
     final AuthnRequestGeneratorContext generatorContext = context != null
         ? context
@@ -106,13 +117,6 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
         };
 
     final SPSSODescriptor spDescriptor = this.getSpMetadata().getSPSSODescriptor(SAMLConstants.SAML20P_NS);
-
-    // First get hold of the IdP metadata ...
-    //
-    final EntityDescriptor idpMetadata = this.getIdpMetadata(idpEntityID);
-    if (idpMetadata == null) {
-      throw new RequestGenerationException("No metadata could be found for IdP " + idpEntityID);
-    }
 
     // Make some checks about the holder of key requirement ...
     // If the hok-requirement states that HoK must be used, we ensure that the SP
@@ -128,7 +132,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
 
     // Find out where to send the request and with which binding ...
     //
-    final SingleSignOnService ssoService = this.getSingleSignOnService(idpMetadata, generatorContext);
+    final SingleSignOnService ssoService = this.getSingleSignOnService(idp, generatorContext);
 
     // Is this a HoK endpoint?
     boolean hokActive = HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI.equals(ssoService.getBinding());
@@ -170,7 +174,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     // Get the intersection concerning NameID:s between the SP and IdP metadata
     // and invoke the builder for getting a NameIDPolicy.
     //
-    final List<NameIDFormat> idpFormats = idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getNameIDFormats();
+    final List<NameIDFormat> idpFormats = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getNameIDFormats();
     final List<NameIDFormat> formats = spDescriptor.getNameIDFormats().stream()
       .filter(f -> idpFormats.stream().filter(idpf -> idpf.getURI().equals(f.getURI())).findFirst().isPresent())
       .collect(Collectors.toList());
@@ -180,13 +184,13 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     // We need to get hold of the assurance certifications of the IdP.
     //
     builder.requestedAuthnContext(generatorContext.getRequestedAuthnContextBuilderFunction()
-      .apply(this.getAssuranceCertificationUris(idpMetadata, generatorContext), hokActive));
+      .apply(this.getAssuranceCertificationUris(idp, generatorContext), hokActive));
 
     // Add Scoping element (if implemented)
-    this.addScoping(builder, generatorContext, idpMetadata);
+    this.addScoping(builder, generatorContext, idp);
 
     // Add Extensions element (if implemented)
-    this.addExtensions(builder, generatorContext, idpMetadata);
+    this.addExtensions(builder, generatorContext, idp);
 
     // OK, we are almost done. Build the AuthnRequest and let's invoke the customizer to give the
     // caller the possibility to add extensions and such ...
@@ -199,7 +203,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     }
 
     return this.buildRequestHttpObject(
-      authnRequest, relayState, generatorContext, this.getBinding(ssoService), ssoService.getLocation(), idpMetadata);
+      authnRequest, relayState, generatorContext, this.getBinding(ssoService), ssoService.getLocation(), idp);
   }
 
   /**
@@ -287,7 +291,9 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
    *          the entityID for the IdP
    * @return the metadata or null if no metadata could be found
    */
-  protected abstract EntityDescriptor getIdpMetadata(final String idpEntityID);
+  protected EntityDescriptor getIdpMetadata(final String idpEntityID) {
+    return null;
+  }
 
   /**
    * Builds a request HTTP object (including signing).
