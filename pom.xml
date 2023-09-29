@@ -45,6 +45,7 @@
     <java.version>17</java.version>
 
     <opensaml.version>5.0.0</opensaml.version>
+    <shib.support.version>9.0.0</shib.support.version>
     <slf4j.version>2.0.7</slf4j.version>
     <jackson.version>2.15.2</jackson.version>
   </properties>
@@ -226,7 +227,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -242,32 +243,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>test-output</directory>
-            </fileset>
-          </filesets>
-        </configuration>
+        <version>3.3.1</version>
       </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.9</version>      
-      </plugin>
-      
+            
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.4.1</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -286,16 +274,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.6.0</version>
         <configuration>           
-          <doctitle>OpenSAML 4.x utility extensions - ${project.version}</doctitle>
-          <windowtitle>OpenSAML 4.x utility extensions - ${project.version}</windowtitle>             
+          <doctitle>OpenSAML 5.x utility extensions - ${project.version}</doctitle>
+          <windowtitle>OpenSAML 5.x utility extensions - ${project.version}</windowtitle>             
           <links>
-            <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/4.3.0/apidocs/</link>
-            <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/8.4.0/apidocs/</link>
+            <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/${opensaml.version}/apidocs/</link>
+            <link>https://build.shibboleth.net/nexus/content/sites/site/java-shib-shared/${shib.support.version}/apidocs/</link>
             <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/latest/</link>
           </links>
           <detectJavaApiLink>true</detectJavaApiLink>
+          <doclint>all,-missing</doclint>
         </configuration>
       </plugin>      
 
@@ -363,7 +352,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
