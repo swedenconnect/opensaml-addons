@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,34 @@
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
 
+import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.saml2.response.ResponseProcessingException;
 
 /**
  * Exception class for response validation errors.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ResponseValidationException extends ResponseProcessingException {
 
   /** For serializing. */
-  private static final long serialVersionUID = -5922797771498993278L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor taking an error message.
-   * 
-   * @param message
-   *          the error message
-   */  
+   *
+   * @param message the error message
+   */
   public ResponseValidationException(final String message) {
     super(message);
   }
 
   /**
    * Constructor taking an error message and the cause of the error.
-   * 
-   * @param message
-   *          the error message
-   * @param cause
-   *          the cause of the error
-   */  
+   *
+   * @param message the error message
+   * @param cause the cause of the error
+   */
   public ResponseValidationException(final String message, final Throwable cause) {
     super(message, cause);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 
 /**
  * A number of predicates that may be installed as filters for a metadata provider.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class MetadataProviderPredicates {
 
   /**
    * Returns a predicate that evaluates to {@code true} if the supplied entity descriptor represents an IdP.
-   * 
+   *
    * @return predicate for filtering IdPs
    */
   public static Predicate<EntityDescriptor> includeOnlyIDPs() {
@@ -40,9 +40,8 @@ public class MetadataProviderPredicates {
   /**
    * Returns a predicate that evaluates to {@code true} if the supplied entity descriptor represents an IdP or if the
    * entity descriptor is "my" entry (typically the SP).
-   * 
-   * @param entityID
-   *          the entityID for the entity descriptor to include even if it's not an IdP
+   *
+   * @param entityID the entityID for the entity descriptor to include even if it's not an IdP
    * @return predicate for filtering IdPs and "my" entity
    */
   public static Predicate<EntityDescriptor> includeOnlyIDPsAndMe(final String entityID) {
@@ -51,7 +50,7 @@ public class MetadataProviderPredicates {
 
   /**
    * Returns a predicate that evaluates to {@code true} if the supplied entity descriptor represents an SP.
-   * 
+   *
    * @return predicate for filtering SPs
    */
   public static Predicate<EntityDescriptor> includeOnlySPs() {
@@ -60,9 +59,8 @@ public class MetadataProviderPredicates {
 
   /**
    * Tells whether the supplied entity descriptor is an IdP.
-   * 
-   * @param ed
-   *          the entity descriptor to test
+   *
+   * @param ed the entity descriptor to test
    * @return {@code true} if the entity descriptor represents an IdP and {@code false} otherwise
    */
   public static boolean isIDP(final EntityDescriptor ed) {
@@ -71,11 +69,10 @@ public class MetadataProviderPredicates {
 
   /**
    * Tells whether the supplied entity descriptor is an SP.
-   * 
-   * @param ed
-   *          the entity descriptor to test
+   *
+   * @param ed the entity descriptor to test
    * @return {@code true} if the entity descriptor represents an SP and {@code false} otherwise
-   */  
+   */
   public static boolean isSP(final EntityDescriptor ed) {
     return !ed.getRoleDescriptors(SPSSODescriptor.DEFAULT_ELEMENT_NAME).isEmpty();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code ContactPerson} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerson> {
@@ -47,13 +47,10 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Creates a builder from an object template.
-   * 
-   * @param template
-   *          the object template
-   * @throws MarshallingException
-   *           for marshalling errors
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
+   *
+   * @param template the object template
+   * @throws MarshallingException for marshalling errors
+   * @throws UnmarshallingException for unmarshalling errors
    */
   public ContactPersonBuilder(final ContactPerson template) throws MarshallingException, UnmarshallingException {
     super(template);
@@ -61,7 +58,7 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Creates a builder instance.
-   * 
+   *
    * @return a builder instance
    */
   public static ContactPersonBuilder builder() {
@@ -70,24 +67,21 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Creates a builder instance.
-   * 
-   * @param template
-   *          the object template
+   *
+   * @param template the object template
    * @return a builder instance
-   * @throws MarshallingException
-   *           for marshalling errors
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
+   * @throws MarshallingException for marshalling errors
+   * @throws UnmarshallingException for unmarshalling errors
    */
-  public static ContactPersonBuilder builder(final ContactPerson template) throws MarshallingException, UnmarshallingException {
+  public static ContactPersonBuilder builder(final ContactPerson template)
+      throws MarshallingException, UnmarshallingException {
     return new ContactPersonBuilder(template);
   }
 
   /**
    * Assigns the type of contact person.
-   * 
-   * @param type
-   *          the type
+   *
+   * @param type the type
    * @return the builder
    */
   public ContactPersonBuilder type(final ContactPersonTypeEnumeration type) {
@@ -97,9 +91,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Assigns the {@code Company} element.
-   * 
-   * @param company
-   *          the company
+   *
+   * @param company the company
    * @return the builder
    */
   public ContactPersonBuilder company(final String company) {
@@ -113,9 +106,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Assigns the {@code GivenName} element.
-   * 
-   * @param givenName
-   *          the name
+   *
+   * @param givenName the name
    * @return the builder
    */
   public ContactPersonBuilder givenName(final String givenName) {
@@ -129,9 +121,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Assigns the {@code SurName} element.
-   * 
-   * @param surname
-   *          the name
+   *
+   * @param surname the name
    * @return the builder
    */
   public ContactPersonBuilder surname(final String surname) {
@@ -145,9 +136,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Assigns the {@code EmailAddress} elements.
-   * 
-   * @param emailAddresses
-   *          the email addresses
+   *
+   * @param emailAddresses the email addresses
    * @return the builder
    */
   public ContactPersonBuilder emailAddresses(final List<String> emailAddresses) {
@@ -163,9 +153,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * @see #emailAddresses(List)
-   * 
-   * @param emailAddresses
-   *          the email addresses
+   *
+   * @param emailAddresses the email addresses
    * @return the builder
    */
   public ContactPersonBuilder emailAddresses(final String... emailAddresses) {
@@ -174,15 +163,15 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * Assigns the {@code TelephoneNumber} elements.
-   * 
-   * @param telephoneNumbers
-   *          the numbers to assign
+   *
+   * @param telephoneNumbers the numbers to assign
    * @return the builder
    */
   public ContactPersonBuilder telephoneNumbers(final List<String> telephoneNumbers) {
     if (telephoneNumbers != null) {
       for (final String t : telephoneNumbers) {
-        final TelephoneNumber tn = (TelephoneNumber) XMLObjectSupport.buildXMLObject(TelephoneNumber.DEFAULT_ELEMENT_NAME);
+        final TelephoneNumber tn =
+            (TelephoneNumber) XMLObjectSupport.buildXMLObject(TelephoneNumber.DEFAULT_ELEMENT_NAME);
         tn.setValue(t);
         this.object().getTelephoneNumbers().add(tn);
       }
@@ -192,9 +181,8 @@ public class ContactPersonBuilder extends AbstractSAMLObjectBuilder<ContactPerso
 
   /**
    * @see #telephoneNumbers(List)
-   * 
-   * @param telephoneNumbers
-   *          the numbers to assign
+   *
+   * @param telephoneNumbers the numbers to assign
    * @return the builder
    */
   public ContactPersonBuilder telephoneNumbers(final String... telephoneNumbers) {

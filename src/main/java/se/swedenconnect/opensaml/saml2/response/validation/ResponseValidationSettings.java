@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import java.util.Optional;
 public class ResponseValidationSettings {
 
   /** The default allowed clock skew (in milliseconds) - 30 seconds. */
-  public static final Duration DEFAULT_ALLOWED_CLOCK_SKEW = Duration.ofSeconds(30); 
+  public static final Duration DEFAULT_ALLOWED_CLOCK_SKEW = Duration.ofSeconds(30);
 
   /** The default age for a response message that we allow (in milliseconds) - 3 minutes. */
-  public static final Duration DEFAULT_MAX_AGE_RESPONSE = Duration.ofMinutes(3); 
+  public static final Duration DEFAULT_MAX_AGE_RESPONSE = Duration.ofMinutes(3);
 
   /** Default max session age (in milliseconds) - 1 hour. */
-  public static final Duration DEFAULT_MAX_SESSION_AGE = Duration.ofHours(1); 
+  public static final Duration DEFAULT_MAX_SESSION_AGE = Duration.ofHours(1);
 
   /** The allowed clock skew (in milliseconds). */
   private Duration allowedClockSkew;
@@ -66,9 +66,8 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@link #DEFAULT_ALLOWED_CLOCK_SKEW}.
    * </p>
-   * 
-   * @param allowedClockSkew
-   *          the allowed clock skew
+   *
+   * @param allowedClockSkew the allowed clock skew
    */
   public void setAllowedClockSkew(final Duration allowedClockSkew) {
     this.allowedClockSkew = allowedClockSkew;
@@ -79,7 +78,7 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@link #DEFAULT_MAX_AGE_RESPONSE}.
    * </p>
-   * 
+   *
    * @return the maximum allowed "age" of a response message
    */
   public Duration getMaxAgeResponse() {
@@ -91,9 +90,8 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@link #DEFAULT_MAX_AGE_RESPONSE}.
    * </p>
-   * 
-   * @param maxAgeResponse
-   *          the maximum allowed "age" of a response message
+   *
+   * @param maxAgeResponse the maximum allowed "age" of a response message
    */
   public void setMaxAgeResponse(final Duration maxAgeResponse) {
     this.maxAgeResponse = maxAgeResponse;
@@ -104,7 +102,7 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@link #DEFAULT_MAX_SESSION_AGE}.
    * </p>
-   * 
+   *
    * @return the maximum session age allowed for SSO
    */
   public Duration getMaxSessionAge() {
@@ -116,9 +114,8 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@link #DEFAULT_MAX_SESSION_AGE}.
    * </p>
-   * 
-   * @param maxSessionAge
-   *          the maximum session age allowed for SSO
+   *
+   * @param maxSessionAge the maximum session age allowed for SSO
    */
   public void setMaxSessionAge(final Duration maxSessionAge) {
     this.maxSessionAge = maxSessionAge;
@@ -129,7 +126,7 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@code false}.
    * </p>
-   * 
+   *
    * @return whether strict validation should be performed
    */
   public boolean isStrictValidation() {
@@ -141,9 +138,8 @@ public class ResponseValidationSettings {
    * <p>
    * The default is {@code false}.
    * </p>
-   * 
-   * @param strictValidation
-   *          whether strict validation should be performed
+   *
+   * @param strictValidation whether strict validation should be performed
    */
   public void setStrictValidation(final boolean strictValidation) {
     this.strictValidation = strictValidation;
@@ -154,7 +150,7 @@ public class ResponseValidationSettings {
    * <p>
    * Should correspond the {@code WantAssertionsSigned} of the SP metadata.
    * </p>
-   * 
+   *
    * @return do we require signed assertions?
    */
   public boolean isRequireSignedAssertions() {
@@ -166,9 +162,8 @@ public class ResponseValidationSettings {
    * <p>
    * Should correspond the {@code WantAssertionsSigned} of the SP metadata.
    * </p>
-   * 
-   * @param requireSignedAssertions
-   *          whether we require signed assertions?
+   *
+   * @param requireSignedAssertions whether we require signed assertions?
    */
   public void setRequireSignedAssertions(final boolean requireSignedAssertions) {
     this.requireSignedAssertions = requireSignedAssertions;
@@ -177,8 +172,10 @@ public class ResponseValidationSettings {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return String.format("allowedClockSkew=%s, maxAgeResponse=%s, maxSessionAge=%s, strictValidation=%s, requireSignedAssertions=%s",
-      this.allowedClockSkew, this.maxAgeResponse, this.maxSessionAge, this.strictValidation, this.requireSignedAssertions);
+    return String.format(
+        "allowedClockSkew=%s, maxAgeResponse=%s, maxSessionAge=%s, strictValidation=%s, requireSignedAssertions=%s",
+        this.allowedClockSkew, this.maxAgeResponse, this.maxSessionAge, this.strictValidation,
+        this.requireSignedAssertions);
   }
 
 }

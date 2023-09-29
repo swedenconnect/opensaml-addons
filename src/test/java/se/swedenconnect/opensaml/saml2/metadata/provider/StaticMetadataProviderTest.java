@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * <p>
  * See {@link BaseMetadataProviderTest} for test cases.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class StaticMetadataProviderTest extends BaseMetadataProviderTest {
@@ -35,7 +35,7 @@ public class StaticMetadataProviderTest extends BaseMetadataProviderTest {
   @Override
   protected AbstractMetadataProvider createMetadataProvider(final Resource resource) throws Exception {
     final XMLObject object = XMLObjectSupport.unmarshallFromInputStream(
-      XMLObjectProviderRegistrySupport.getParserPool(), resource.getInputStream());
+        XMLObjectProviderRegistrySupport.getParserPool(), resource.getInputStream());
     Element dom = object.getDOM();
     if (dom == null) {
       dom = XMLObjectSupport.marshall(object);

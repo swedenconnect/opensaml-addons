@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,23 @@
  */
 package se.swedenconnect.opensaml.saml2.response.replay;
 
+import se.swedenconnect.opensaml.common.LibraryVersion;
+
 /**
  * Exception class that indicates a message replay attack.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class MessageReplayException extends Exception {
 
   /** For serializing. */
-  private static final long serialVersionUID = -2681141524740588382L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor taking an error message.
-   * 
-   * @param message
-   *          the error message
-   */  
+   *
+   * @param message the error message
+   */
   public MessageReplayException(final String message) {
     super(message);
   }

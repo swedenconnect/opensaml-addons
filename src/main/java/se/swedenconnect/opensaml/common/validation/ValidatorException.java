@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,31 @@ package se.swedenconnect.opensaml.common.validation;
 
 import org.opensaml.saml.common.assertion.ValidationContext;
 
+import se.swedenconnect.opensaml.common.LibraryVersion;
+
 /**
  * Generic exception class for validator errors.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ValidatorException extends Exception {
 
   /** For serializing. */
-  private static final long serialVersionUID = 1916858576951552731L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor that initializes based on the supplied {@link ValidationContext}.
-   * 
-   * @param context
-   *          validation context
+   *
+   * @param context validation context
    */
   public ValidatorException(final ValidationContext context) {
-    super(context.getValidationFailureMessage());
+    super(String.join(" - ", context.getValidationFailureMessages()));
   }
 
   /**
    * Constructor accepting an error message.
-   * 
-   * @param message
-   *          the error message
+   *
+   * @param message the error message
    */
   public ValidatorException(final String message) {
     super(message);
@@ -49,11 +49,9 @@ public class ValidatorException extends Exception {
 
   /**
    * Constructor accepting an error message and the cause of the error.
-   * 
-   * @param message
-   *          the error message
-   * @param cause
-   *          the cause of the error
+   *
+   * @param message the error message
+   * @param cause the cause of the error
    */
   public ValidatorException(final String message, final Throwable cause) {
     super(message, cause);

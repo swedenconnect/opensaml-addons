@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,13 +34,13 @@ import org.opensaml.saml.saml2.core.Subject;
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ResponseProcessingResultImpl implements ResponseProcessingResult {
-  
+
   /** The response ID. */
   private final String responseId;
-  
+
   /** The InResponseTo attribute of the response. */
   private final String inResponseTo;
-  
+
   /** The issue instant. */
   private final Instant issueInstant;
 
@@ -49,16 +49,17 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
 
   /**
    * Constructor.
-   * 
-   * @param response
-   *          the Response
-   * @param assertion
-   *          the Assertion
+   *
+   * @param response the Response
+   * @param assertion the Assertion
    */
   public ResponseProcessingResultImpl(final Response response, final Assertion assertion) {
-    this.responseId = Optional.ofNullable(response).map(Response::getID).orElseThrow(() -> new NullPointerException("response is required"));
-    this.inResponseTo = Optional.ofNullable(response).map(Response::getInResponseTo).orElseThrow(() -> new NullPointerException("response is required"));
-    this.issueInstant = Optional.ofNullable(response).map(Response::getIssueInstant).orElseThrow(() -> new NullPointerException("response is required"));
+    this.responseId = Optional.ofNullable(response).map(Response::getID)
+        .orElseThrow(() -> new NullPointerException("response is required"));
+    this.inResponseTo = Optional.ofNullable(response).map(Response::getInResponseTo)
+        .orElseThrow(() -> new NullPointerException("response is required"));
+    this.issueInstant = Optional.ofNullable(response).map(Response::getIssueInstant)
+        .orElseThrow(() -> new NullPointerException("response is required"));
     this.assertion = Objects.requireNonNull(assertion, "assertion is required");
   }
 
@@ -90,7 +91,7 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   @Override
   public List<Attribute> getAttributes() {
     try {
-      return Collections.unmodifiableList(this.assertion.getAttributeStatements().get(0).getAttributes());      
+      return Collections.unmodifiableList(this.assertion.getAttributeStatements().get(0).getAttributes());
     }
     catch (NullPointerException | IndexOutOfBoundsException e) {
       return Collections.emptyList();

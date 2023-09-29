@@ -41,10 +41,10 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.collection.Pair;
-import net.shibboleth.utilities.java.support.net.URLBuilder;
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.collection.Pair;
+import net.shibboleth.shared.net.URLBuilder;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
 
 /**
@@ -52,7 +52,7 @@ import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
  * <p>
  * If signature credentials are supplied when creating the object the request will be signed.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
  * @param <T> the type of the request
@@ -80,7 +80,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
 
   /**
    * Constructor that puts together the resulting object.
-   * 
+   *
    * @param request the request object
    * @param relayState the relay state
    * @param signatureCredentials optional signature credentials
@@ -98,7 +98,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
 
   /**
    * Constructor that puts together the resulting object.
-   * 
+   *
    * @param request the request object
    * @param relayState the relay state
    * @param signatureCredentials optional signature credentials
@@ -121,7 +121,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
     //
     final MessageContext messageContext = new MessageContext();
     messageContext.setMessage(request);
-    messageContext.getSubcontext(SAMLBindingContext.class, true).setRelayState(relayState);
+    messageContext.ensureSubcontext(SAMLBindingContext.class).setRelayState(relayState);
 
     if (signatureCredentials != null) {
 
@@ -150,7 +150,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
 
       try {
         final SignatureSigningParameters parameters = signatureParametersResolver.resolveSingle(criteriaSet);
-        messageContext.getSubcontext(SecurityParametersContext.class, true).setSignatureSigningParameters(parameters);
+        messageContext.ensureSubcontext(SecurityParametersContext.class).setSignatureSigningParameters(parameters);
       }
       catch (ResolverException e) {
         throw new SignatureException(e);
@@ -201,7 +201,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
       }
       catch (final MalformedURLException e) {
         throw new RuntimeException("Invalid endpoint", e);
-      }      
+      }
     }
     return this.requestParameters;
   }

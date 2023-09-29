@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
@@ -69,20 +69,20 @@ public class AuthnRequestBuilderTest extends OpenSAMLTestBase {
         .build())
       .build();
 
-    Assert.assertEquals(id, request.getID());
-    Assert.assertEquals(assertionConsumerServiceURL, request.getAssertionConsumerServiceURL());
-    Assert.assertEquals(destination, request.getDestination());
-    Assert.assertEquals(issuer, request.getIssuer().getValue());
-    Assert.assertEquals(NameID.ENTITY, request.getIssuer().getFormat());
-    Assert.assertEquals(Boolean.TRUE, request.isForceAuthn());
-    Assert.assertEquals(Boolean.FALSE, request.isPassive());
-    Assert.assertEquals(now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), request.getIssueInstant().toEpochMilli());
-    Assert.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, request.getProtocolBinding());
-    Assert.assertEquals(NameID.PERSISTENT, request.getNameIDPolicy().getFormat());
-    Assert.assertEquals(requesterID, request.getScoping().getRequesterIDs().get(0).getURI());
-    Assert.assertEquals(Boolean.TRUE, request.getNameIDPolicy().getAllowCreate());
-    Assert.assertEquals(AuthnContextComparisonTypeEnumeration.EXACT, request.getRequestedAuthnContext().getComparison());
-    Assert.assertEquals(Arrays.asList(authnContext),
+    Assertions.assertEquals(id, request.getID());
+    Assertions.assertEquals(assertionConsumerServiceURL, request.getAssertionConsumerServiceURL());
+    Assertions.assertEquals(destination, request.getDestination());
+    Assertions.assertEquals(issuer, request.getIssuer().getValue());
+    Assertions.assertEquals(NameID.ENTITY, request.getIssuer().getFormat());
+    Assertions.assertEquals(Boolean.TRUE, request.isForceAuthn());
+    Assertions.assertEquals(Boolean.FALSE, request.isPassive());
+    Assertions.assertEquals(now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), request.getIssueInstant().toEpochMilli());
+    Assertions.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, request.getProtocolBinding());
+    Assertions.assertEquals(NameID.PERSISTENT, request.getNameIDPolicy().getFormat());
+    Assertions.assertEquals(requesterID, request.getScoping().getRequesterIDs().get(0).getURI());
+    Assertions.assertEquals(Boolean.TRUE, request.getNameIDPolicy().getAllowCreate());
+    Assertions.assertEquals(AuthnContextComparisonTypeEnumeration.EXACT, request.getRequestedAuthnContext().getComparison());
+    Assertions.assertEquals(Arrays.asList(authnContext),
       request.getRequestedAuthnContext().getAuthnContextClassRefs().stream()
         .map(AuthnContextClassRef::getURI)
         .collect(Collectors.toList()));

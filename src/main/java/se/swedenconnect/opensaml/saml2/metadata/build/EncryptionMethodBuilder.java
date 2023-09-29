@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code md:EncryptionMethod} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<EncryptionMethod> {
 
   /**
    * Creates a new {@code EncryptionMethodBuilder} instance.
-   * 
+   *
    * @return a EncryptionMethodBuilder instance
    */
   public static EncryptionMethodBuilder builder() {
@@ -41,9 +41,8 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
   /**
    * Utility method that creates a {@code EncryptionMethod} element having only its {@code Algorithm} attribute
    * assigned.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return a EncryptionMethod instance
    */
   public static EncryptionMethod encryptionMethod(final String algorithm) {
@@ -52,18 +51,16 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
 
   /**
    * Utility method that creates a {@code EncryptionMethod} element.
-   * 
-   * @param algorithm
-   *          the algorithm
-   * @param keySize
-   *          key size (in bits)
+   *
+   * @param algorithm the algorithm
+   * @param keySize key size (in bits)
    * @return a EncryptionMethod instance
    */
   public static EncryptionMethod encryptionMethod(final String algorithm, final Integer keySize) {
     return builder()
-      .algorithm(algorithm)
-      .keySize(keySize)
-      .build();
+        .algorithm(algorithm)
+        .keySize(keySize)
+        .build();
   }
 
   /** {@inheritDoc} */
@@ -74,9 +71,8 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
 
   /**
    * Assigns the algorithm.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return the builder
    */
   public EncryptionMethodBuilder algorithm(final String algorithm) {
@@ -86,9 +82,8 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
 
   /**
    * Assigns the size in bits for the key.
-   * 
-   * @param keySize
-   *          key size
+   *
+   * @param keySize key size
    * @return the builder
    */
   public EncryptionMethodBuilder keySize(final Integer keySize) {
@@ -99,9 +94,8 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
 
   /**
    * Assigns the OAEP parameters.
-   * 
-   * @param base64Encoding
-   *          the parameters in base64
+   *
+   * @param base64Encoding the parameters in base64
    * @return the builder
    */
   public EncryptionMethodBuilder oAEPparams(final String base64Encoding) {

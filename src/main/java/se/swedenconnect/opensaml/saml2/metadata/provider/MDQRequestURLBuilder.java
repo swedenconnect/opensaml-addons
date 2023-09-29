@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ import org.opensaml.core.criterion.EntityIdCriterion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.logic.Constraint;
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import net.shibboleth.shared.logic.Constraint;
+import net.shibboleth.shared.resolver.CriteriaSet;
 
 /**
  * Function which examines an entity ID from supplied criteria and returns a metadata request URL for MDQ.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class MDQRequestURLBuilder implements Function<CriteriaSet, String> {
@@ -44,13 +44,13 @@ public class MDQRequestURLBuilder implements Function<CriteriaSet, String> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param baseUrl the metadata base URL
    */
   public MDQRequestURLBuilder(final String baseUrl) {
     this.baseUrl = Objects.requireNonNull(baseUrl, "baseUrl must not be null");
     if (this.baseUrl.endsWith("/")) {
-      this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length() - 1); 
+      this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length() - 1);
     }
   }
 
@@ -65,7 +65,7 @@ public class MDQRequestURLBuilder implements Function<CriteriaSet, String> {
     }
     final String entityID = criteria.get(EntityIdCriterion.class).getEntityId();
     Constraint.isNotNull(entityID, "Entity ID was null");
-    
+
     final String url = String.format("%s/entities/%s", this.baseUrl, URLEncoder.encode(entityID, StandardCharsets.UTF_8));
     log.debug("Returning request URL: {}", url);
     return url;

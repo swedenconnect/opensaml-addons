@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.shared.component.ComponentInitializationException;
 
 /**
  * A {@code MetadataProvider} that is given an object representing SAML metadata (EntityDescriptor or
  * EntitiesDescriptor).
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class StaticMetadataProvider extends AbstractMetadataProvider {
@@ -45,7 +45,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * Constructor that takes a DOM element representing the metadata.
-   * 
+   *
    * @param element
    *          DOM element
    */
@@ -55,7 +55,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * Constructor that takes an {link EntityDescriptor} object.
-   * 
+   *
    * @param entityDescriptor
    *          the metadata EntityDescriptor
    * @throws MarshallingException
@@ -70,7 +70,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * Constructor that takes an {@link EntitiesDescriptor} object.
-   * 
+   *
    * @param entitiesDescriptor
    *          the metadata EntitiesDescriptor
    * @throws MarshallingException
@@ -97,7 +97,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * Assigns the ID for the provider.
-   * 
+   *
    * @param id
    *          the ID
    */

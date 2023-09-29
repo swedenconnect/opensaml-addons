@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,14 @@ import se.swedenconnect.opensaml.common.utils.LocalizedString;
 
 /**
  * A builder for creating {@link UIInfo} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Creates a builder instance.
-   * 
+   *
    * @return a builder instance
    */
   public static UIInfoBuilder builder() {
@@ -58,9 +58,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the display names.
-   * 
-   * @param displayNames
-   *          the names
+   *
+   * @param displayNames the names
    * @return the builder
    */
   public UIInfoBuilder displayNames(final List<LocalizedString> displayNames) {
@@ -77,9 +76,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #displayNames(List)
-   * 
-   * @param displayNames
-   *          the names
+   *
+   * @param displayNames the names
    * @return the builder
    */
   public UIInfoBuilder displayNames(final LocalizedString... displayNames) {
@@ -88,9 +86,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the keywords.
-   * 
-   * @param keywords
-   *          the keywords where the map keys are language tags
+   *
+   * @param keywords the keywords where the map keys are language tags
    * @return the builder
    */
   public UIInfoBuilder keywords(final Map<String, List<String>> keywords) {
@@ -109,9 +106,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns a set of keywords that do not have the language tag.
-   * 
-   * @param keywords
-   *          the keywords
+   *
+   * @param keywords the keywords
    * @return the builder
    */
   public UIInfoBuilder keywords(final List<String> keywords) {
@@ -127,9 +123,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #keywords(List)
-   * 
-   * @param keywords
-   *          the keywords
+   *
+   * @param keywords the keywords
    * @return the builder
    */
   public UIInfoBuilder keywords(final String... keywords) {
@@ -138,9 +133,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the descriptions.
-   * 
-   * @param descriptions
-   *          the descriptions
+   *
+   * @param descriptions the descriptions
    * @return the builder
    */
   public UIInfoBuilder descriptions(final List<LocalizedString> descriptions) {
@@ -157,9 +151,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #descriptions(List)
-   * 
-   * @param descriptions
-   *          the descriptions
+   *
+   * @param descriptions the descriptions
    * @return the builder
    */
   public UIInfoBuilder descriptions(final LocalizedString... descriptions) {
@@ -168,9 +161,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the logotypes.
-   * 
-   * @param logos
-   *          the logos (will be cloned before assignment)
+   *
+   * @param logos the logos (will be cloned before assignment)
    * @return the builder
    */
   public UIInfoBuilder logos(final List<Logo> logos) {
@@ -189,9 +181,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #logos(List)
-   * 
-   * @param logos
-   *          the logos (will be cloned before assignment)
+   *
+   * @param logos the logos (will be cloned before assignment)
    * @return the builder
    */
   public UIInfoBuilder logos(final Logo... logos) {
@@ -200,15 +191,15 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the information URL:s.
-   * 
-   * @param informationURLs
-   *          the information URL:s
+   *
+   * @param informationURLs the information URL:s
    * @return the builder
    */
   public UIInfoBuilder informationURLs(final List<LocalizedString> informationURLs) {
     if (informationURLs != null) {
       for (final LocalizedString u : informationURLs) {
-        final InformationURL url = (InformationURL) XMLObjectSupport.buildXMLObject(InformationURL.DEFAULT_ELEMENT_NAME);
+        final InformationURL url =
+            (InformationURL) XMLObjectSupport.buildXMLObject(InformationURL.DEFAULT_ELEMENT_NAME);
         url.setURI(u.getLocalString());
         url.setXMLLang(u.getLanguage());
         this.object().getInformationURLs().add(url);
@@ -219,9 +210,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #informationURLs(List)
-   * 
-   * @param informationURLs
-   *          the information URL:s
+   *
+   * @param informationURLs the information URL:s
    * @return the builder
    */
   public UIInfoBuilder informationURLs(final LocalizedString... informationURLs) {
@@ -230,9 +220,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * Assigns the privacy statement URL:s.
-   * 
-   * @param privacyStatementURLs
-   *          the URL:s
+   *
+   * @param privacyStatementURLs the URL:s
    * @return the builder
    */
   public UIInfoBuilder privacyStatementURLs(final List<LocalizedString> privacyStatementURLs) {
@@ -250,9 +239,8 @@ public class UIInfoBuilder extends AbstractSAMLObjectBuilder<UIInfo> {
 
   /**
    * @see #privacyStatementURLs(List)
-   * 
-   * @param privacyStatementURLs
-   *          the URL:s
+   *
+   * @param privacyStatementURLs the URL:s
    * @return the builder
    */
   public UIInfoBuilder privacyStatementURLs(final LocalizedString... privacyStatementURLs) {

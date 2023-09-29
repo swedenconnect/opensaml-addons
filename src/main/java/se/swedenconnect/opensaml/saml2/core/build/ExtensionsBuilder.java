@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Builder for {@link Extensions} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
@@ -42,7 +42,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Creates a builder instance.
-   * 
+   *
    * @return a builder instance
    */
   public static ExtensionsBuilder builder() {
@@ -51,9 +51,8 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Adds the extensions (overwrites any previous extensions).
-   * 
-   * @param extensions
-   *          the extension objects
+   *
+   * @param extensions the extension objects
    * @return the builder
    */
   public ExtensionsBuilder extensions(final List<XMLObject> extensions) {
@@ -74,9 +73,8 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * See {@link #extensions(List)}.
-   * 
-   * @param extensions
-   *          the extension objects
+   *
+   * @param extensions the extension objects
    * @return the builder
    */
   public ExtensionsBuilder extensions(final XMLObject... extensions) {
@@ -85,9 +83,8 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Adds one, or more, extensions to this {@code Extensions} object.
-   * 
-   * @param extension
-   *          the extension(s) to add
+   *
+   * @param extension the extension(s) to add
    * @return the builder
    */
   public ExtensionsBuilder extension(final XMLObject... extension) {

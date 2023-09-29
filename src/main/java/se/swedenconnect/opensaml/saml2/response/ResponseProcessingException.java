@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
+import se.swedenconnect.opensaml.common.LibraryVersion;
+
 /**
  * Exception class for the SAML response processor.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ResponseProcessingException extends Exception {
 
   /** For serializing. */
-  private static final long serialVersionUID = 6421954607769255094L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor taking an error message.
-   * 
-   * @param message
-   *          the error message
+   *
+   * @param message the error message
    */
   public ResponseProcessingException(final String message) {
     super(message);
@@ -37,14 +38,12 @@ public class ResponseProcessingException extends Exception {
 
   /**
    * Constructor taking an error message and the cause of the error.
-   * 
-   * @param message
-   *          the error message
-   * @param cause
-   *          the cause of the error
+   *
+   * @param message the error message
+   * @param cause the cause of the error
    */
   public ResponseProcessingException(final String message, final Throwable cause) {
     super(message, cause);
   }
-  
+
 }

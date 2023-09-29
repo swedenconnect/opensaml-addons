@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,9 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
 
   /**
    * Constructor setting the location and the index.
-   * 
-   * @param location
-   *          the location
-   * @param index
-   *          the index
+   *
+   * @param location the location
+   * @param index the index
    */
   public DiscoveryResponseBuilder(final String location, final Integer index) {
     this();
@@ -46,7 +44,7 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
 
   /**
    * Creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static DiscoveryResponseBuilder builder() {
@@ -55,11 +53,9 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
 
   /**
    * Creates a builder.
-   * 
-   * @param location
-   *          the location
-   * @param index
-   *          the index
+   *
+   * @param location the location
+   * @param index the index
    * @return a builder
    */
   public static DiscoveryResponseBuilder builder(final String location, final Integer index) {
@@ -68,9 +64,8 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
 
   /**
    * Adds discovery response location.
-   * 
-   * @param location
-   *          URL for discovery responses
+   *
+   * @param location URL for discovery responses
    * @return the builder
    */
   public DiscoveryResponseBuilder location(final String location) {
@@ -80,9 +75,8 @@ public class DiscoveryResponseBuilder extends AbstractSAMLObjectBuilder<Discover
 
   /**
    * Adds discovery index.
-   * 
-   * @param index
-   *          the index
+   *
+   * @param index the index
    * @return the builder
    */
   public DiscoveryResponseBuilder index(final Integer index) {

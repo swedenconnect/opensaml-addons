@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.messaging.encoder.MessageEncodingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
@@ -35,9 +38,10 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.component.AbstractInitializableComponent;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGenerationStrategy;
+import net.shibboleth.shared.component.AbstractInitializableComponent;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import se.swedenconnect.opensaml.common.utils.SamlLog;
 import se.swedenconnect.opensaml.saml2.core.build.AuthnRequestBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
@@ -46,10 +50,11 @@ import se.swedenconnect.opensaml.saml2.request.AuthnRequestGeneratorContext.HokR
 
 /**
  * Abstract base class for generating AuthnRequest messages.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
-public abstract class AbstractAuthnRequestGenerator extends AbstractInitializableComponent implements AuthnRequestGenerator {
+public abstract class AbstractAuthnRequestGenerator extends AbstractInitializableComponent
+    implements AuthnRequestGenerator {
 
   /** Logging instance. */
   private final Logger log = LoggerFactory.getLogger(AbstractAuthnRequestGenerator.class);
@@ -64,24 +69,30 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
   private EntityDescriptor cachedSpMetadata;
 
   /** Generates ID. */
-  private final RandomIdentifierGenerationStrategy idGenerator = new RandomIdentifierGenerationStrategy(20);
+  private final RandomIdentifierGenerationStrategy idGenerator;
 
   /**
    * Constructor.
-   * 
-   * @param spEntityID
-   *          the SP entityID
-   * @param signCredential
-   *          the signing credential
+   *
+   * @param spEntityID the SP entityID
+   * @param signCredential the signing credential
    */
   public AbstractAuthnRequestGenerator(final String spEntityID, final X509Credential signCredential) {
     this.spEntityID = Optional.ofNullable(spEntityID)
-      .filter(e -> !StringUtils.isBlank(e))
-      .orElseThrow(() -> new IllegalArgumentException("spEntityID must be set"));
+        .filter(e -> !StringUtils.isBlank(e))
+        .orElseThrow(() -> new IllegalArgumentException("spEntityID must be set"));
     this.signCredential = signCredential;
     if (this.signCredential == null) {
       log.warn("No signing credential supplied - Generation will fail if the IdP requires signed requests");
     }
+    try {
+      this.idGenerator = new RandomIdentifierGenerationStrategy(
+          new RandomIdentifierParameterSpec(new SecureRandom(), 20, new Hex()));
+    }
+    catch (final InvalidAlgorithmParameterException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   /** {@inheritDoc} */
@@ -99,7 +110,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
       final String relayState, final AuthnRequestGeneratorContext context) throws RequestGenerationException {
     return this.generateAuthnRequest(this.getIdpMetadata(idpEntityID), relayState, context);
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public RequestHttpObject<AuthnRequest> generateAuthnRequest(final EntityDescriptor idp,
@@ -108,7 +119,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     if (idp == null) {
       throw new RequestGenerationException("No metadata is available for IdP");
     }
-    
+
     log.debug("Request to generate an AuthnRequest for {} ...", idp.getEntityID());
 
     final AuthnRequestGeneratorContext generatorContext = context != null
@@ -125,8 +136,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     if (HokRequirement.REQUIRED.equals(generatorContext.getHokRequirement())) {
       if (HolderOfKeyMetadataSupport.getHokAssertionConsumerServices(spDescriptor).isEmpty()) {
         throw new RequestGenerationException(
-          "Context Holder-of-key requirement states that HoK must be used, but SP does not "
-              + "have a dedicated AssertionConsumerService endpoint for this");
+            "Context Holder-of-key requirement states that HoK must be used, but SP does not "
+                + "have a dedicated AssertionConsumerService endpoint for this");
       }
     }
 
@@ -141,17 +152,18 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     //
     AuthnRequestBuilder builder = AuthnRequestBuilder.builder();
     builder
-      .id(this.idGenerator.generateIdentifier())
-      .issuer(this.getSpEntityID())
-      .issueInstant(Instant.now())
-      .forceAuthn(generatorContext.getForceAuthnAttribute())
-      .isPassive(generatorContext.getIsPassiveAttribute())
-      .destination(ssoService.getLocation());
+        .id(this.idGenerator.generateIdentifier())
+        .issuer(this.getSpEntityID())
+        .issueInstant(Instant.now())
+        .forceAuthn(generatorContext.getForceAuthnAttribute())
+        .isPassive(generatorContext.getIsPassiveAttribute())
+        .destination(ssoService.getLocation());
 
     // Ask the context callback about which AssertionConsumerService to use ...
     //
     final Object assertionConsumerService =
-        generatorContext.getAssertionConsumerServiceResolver().apply(this.getPossibleAssertionConsumerServices(hokActive));
+        generatorContext.getAssertionConsumerServiceResolver()
+            .apply(this.getPossibleAssertionConsumerServices(hokActive));
     if (assertionConsumerService != null) {
       if (assertionConsumerService instanceof String) {
         builder.assertionConsumerServiceURL((String) assertionConsumerService);
@@ -168,7 +180,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     //
     if (!spDescriptor.getAttributeConsumingServices().isEmpty()) {
       builder.attributeConsumerServiceIndex(
-        generatorContext.getAttributeConsumingServiceIndexResolver().apply(spDescriptor.getAttributeConsumingServices()));
+          generatorContext.getAttributeConsumingServiceIndexResolver()
+              .apply(spDescriptor.getAttributeConsumingServices()));
     }
 
     // Get the intersection concerning NameID:s between the SP and IdP metadata
@@ -176,15 +189,15 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     //
     final List<NameIDFormat> idpFormats = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getNameIDFormats();
     final List<NameIDFormat> formats = spDescriptor.getNameIDFormats().stream()
-      .filter(f -> idpFormats.stream().filter(idpf -> idpf.getURI().equals(f.getURI())).findFirst().isPresent())
-      .collect(Collectors.toList());
+        .filter(f -> idpFormats.stream().filter(idpf -> idpf.getURI().equals(f.getURI())).findFirst().isPresent())
+        .collect(Collectors.toList());
     builder.nameIDPolicy(generatorContext.getNameIDPolicyBuilderFunction().apply(formats));
 
     // OK, time to build the RequestedAuthnContext element ...
     // We need to get hold of the assurance certifications of the IdP.
     //
     builder.requestedAuthnContext(generatorContext.getRequestedAuthnContextBuilderFunction()
-      .apply(this.getAssuranceCertificationUris(idp, generatorContext), hokActive));
+        .apply(this.getAssuranceCertificationUris(idp, generatorContext), hokActive));
 
     // Add Scoping element (if implemented)
     this.addScoping(builder, generatorContext, idp);
@@ -203,7 +216,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     }
 
     return this.buildRequestHttpObject(
-      authnRequest, relayState, generatorContext, this.getBinding(ssoService), ssoService.getLocation(), idp);
+        authnRequest, relayState, generatorContext, this.getBinding(ssoService), ssoService.getLocation(), idp);
   }
 
   /**
@@ -211,15 +224,11 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
    * <p>
    * The default implementation does nothing.
    * </p>
-   * 
-   * @param builder
-   *          the builder
-   * @param context
-   *          the generator context
-   * @param idpMetadata
-   *          the IdP metadata
-   * @throws RequestGenerationException
-   *           for generation errors
+   *
+   * @param builder the builder
+   * @param context the generator context
+   * @param idpMetadata the IdP metadata
+   * @throws RequestGenerationException for generation errors
    */
   protected void addScoping(final AuthnRequestBuilder builder, final AuthnRequestGeneratorContext context,
       final EntityDescriptor idpMetadata) throws RequestGenerationException {
@@ -231,15 +240,11 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
    * <p>
    * The default implementation does nothing.
    * </p>
-   * 
-   * @param builder
-   *          the builder
-   * @param context
-   *          the generator context
-   * @param idpMetadata
-   *          the IdP metadata
-   * @throws RequestGenerationException
-   *           for generation errors
+   *
+   * @param builder the builder
+   * @param context the generator context
+   * @param idpMetadata the IdP metadata
+   * @throws RequestGenerationException for generation errors
    */
   protected void addExtensions(final AuthnRequestBuilder builder, final AuthnRequestGeneratorContext context,
       final EntityDescriptor idpMetadata) throws RequestGenerationException {
@@ -251,14 +256,11 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
    * <p>
    * The default implementation returns all URI:s found in the metadata.
    * </p>
-   * 
-   * @param idpMetadata
-   *          the IdP metadata
-   * @param context
-   *          the context
+   *
+   * @param idpMetadata the IdP metadata
+   * @param context the context
    * @return a list of URI:s
-   * @throws RequestGenerationException
-   *           for errors
+   * @throws RequestGenerationException for errors
    */
   protected List<String> getAssuranceCertificationUris(final EntityDescriptor idpMetadata,
       final AuthnRequestGeneratorContext context) throws RequestGenerationException {
@@ -279,16 +281,15 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
 
   /**
    * Gets the metadata for the SP that this generator services.
-   * 
+   *
    * @return the SP metadata, or null if no metadata is found
    */
   protected abstract EntityDescriptor getSpMetadata();
 
   /**
    * Gets the IdP metadata for the given entityID.
-   * 
-   * @param idpEntityID
-   *          the entityID for the IdP
+   *
+   * @param idpEntityID the entityID for the IdP
    * @return the metadata or null if no metadata could be found
    */
   protected EntityDescriptor getIdpMetadata(final String idpEntityID) {
@@ -297,40 +298,34 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
 
   /**
    * Builds a request HTTP object (including signing).
-   * 
-   * @param request
-   *          the actual request
-   * @param relayState
-   *          the RelayState (may be null)
-   * @param context
-   *          the request generation context
-   * @param binding
-   *          the binding to use
-   * @param destination
-   *          the destination URL
-   * @param recipientMetadata
-   *          the recipient metadata
+   *
+   * @param request the actual request
+   * @param relayState the RelayState (may be null)
+   * @param context the request generation context
+   * @param binding the binding to use
+   * @param destination the destination URL
+   * @param recipientMetadata the recipient metadata
    * @return a request HTTP object
-   * @throws RequestGenerationException
-   *           for errors during signing or encoding
+   * @throws RequestGenerationException for errors during signing or encoding
    */
   protected RequestHttpObject<AuthnRequest> buildRequestHttpObject(final AuthnRequest request,
       final String relayState, final AuthnRequestGeneratorContext context, final String binding,
       final String destination, final EntityDescriptor recipientMetadata)
       throws RequestGenerationException {
 
-    final X509Credential signCred = Optional.ofNullable(context.getOverrideSignCredential()).orElse(this.signCredential);
+    final X509Credential signCred =
+        Optional.ofNullable(context.getOverrideSignCredential()).orElse(this.signCredential);
 
     try {
       if (SAMLConstants.SAML2_REDIRECT_BINDING_URI.equals(binding)) {
         // Redirect binding
         return new RedirectRequestHttpObject<>(request, relayState, signCred, destination,
-          recipientMetadata, context.getSignatureSigningConfiguration());
+            recipientMetadata, context.getSignatureSigningConfiguration());
       }
       else if (SAMLConstants.SAML2_POST_BINDING_URI.equals(binding)) {
         // POST binding
         return new PostRequestHttpObject<>(request, relayState, signCred, destination, recipientMetadata,
-          context.getSignatureSigningConfiguration());
+            context.getSignatureSigningConfiguration());
       }
       else {
         throw new RequestGenerationException("Unsupported binding: " + binding);
@@ -345,9 +340,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
 
   /**
    * Extracts all possible SP AssertionConsumerService endpoints.
-   * 
-   * @param hokActive
-   *          a flag that tells whether HoK is active or not
+   *
+   * @param hokActive a flag that tells whether HoK is active or not
    * @return a list of possible endpoints
    */
   protected List<AssertionConsumerService> getPossibleAssertionConsumerServices(final boolean hokActive) {
@@ -357,16 +351,15 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     }
     else {
       return descriptor.getAssertionConsumerServices().stream()
-        .filter(a -> SAMLConstants.SAML2_POST_BINDING_URI.equals(a.getBinding()))
-        .collect(Collectors.toList());
+          .filter(a -> SAMLConstants.SAML2_POST_BINDING_URI.equals(a.getBinding()))
+          .collect(Collectors.toList());
     }
   }
 
   /**
    * Utility method that, given a {@link SingleSignOnService}, gets the binding URI (redirect/post).
-   * 
-   * @param sso
-   *          the SingleSignOnService
+   *
+   * @param sso the SingleSignOnService
    * @return the binding URI
    */
   protected String getBinding(final SingleSignOnService sso) {
@@ -381,25 +374,25 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
   /**
    * Returns the {@code SingleSignOnService} element to use when sending the request to the IdP. The preferred binding
    * will be searched for first, and if this is not found, another binding that we support will be used.
-   * 
-   * @param idp
-   *          the IdP metadata
-   * @param context
-   *          context for generating
+   *
+   * @param idp the IdP metadata
+   * @param context context for generating
    * @return a SingleSignOnService object
-   * @throws RequestGenerationException
-   *           if not valid endpoint can be found
+   * @throws RequestGenerationException if not valid endpoint can be found
    */
-  protected SingleSignOnService getSingleSignOnService(final EntityDescriptor idp, final AuthnRequestGeneratorContext context)
+  protected SingleSignOnService getSingleSignOnService(final EntityDescriptor idp,
+      final AuthnRequestGeneratorContext context)
       throws RequestGenerationException {
 
     final IDPSSODescriptor descriptor = Optional.ofNullable(idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS))
-      .orElseThrow(() -> new RequestGenerationException("Invalid IdP metadata - missing IDPSSODescriptor"));
+        .orElseThrow(() -> new RequestGenerationException("Invalid IdP metadata - missing IDPSSODescriptor"));
 
-    if (HokRequirement.REQUIRED.equals(context.getHokRequirement()) || HokRequirement.IF_AVAILABLE.equals(context.getHokRequirement())) {
+    if (HokRequirement.REQUIRED.equals(context.getHokRequirement())
+        || HokRequirement.IF_AVAILABLE.equals(context.getHokRequirement())) {
       SingleSignOnService ssoService = null;
       for (final SingleSignOnService sso : HolderOfKeyMetadataSupport.getHokSingleSignOnServices(descriptor)) {
-        final String protocolBinding = sso.getUnknownAttributes().get(HolderOfKeyMetadataSupport.HOK_PROTOCOL_BINDING_ATTRIBUTE);
+        final String protocolBinding =
+            sso.getUnknownAttributes().get(HolderOfKeyMetadataSupport.HOK_PROTOCOL_BINDING_ATTRIBUTE);
         if (context.getPreferredBinding().equals(protocolBinding)) {
           return sso;
         }
@@ -411,32 +404,34 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
         return ssoService;
       }
       else if (HokRequirement.REQUIRED.equals(context.getHokRequirement())) {
-        String msg = String.format("IdP '%s' does not specify endpoints for Holder-of-key - cannot send request", idp.getEntityID());
+        String msg = String.format("IdP '%s' does not specify endpoints for Holder-of-key - cannot send request",
+            idp.getEntityID());
         log.error(msg);
         throw new RequestGenerationException(msg);
       }
       else {
         // HokRequirement.IF_AVAILABLE
-        log.info("IdP '%s' does not specify endpoints for Holder-of-key - using normal WebSSO Profile", idp.getEntityID());
+        log.info("IdP '%s' does not specify endpoints for Holder-of-key - using normal WebSSO Profile",
+            idp.getEntityID());
       }
     }
 
     SingleSignOnService ssoService = descriptor.getSingleSignOnServices()
-      .stream()
-      .filter(s -> context.getPreferredBinding().equals(s.getBinding()))
-      .findFirst()
-      .orElse(null);
+        .stream()
+        .filter(s -> context.getPreferredBinding().equals(s.getBinding()))
+        .findFirst()
+        .orElse(null);
 
     if (ssoService == null) {
       ssoService = descriptor.getSingleSignOnServices().stream()
-        .filter(s -> SAMLConstants.SAML2_POST_BINDING_URI.equals(s.getBinding())
-            || SAMLConstants.SAML2_REDIRECT_BINDING_URI.equals(s.getBinding()))
-        .findFirst()
-        .orElse(null);
+          .filter(s -> SAMLConstants.SAML2_POST_BINDING_URI.equals(s.getBinding())
+              || SAMLConstants.SAML2_REDIRECT_BINDING_URI.equals(s.getBinding()))
+          .findFirst()
+          .orElse(null);
     }
     if (ssoService == null) {
       String msg = String.format(
-        "IdP '%s' does not specify endpoints for POST or Redirect - cannot send request", idp.getEntityID());
+          "IdP '%s' does not specify endpoints for POST or Redirect - cannot send request", idp.getEntityID());
       log.error(msg);
       throw new RequestGenerationException(msg);
     }

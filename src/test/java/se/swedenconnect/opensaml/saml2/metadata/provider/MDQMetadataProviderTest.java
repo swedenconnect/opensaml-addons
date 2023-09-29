@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import java.util.function.Function;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
@@ -62,8 +62,8 @@ public class MDQMetadataProviderTest extends OpenSAMLTestBase {
     catch (Exception e) {
     }
   }
-  
-  @BeforeClass
+
+  @BeforeAll
   static public void startServer() throws Exception {
 
     // Since our test CA cert is missing BasicConstraints extension ...
@@ -75,58 +75,56 @@ public class MDQMetadataProviderTest extends OpenSAMLTestBase {
   /**
    * Stops the "remote" metadata service.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
-  @AfterClass
+  @AfterAll
   static public void stopServer() throws Exception {
     server.stop();
 
     System.clearProperty("jdk.security.allowNonCaAnchor");
-  }  
+  }
 
-  @Before
+  @BeforeEach
   public void init() throws Exception {
     try {
       FileUtils.forceDelete(cacheDir);
     }
-    catch (Exception e) {      
-    }    
+    catch (Exception e) {
+    }
 //    this.cert = decodeCertificate(new ClassPathResource("nordunet.crt").getInputStream());
   }
-  
+
   @Test
   public void testGet() throws Exception {
-    
-    final MDQMetadataProvider provider = new MDQMetadataProvider(server.getUrl(), 
+
+    final MDQMetadataProvider provider = new MDQMetadataProvider(server.getUrl(),
         HTTPMetadataProvider.createDefaultHttpClient(trustStore, null),
         cacheDir.getAbsolutePath());
-    
+
 //    provider.setSignatureVerificationCertificate(this.cert);
     provider.initialize();
 
-    Assert.assertTrue(provider.getIdentityProviders().isEmpty());
-    Assert.assertTrue(provider.getServiceProviders().isEmpty());
+    Assertions.assertTrue(provider.getIdentityProviders().isEmpty());
+    Assertions.assertTrue(provider.getServiceProviders().isEmpty());
 
     // Now, get some entities using MDQ ...
     final EntityDescriptor ed = provider.getEntityDescriptor("https://sickelstatest.transportstyrelsen.se/extweb/");
-    Assert.assertNotNull(ed);
+    Assertions.assertNotNull(ed);
 
     final EntityDescriptor ed2 = provider.getEntityDescriptor("https://idp.svelegtest.se/idp");
-    Assert.assertNotNull(ed2);
+    Assertions.assertNotNull(ed2);
 
-    Assert.assertTrue(provider.getIdentityProviders().size() == 1);
-    Assert.assertTrue(provider.getServiceProviders().size() == 1);
+    Assertions.assertTrue(provider.getIdentityProviders().size() == 1);
+    Assertions.assertTrue(provider.getServiceProviders().size() == 1);
 
     EntitiesDescriptor metadata = (EntitiesDescriptor) provider.getMetadata();
-    Assert.assertNotNull(metadata);
-    Assert.assertEquals(2, metadata.getEntityDescriptors().size());
-    
+    Assertions.assertNotNull(metadata);
+    Assertions.assertEquals(2, metadata.getEntityDescriptors().size());
+
     // Not found
     final EntityDescriptor ed3 = provider.getEntityDescriptor("https://not.found.com");
-    Assert.assertNull(ed3);
+    Assertions.assertNull(ed3);
   }
-  
 
 //  @Test
 //  public void testList() throws Exception {
@@ -145,7 +143,7 @@ public class MDQMetadataProviderTest extends OpenSAMLTestBase {
 //    final EntityDescriptor edb = provider.getEntityDescriptor("http://adfs.hv.se/adfs/services/trust2");
 //    Assert.assertNull(edb);
 //
-//    
+//
 //    // Both a SP and IdP
 //    final EntityDescriptor ed2 = provider.getEntityDescriptor("http://adfs.helb-prigogine.be/adfs/services/trust");
 //    Assert.assertNotNull(ed2);

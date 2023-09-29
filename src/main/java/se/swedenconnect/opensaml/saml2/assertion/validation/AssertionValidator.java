@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 
 /**
  * A validator for {@code Assertion} objects.
- * 
+ *
  * <p>
  * Supports the following {@link ValidationContext} static parameters:
  * </p>
@@ -85,7 +85,7 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
  * <li>{@link #RESPONSE_ISSUE_INSTANT}: Optional. If set, the IssueInstant of the Assertion being validated is compared
  * with the corresponding response issue instant.</li>
  * </ul>
- * 
+ *
  * <p>
  * Supports the following {@link ValidationContext} dynamic parameters:
  * </p>
@@ -94,12 +94,12 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
  * validation if subject confirmation was successfully performed.</li>
  * <li>{@link #HOK_PROFILE_ACTIVE}: Is set to indicate whether the holder-of-key WebSSO profile is active.</li>
  * </ul>
- * 
+ *
  * <p>
  * <b>Note:</b> Also check the validation context parameters defined by the {@code SubjectConfirmationValidator} and
  * {@code ConditionValidator} instances that are installed.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AssertionValidator extends AbstractSignableObjectValidator<Assertion> {
@@ -129,17 +129,12 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Constructor.
-   * 
-   * @param trustEngine
-   *          the trust used to validate the object's signature
-   * @param signaturePrevalidator
-   *          the signature pre-validator used to pre-validate the object's signature
-   * @param confirmationValidators
-   *          validators used to validate {@link SubjectConfirmation} methods within the assertion
-   * @param conditionValidators
-   *          validators used to validate the {@link Condition} elements within the assertion
-   * @param statementValidators
-   *          validators used to validate {@link Statement}s within the assertion
+   *
+   * @param trustEngine the trust used to validate the object's signature
+   * @param signaturePrevalidator the signature pre-validator used to pre-validate the object's signature
+   * @param confirmationValidators validators used to validate {@link SubjectConfirmation} methods within the assertion
+   * @param conditionValidators validators used to validate the {@link Condition} elements within the assertion
+   * @param statementValidators validators used to validate {@link Statement}s within the assertion
    */
   public AssertionValidator(final SignatureTrustEngine trustEngine,
       final SignaturePrevalidator signaturePrevalidator,
@@ -200,16 +195,14 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Validates that the {@code Assertion} object has an ID attribute.
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateID(final Assertion assertion, final ValidationContext context) {
     if (assertion.getID() == null || assertion.getID().isBlank()) {
-      context.setValidationFailureMessage("Missing ID attribute in Assertion");
+      context.getValidationFailureMessages().add("Missing ID attribute in Assertion");
       return ValidationResult.INVALID;
     }
     return ValidationResult.VALID;
@@ -217,16 +210,15 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Validates that the {@code Response} object has a valid Version attribute.
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateVersion(final Assertion assertion, final ValidationContext context) {
-    if (assertion.getVersion() == null || !assertion.getVersion().toString().equals(SAMLVersion.VERSION_20.toString())) {
-      context.setValidationFailureMessage("Invalid SAML version in Assertion");
+    if (assertion.getVersion() == null
+        || !assertion.getVersion().toString().equals(SAMLVersion.VERSION_20.toString())) {
+      context.getValidationFailureMessages().add("Invalid SAML version in Assertion");
       return ValidationResult.INVALID;
     }
     return ValidationResult.VALID;
@@ -239,16 +231,14 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    * after the response issue instant. Otherwise the method checks that the IssueInstant is not too old given the
    * {@link CoreValidatorParameters#MAX_AGE_MESSAGE} and {@link CoreValidatorParameters#RECEIVE_INSTANT} context
    * parameters.
-   * 
-   * @param assertion
-   *          the response
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateIssueInstant(final Assertion assertion, final ValidationContext context) {
     if (assertion.getIssueInstant() == null) {
-      context.setValidationFailureMessage("Missing IssueInstant attribute in Assertion");
+      context.getValidationFailureMessages().add("Missing IssueInstant attribute in Assertion");
       return ValidationResult.INVALID;
     }
 
@@ -259,9 +249,10 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
     Instant responseIssueInstant = this.getResponseIssueInstant(context);
     if (responseIssueInstant != null) {
       if (assertion.getIssueInstant().isAfter(responseIssueInstant)) {
-        final String msg = String.format("Invalid Assertion - Its issue-instant (%s) is after the response message issue-instant (%s)",
-          assertion.getIssueInstant(), responseIssueInstant);
-        context.setValidationFailureMessage(msg);
+        final String msg =
+            String.format("Invalid Assertion - Its issue-instant (%s) is after the response message issue-instant (%s)",
+                assertion.getIssueInstant(), responseIssueInstant);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
@@ -280,17 +271,18 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       //
       if ((receiveInstantMillis - issueInstantMillis) > (maxAgeResponse.toMillis() + allowedClockSkew.toMillis())) {
         final String msg = String.format("Received Assertion is too old - issue-instant: %s - receive-time: %s",
-          assertion.getIssueInstant(), receiveInstant);
-        context.setValidationFailureMessage(msg);
+            assertion.getIssueInstant(), receiveInstant);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
 
       // Not yet valid? -> Clock skew is unacceptable.
       //
       if ((issueInstantMillis - receiveInstantMillis) > allowedClockSkew.toMillis()) {
-        final String msg = String.format("Issue-instant of Assertion (%s) is newer than receive time (%s) - Non accepted clock skew",
-          assertion.getIssueInstant(), receiveInstant);
-        context.setValidationFailureMessage(msg);
+        final String msg =
+            String.format("Issue-instant of Assertion (%s) is newer than receive time (%s) - Non accepted clock skew",
+                assertion.getIssueInstant(), receiveInstant);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
@@ -300,9 +292,8 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Gets the {@link #RESPONSE_ISSUE_INSTANT} setting.
-   * 
-   * @param context
-   *          the context
+   *
+   * @param context the context
    * @return the response issue instant, or null if it is not set
    */
   protected Instant getResponseIssueInstant(final ValidationContext context) {
@@ -321,24 +312,22 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
   /**
    * Ensures that the {@code Issuer} element is present and matches the expected issuer (if set in the context under the
    * {@link CoreValidatorParameters#EXPECTED_ISSUER} key).
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateIssuer(final Assertion assertion, final ValidationContext context) {
     if (assertion.getIssuer() == null || assertion.getIssuer().getValue() == null) {
-      context.setValidationFailureMessage("Missing Issuer element in Assertion");
+      context.getValidationFailureMessages().add("Missing Issuer element in Assertion");
       return ValidationResult.INVALID;
     }
     String expectedIssuer = (String) context.getStaticParameters().get(CoreValidatorParameters.EXPECTED_ISSUER);
     if (expectedIssuer != null) {
       if (!assertion.getIssuer().getValue().equals(expectedIssuer)) {
         final String msg = String.format("Issuer of Assertion (%s) did not match expected issuer (%s)",
-          assertion.getIssuer().getValue(), expectedIssuer);
-        context.setValidationFailureMessage(msg);
+            assertion.getIssuer().getValue(), expectedIssuer);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
@@ -355,42 +344,44 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    * <p>
    * The method also sets the dynamic validation parameter {@link #HOK_PROFILE_ACTIVE}.
    * </p>
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return a validation result
    */
-  protected ValidationResult validateHolderOfKeyRequirement(final Assertion assertion, final ValidationContext context) {
+  protected ValidationResult validateHolderOfKeyRequirement(final Assertion assertion,
+      final ValidationContext context) {
 
     // First see if the caller has informed us about the HoK status.
     // In that case we are done.
     //
-    if (Optional.ofNullable(context.getStaticParameters().get(HOK_PROFILE_ACTIVE)).map(Boolean.class::cast).orElse(null) != null) {
-      context.getDynamicParameters().put(HOK_PROFILE_ACTIVE, (Boolean) context.getStaticParameters().get(HOK_PROFILE_ACTIVE));
+    if (Optional.ofNullable(context.getStaticParameters().get(HOK_PROFILE_ACTIVE)).map(Boolean.class::cast)
+        .orElse(null) != null) {
+      context.getDynamicParameters().put(HOK_PROFILE_ACTIVE, context.getStaticParameters().get(HOK_PROFILE_ACTIVE));
       return ValidationResult.VALID;
     }
-    
+
     Boolean hokActive = Boolean.FALSE;
 
-    try {            
+    try {
       final String receiveUrl = (String) context.getStaticParameters().get(CoreValidatorParameters.RECEIVE_URL);
       if (receiveUrl == null) {
-        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
-          CoreValidatorParameters.RECEIVE_URL);
+        final String msg =
+            String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+                CoreValidatorParameters.RECEIVE_URL);
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INDETERMINATE;
       }
 
-      final AuthnRequest authnRequest = (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
+      final AuthnRequest authnRequest =
+          (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
       if (authnRequest == null || authnRequest.getDestination() == null) {
         final String msg = String.format("Could not determine if Holder-of-key profile is active."
             + "'%s' parameter is missing or no Destination was set in AuthnRequest",
-          CoreValidatorParameters.AUTHN_REQUEST);
+            CoreValidatorParameters.AUTHN_REQUEST);
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INDETERMINATE;
       }
       final String destination = authnRequest.getDestination();
@@ -398,18 +389,19 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       final EntityDescriptor idpMetadata =
           (EntityDescriptor) context.getStaticParameters().get(CoreValidatorParameters.IDP_METADATA);
       if (idpMetadata == null) {
-        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
-          CoreValidatorParameters.IDP_METADATA);
+        final String msg =
+            String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+                CoreValidatorParameters.IDP_METADATA);
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INDETERMINATE;
       }
 
       hokActive = idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getSingleSignOnServices().stream()
-        .filter(s -> s.getLocation() != null && s.getLocation().equals(destination))
-        .filter(HolderOfKeyMetadataSupport::isHoKSingleSignOnService)
-        .findFirst()
-        .isPresent();
+          .filter(s -> s.getLocation() != null && s.getLocation().equals(destination))
+          .filter(HolderOfKeyMetadataSupport::isHoKSingleSignOnService)
+          .findFirst()
+          .isPresent();
 
       if (!hokActive) {
         // HoK is not active.
@@ -419,21 +411,22 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       final EntityDescriptor spMetadata =
           (EntityDescriptor) context.getStaticParameters().get(CoreValidatorParameters.SP_METADATA);
       if (spMetadata == null) {
-        final String msg = String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
-          CoreValidatorParameters.SP_METADATA);
+        final String msg =
+            String.format("Could not determine if Holder-of-key profile is active. '%s' parameter is missing",
+                CoreValidatorParameters.SP_METADATA);
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INDETERMINATE;
       }
 
       if (spMetadata.getSPSSODescriptor(SAMLConstants.SAML20P_NS).getAssertionConsumerServices().stream()
-        .filter(s -> receiveUrl.equals(s.getLocation()))
-        .filter(HolderOfKeyMetadataSupport::isHoKAssertionConsumerService)
-        .findFirst().isEmpty()) {
-        
+          .filter(s -> receiveUrl.equals(s.getLocation()))
+          .filter(HolderOfKeyMetadataSupport::isHoKAssertionConsumerService)
+          .findFirst().isEmpty()) {
+
         final String msg = "Expected response to be delivered to a Holder-of-key AssertionConsumerService endpoint";
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
 
@@ -448,11 +441,9 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    * Validates the {@code Subject} element of the assertion. The default implementation returns
    * {@link ValidationResult#VALID} if there is no {@code Subject} element since it is optional according to the SAML
    * 2.0 Core specifications.
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateSubject(final Assertion assertion, final ValidationContext context) {
@@ -461,7 +452,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       // Assertions containing AuthnStatements must contain a Subject.
       //
       if (assertion.getAuthnStatements() != null && !assertion.getAuthnStatements().isEmpty()) {
-        context.setValidationFailureMessage("Assertion contains AuthnStatement but no Subject - invalid");
+        context.getValidationFailureMessages().add("Assertion contains AuthnStatement but no Subject - invalid");
         return ValidationResult.INVALID;
       }
 
@@ -472,12 +463,12 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
     List<SubjectConfirmation> confirmations = subject.getSubjectConfirmations();
     if (confirmations == null || confirmations.isEmpty()) {
       final boolean hokProfileActive = Optional.ofNullable(context.getDynamicParameters().get(HOK_PROFILE_ACTIVE))
-        .map(Boolean.class::cast).orElse(Boolean.FALSE);
+          .map(Boolean.class::cast).orElse(Boolean.FALSE);
       if (hokProfileActive) {
         String msg = String.format("No subject confirmation for method '%s' found for assertion with ID '%s'",
-          SubjectConfirmation.METHOD_HOLDER_OF_KEY, assertion.getID());
+            SubjectConfirmation.METHOD_HOLDER_OF_KEY, assertion.getID());
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
       else {
@@ -492,24 +483,23 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
   /**
    * Validates the subject confirmations and for the one that is confirmed, it is saved in the validation context under
    * the {@link SAML2AssertionValidationParameters#CONFIRMED_SUBJECT_CONFIRMATION} key.
-   * 
-   * @param assertion
-   *          the assertion
-   * @param subjectConfirmations
-   *          the subject confirmations
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param subjectConfirmations the subject confirmations
+   * @param context the validation context
    * @return a validation result
    */
-  protected ValidationResult validateSubjectConfirmations(final Assertion assertion, final List<SubjectConfirmation> subjectConfirmations,
+  protected ValidationResult validateSubjectConfirmations(final Assertion assertion,
+      final List<SubjectConfirmation> subjectConfirmations,
       final ValidationContext context) {
 
     final boolean hokProfileActive = Optional.ofNullable(context.getDynamicParameters().get(HOK_PROFILE_ACTIVE))
-      .map(Boolean.class::cast).orElse(Boolean.FALSE);
+        .map(Boolean.class::cast).orElse(Boolean.FALSE);
 
     for (final SubjectConfirmation confirmation : subjectConfirmations) {
       if (hokProfileActive && !SubjectConfirmation.METHOD_HOLDER_OF_KEY.equals(confirmation.getMethod())) {
-        log.info("Holder-of-key profile is active - Ignoring SubjectConfirmation with method '{}'", confirmation.getMethod());
+        log.info("Holder-of-key profile is active - Ignoring SubjectConfirmation with method '{}'",
+            confirmation.getMethod());
         continue;
       }
       final SubjectConfirmationValidator validator = subjectConfirmationValidators.get(confirmation.getMethod());
@@ -518,18 +508,18 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
           final ValidationResult r = validator.validate(confirmation, assertion, context);
           if (r == ValidationResult.VALID) {
             context.getDynamicParameters().put(
-              SAML2AssertionValidationParameters.CONFIRMED_SUBJECT_CONFIRMATION, confirmation);
+                SAML2AssertionValidationParameters.CONFIRMED_SUBJECT_CONFIRMATION, confirmation);
             return ValidationResult.VALID;
           }
           else {
-            if (context.getValidationFailureMessage() == null) {
-              context.setValidationFailureMessage(
-                String.format("Validation of SubjectConfirmation with method '%s' failed", confirmation.getMethod()));
-              log.info("{}", context.getValidationFailureMessage());
+            if (context.getValidationFailureMessages().isEmpty()) {
+              context.getValidationFailureMessages().add(
+                  String.format("Validation of SubjectConfirmation with method '%s' failed", confirmation.getMethod()));
+              log.info("{}", String.join(", ", context.getValidationFailureMessages()));
             }
             else {
               log.info("Validation of SubjectConfirmation with method '{}' failed - {}", confirmation.getMethod(),
-                context.getValidationFailureMessage());
+                  String.join(", ", context.getValidationFailureMessages()));
             }
             if (hokProfileActive) {
               return ValidationResult.INVALID;
@@ -539,7 +529,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
         catch (Exception e) {
           log.warn("Error while executing subject confirmation validation " + validator.getClass().getName(), e);
           final String msg = String.format("Error during validation of subject confirmation data - {}", e.getMessage());
-          context.setValidationFailureMessage(msg);
+          context.getValidationFailureMessages().add(msg);
           return ValidationResult.INVALID;
         }
       }
@@ -548,19 +538,18 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       }
     }
 
-    final String msg = String.format("No subject confirmation methods were met for assertion with ID '%s'", assertion.getID());
+    final String msg =
+        String.format("No subject confirmation methods were met for assertion with ID '%s'", assertion.getID());
     log.debug(msg);
-    context.setValidationFailureMessage(msg);
+    context.getValidationFailureMessages().add(msg);
     return ValidationResult.INVALID;
   }
 
   /**
    * Validates the {@code Conditions} elements of the assertion.
-   * 
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion
+   * @param context the validation context
    * @return the validation result
    */
   protected ValidationResult validateConditions(final Assertion assertion, final ValidationContext context) {
@@ -584,10 +573,10 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
       if (validator == null) {
         final String msg = String.format("Unknown Condition '%s' of type '%s' in assertion '%s'",
-          condition.getElementQName(), condition.getSchemaType(), assertion.getID());
+            condition.getElementQName(), condition.getSchemaType(), assertion.getID());
         log.warn(msg);
         if (isStrictValidation(context)) {
-          context.setValidationFailureMessage(msg);
+          context.getValidationFailureMessages().add(msg);
           return ValidationResult.INDETERMINATE;
         }
         else {
@@ -602,18 +591,17 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       catch (AssertionValidationException e) {
         log.error("Failed Conditions validation - {}", e.getMessage());
         log.debug("", e);
-        context.setValidationFailureMessage(e.getMessage());
+        context.getValidationFailureMessages().add(e.getMessage());
         r = ValidationResult.INVALID;
       }
 
       if (r != ValidationResult.VALID) {
         String msg = String.format("Condition '%s' of type '%s' in assertion '%s' was not valid - %s.",
-          condition.getElementQName(), condition.getSchemaType(), assertion.getID(), context.getValidationFailureMessage());
-        if (context.getValidationFailureMessage() != null) {
-          msg = msg + ": " + context.getValidationFailureMessage();
-        }
+            condition.getElementQName(), condition.getSchemaType(), assertion.getID(),
+            String.join(", ", context.getValidationFailureMessages()));
+
         log.debug(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
@@ -623,11 +611,9 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Validates the NotBefore and NotOnOrAfter Conditions constraints on the assertion.
-   * 
-   * @param assertion
-   *          the assertion whose conditions will be validated
-   * @param context
-   *          current validation context
+   *
+   * @param assertion the assertion whose conditions will be validated
+   * @param context current validation context
    * @return the result of the validation evaluation
    */
   protected ValidationResult validateConditionsTimeBounds(final Assertion assertion, final ValidationContext context) {
@@ -641,18 +627,20 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
     final Instant receiveInstant = getReceiveInstant(context);
 
     final Instant notBefore = conditions.getNotBefore();
-    log.debug("Evaluating Conditions NotBefore '{}' against 'skewed now' time '{}'", notBefore, receiveInstant.plus(clockSkew));
+    log.debug("Evaluating Conditions NotBefore '{}' against 'skewed now' time '{}'", notBefore,
+        receiveInstant.plus(clockSkew));
     if (notBefore != null && notBefore.isAfter(receiveInstant.plus(clockSkew))) {
-      context.setValidationFailureMessage(String.format(
-        "Assertion '%s' with NotBefore condition of '%s' is not yet valid", assertion.getID(), notBefore));
+      context.getValidationFailureMessages().add(String.format(
+          "Assertion '%s' with NotBefore condition of '%s' is not yet valid", assertion.getID(), notBefore));
       return ValidationResult.INVALID;
     }
 
     final Instant notOnOrAfter = conditions.getNotOnOrAfter();
-    log.debug("Evaluating Conditions NotOnOrAfter '{}' against 'skewed now' time '{}'", notOnOrAfter, receiveInstant.minus(clockSkew));
+    log.debug("Evaluating Conditions NotOnOrAfter '{}' against 'skewed now' time '{}'", notOnOrAfter,
+        receiveInstant.minus(clockSkew));
     if (notOnOrAfter != null && notOnOrAfter.isBefore(receiveInstant.minus(clockSkew))) {
-      context.setValidationFailureMessage(String.format(
-        "Assertion '%s' with NotOnOrAfter condition of '%s' is no longer valid", assertion.getID(), notOnOrAfter));
+      context.getValidationFailureMessages().add(String.format(
+          "Assertion '%s' with NotOnOrAfter condition of '%s' is no longer valid", assertion.getID(), notOnOrAfter));
       return ValidationResult.INVALID;
     }
 
@@ -661,11 +649,9 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
 
   /**
    * Validates the statements of the assertion using the registered {@link StatementValidator} instance.
-   * 
-   * @param assertion
-   *          the assertion to validate
-   * @param context
-   *          the validation context
+   *
+   * @param assertion the assertion to validate
+   * @param context the validation context
    * @return validation result
    */
   protected ValidationResult validateStatements(final Assertion assertion, final ValidationContext context) {
@@ -690,7 +676,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
         catch (AssertionValidationException e) {
           log.error("Failed Statement validation - {}", e.getMessage());
           log.debug("", e);
-          context.setValidationFailureMessage(e.getMessage());
+          context.getValidationFailureMessages().add(e.getMessage());
           result = ValidationResult.INVALID;
         }
         if (result != ValidationResult.VALID) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
 /**
- * Core parameter keys used to store and retrieve static and dynamic parameters within a {@link ValidationContext}.
- * See also {@link SAML2AssertionValidationParameters}.
- * 
+ * Core parameter keys used to store and retrieve static and dynamic parameters within a {@link ValidationContext}. See
+ * also {@link SAML2AssertionValidationParameters}.
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class CoreValidatorParameters {
@@ -69,16 +69,16 @@ public class CoreValidatorParameters {
    * Carries a {@link String} that holds the {@code AuthnRequest} ID attribute.
    */
   public static final String AUTHN_REQUEST_ID = STD_PREFIX + ".AuthnRequestID";
-  
+
   /**
    * Carries a {@link EntityDescriptor} that holds the SP metadata.
    */
   public static final String SP_METADATA = STD_PREFIX + ".SpMetadata";
-  
+
   /**
    * Carries a {@link EntityDescriptor} that holds the IdP metadata.
    */
-  public static final String IDP_METADATA = STD_PREFIX + ".IdpMetadata";  
+  public static final String IDP_METADATA = STD_PREFIX + ".IdpMetadata";
 
   // Hidden
   private CoreValidatorParameters() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
 
 /**
  * Unmarshaller for the {@link Scope} element.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ScopeUnmarshaller extends AbstractXMLObjectUnmarshaller {
 
   /** {@inheritDoc} */
+  @Override
   protected void processAttribute(final XMLObject xmlObject, final Attr attribute) throws UnmarshallingException {
     final Scope scope = (Scope) xmlObject;
     if (attribute.getLocalName().equals(Scope.REGEXP_ATTRIB_NAME)) {
@@ -38,6 +39,7 @@ public class ScopeUnmarshaller extends AbstractXMLObjectUnmarshaller {
   }
 
   /** {@inheritDoc} */
+  @Override
   protected void processElementContent(final XMLObject xmlObject, final String elementContent) {
     final Scope scope = (Scope) xmlObject;
     scope.setValue(elementContent);

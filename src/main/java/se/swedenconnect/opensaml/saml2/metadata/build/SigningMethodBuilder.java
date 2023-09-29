@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code alg:SigningMethod} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMethod> {
 
   /**
    * Creates a new {@code SigningMethodBuilder} instance.
-   * 
+   *
    * @return a SigningMethodBuilder instance
    */
   public static SigningMethodBuilder builder() {
@@ -37,9 +37,8 @@ public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMetho
 
   /**
    * Utility method that creates a {@code SigningMethod} element having only its {@code Algorithm} attribute assigned.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return a SigningMethod instance
    */
   public static SigningMethod signingMethod(final String algorithm) {
@@ -48,21 +47,19 @@ public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMetho
 
   /**
    * Utility method that creates a {@code SigningMethod} element.
-   * 
-   * @param algorithm
-   *          the algorithm
-   * @param minKeySize
-   *          minimum key size (in bits)
-   * @param maxKeySize
-   *          maximum key size (in bits)
+   *
+   * @param algorithm the algorithm
+   * @param minKeySize minimum key size (in bits)
+   * @param maxKeySize maximum key size (in bits)
    * @return a SigningMethod instance
    */
-  public static SigningMethod signingMethod(final String algorithm, final Integer minKeySize, final Integer maxKeySize) {
+  public static SigningMethod signingMethod(final String algorithm, final Integer minKeySize,
+      final Integer maxKeySize) {
     return builder()
-      .algorithm(algorithm)
-      .minKeySize(minKeySize)
-      .maxKeySize(maxKeySize)
-      .build();
+        .algorithm(algorithm)
+        .minKeySize(minKeySize)
+        .maxKeySize(maxKeySize)
+        .build();
   }
 
   /** {@inheritDoc} */
@@ -73,9 +70,8 @@ public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMetho
 
   /**
    * Assigns the algorithm.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return the builder
    */
   public SigningMethodBuilder algorithm(final String algorithm) {
@@ -85,9 +81,8 @@ public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMetho
 
   /**
    * Assigns the minimum size in bits for the key.
-   * 
-   * @param keySize
-   *          minimum key size
+   *
+   * @param keySize minimum key size
    * @return the builder
    */
   public SigningMethodBuilder minKeySize(final Integer keySize) {
@@ -97,9 +92,8 @@ public class SigningMethodBuilder extends AbstractSAMLObjectBuilder<SigningMetho
 
   /**
    * Assigns the maximum size in bits for the key.
-   * 
-   * @param keySize
-   *          maximum key size
+   *
+   * @param keySize maximum key size
    * @return the builder
    */
   public SigningMethodBuilder maxKeySize(final Integer keySize) {

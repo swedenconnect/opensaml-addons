@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 
 /**
  * A builder for {@code SingleSignOnService} elements.
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<SingleSignOnService> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static SingleSignOnServiceBuilder builder() {
@@ -39,9 +39,8 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Assigns the location URI.
-   * 
-   * @param location
-   *          the URI
+   *
+   * @param location the URI
    * @return the builder
    */
   public SingleSignOnServiceBuilder location(final String location) {
@@ -51,9 +50,8 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Assigns the binding of the service
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return the builder
    * @see #postBinding()
    * @see #redirectBinding()
@@ -65,7 +63,7 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Shortcut for assigning the SAML POST binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -76,7 +74,7 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Shortcut for assigning the SAML Redirect binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -90,9 +88,8 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
    * {@value HolderOfKeyMetadataSupport#HOK_WEBSSO_PROFILE_URI} and the actual binding should be assigned to the
    * {@code hoksso:ProtocolBinding} attribute. This method sets the {@code hoksso:ProtocolBinding} attribute to the
    * given binding.
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return this builder
    * @see #hokPostBinding()
    * @see #hokRedirectBinding()
@@ -105,23 +102,23 @@ public class SingleSignOnServiceBuilder extends AbstractSAMLObjectBuilder<Single
   /**
    * Shortcut to assign the {@code Binding} attribute to Holder-of-key and the {@code hoksso:ProtocolBinding} attribute
    * to the POST binding.
-   * 
+   *
    * @return this builder
    */
   public SingleSignOnServiceBuilder hokPostBinding() {
     return this.binding(HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI)
-      .protocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+        .protocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
   }
 
   /**
    * Shortcut to assign the {@code Binding} attribute to Holder-of-key and the {@code hoksso:ProtocolBinding} attribute
    * to the Redirect binding.
-   * 
+   *
    * @return this builder
    */
   public SingleSignOnServiceBuilder hokRedirectBinding() {
     return this.binding(HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI)
-      .protocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+        .protocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
   }
 
   /** {@inheritDoc} */

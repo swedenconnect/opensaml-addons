@@ -27,7 +27,7 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 
 /**
  * A builder for {@link SPSSODescriptor} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODescriptor, SPSSODescriptorBuilder> {
@@ -38,7 +38,7 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
   public SPSSODescriptorBuilder() {
     super();
   }
-  
+
   /**
    * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
    * elements and attributes of the template object using the assignment methods of the builder.
@@ -46,17 +46,17 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
    * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
    * modifications will have no effect on the passed object.
    * </p>
-   * 
+   *
    * @param template the template object
    * @param clone whether the template object should be cloned
    */
   public SPSSODescriptorBuilder(final SPSSODescriptor template, final boolean clone) {
     super(template, clone);
-  }  
+  }
 
   /**
    * Utility method that creates a {@code SPSSODescriptorBuilder} instance.
-   * 
+   *
    * @return a SPSSODescriptorBuilder instance
    */
   public static SPSSODescriptorBuilder builder() {
@@ -65,9 +65,8 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
 
   /**
    * Assigns the {@code AuthnRequestsSigned} attribute of the {@code md:SPSSODescriptor} element.
-   * 
-   * @param b
-   *          boolean (if null, the attribute is not set)
+   *
+   * @param b boolean (if null, the attribute is not set)
    * @return the builder
    */
   public SPSSODescriptorBuilder authnRequestsSigned(final Boolean b) {
@@ -77,9 +76,8 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
 
   /**
    * Assigns the {@code WantAssertionsSigned} attribute of the {@code md:SPSSODescriptor} element.
-   * 
-   * @param b
-   *          whether assertions should be signed
+   *
+   * @param b whether assertions should be signed
    * @return the builder
    */
   public SPSSODescriptorBuilder wantAssertionsSigned(final Boolean b) {
@@ -89,12 +87,12 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
 
   /**
    * Adds {@code md:AssertionConsumerService} elements to the {@code SPSSODescriptor}.
-   * 
-   * @param assertionConsumerServices
-   *          assertion consumer service objects (cloned before assignment)
+   *
+   * @param assertionConsumerServices assertion consumer service objects (cloned before assignment)
    * @return the builder
    */
-  public SPSSODescriptorBuilder assertionConsumerServices(final List<AssertionConsumerService> assertionConsumerServices) {
+  public SPSSODescriptorBuilder assertionConsumerServices(
+      final List<AssertionConsumerService> assertionConsumerServices) {
     this.object().getAssertionConsumerServices().clear();
     if (assertionConsumerServices == null || assertionConsumerServices.isEmpty()) {
       return this;
@@ -112,24 +110,24 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
 
   /**
    * See {@link #assertionConsumerServices(List)}.
-   * 
-   * @param assertionConsumerServices
-   *          assertion consumer service objects (cloned before assignment)
+   *
+   * @param assertionConsumerServices assertion consumer service objects (cloned before assignment)
    * @return the builder
    */
   public SPSSODescriptorBuilder assertionConsumerServices(final AssertionConsumerService... assertionConsumerServices) {
-    return this.assertionConsumerServices(assertionConsumerServices != null ? Arrays.asList(assertionConsumerServices) : null);
+    return this
+        .assertionConsumerServices(assertionConsumerServices != null ? Arrays.asList(assertionConsumerServices) : null);
   }
-  
+
   /**
    * Adds {@code md:AttributeConsumingService} elements to the {@code SPSSODescriptor}.
-   * 
-   * @param attributeConsumingServices
-   *          attribute consumer service objects (cloned before assignment)
+   *
+   * @param attributeConsumingServices attribute consumer service objects (cloned before assignment)
    * @return the builder
    */
-  public SPSSODescriptorBuilder attributeConsumingServices(final List<AttributeConsumingService> attributeConsumingServices) {
-    this.object().getAttributeConsumingServices().clear();    
+  public SPSSODescriptorBuilder attributeConsumingServices(
+      final List<AttributeConsumingService> attributeConsumingServices) {
+    this.object().getAttributeConsumingServices().clear();
     if (attributeConsumingServices == null || attributeConsumingServices.isEmpty()) {
       return null;
     }
@@ -146,14 +144,15 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
 
   /**
    * See {@link #attributeConsumingServices(List)}.
-   * 
-   * @param attributeConsumingServices
-   *          attribute consumer service objects (cloned before assignment)
+   *
+   * @param attributeConsumingServices attribute consumer service objects (cloned before assignment)
    * @return the builder
    */
-  public SPSSODescriptorBuilder attributeConsumingServices(final AttributeConsumingService... attributeConsumingServices) {
-    return this.attributeConsumingServices(attributeConsumingServices != null ? Arrays.asList(attributeConsumingServices) : null);
-  }  
+  public SPSSODescriptorBuilder attributeConsumingServices(
+      final AttributeConsumingService... attributeConsumingServices) {
+    return this.attributeConsumingServices(
+        attributeConsumingServices != null ? Arrays.asList(attributeConsumingServices) : null);
+  }
 
   /** {@inheritDoc} */
   @Override

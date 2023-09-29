@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,15 +59,15 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 
-import net.shibboleth.utilities.java.support.codec.Base64Support;
-import net.shibboleth.utilities.java.support.codec.DecodingException;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.component.InitializableComponent;
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
-import net.shibboleth.utilities.java.support.xml.SerializeSupport;
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.codec.Base64Support;
+import net.shibboleth.shared.codec.DecodingException;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.component.InitializableComponent;
+import net.shibboleth.shared.component.UninitializedComponentException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
+import net.shibboleth.shared.xml.SerializeSupport;
+import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AbstractAssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidationParametersBuilder;
@@ -86,7 +86,7 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
  * <p>
  * Note that {@link #initialize()} must be invoked before the bean can be used.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class ResponseProcessorImpl implements ResponseProcessor, InitializableComponent {
@@ -164,7 +164,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       //
       if (!StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
         log.info("Authentication failed with status '{}' [{}]",
-          ResponseStatusErrorException.statusToString(response.getStatus()), logId(response));
+            ResponseStatusErrorException.statusToString(response.getStatus()), logId(response));
         throw new ResponseStatusErrorException(response.getStatus(), response.getID(), issuer);
       }
 
@@ -232,11 +232,11 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
       this.metadataCredentialResolver = new MetadataCredentialResolver();
       this.metadataCredentialResolver.setKeyInfoCredentialResolver(DefaultSecurityConfigurationBootstrap
-        .buildBasicInlineKeyInfoCredentialResolver());
+          .buildBasicInlineKeyInfoCredentialResolver());
       this.metadataCredentialResolver.initialize();
 
       this.signatureTrustEngine = new ExplicitKeySignatureTrustEngine(this.metadataCredentialResolver,
-        DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
+          DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
 
       this.responseValidator = this.createResponseValidator(signatureTrustEngine, signatureProfileValidator);
       if (this.responseValidator == null) {
@@ -264,11 +264,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * subclasses should create a {@code SwedishEidResponseValidator} instance, see the swedish-eid-opensaml library
    * (https://github.com/litsec/swedish-eid-opensaml).
    * </p>
-   * 
-   * @param signatureTrustEngine
-   *          the signature trust engine to be used when validating signatures
-   * @param signatureProfileValidator
-   *          validator for checking the a Signature is correct with respect to the standards
+   *
+   * @param signatureTrustEngine the signature trust engine to be used when validating signatures
+   * @param signatureProfileValidator validator for checking the a Signature is correct with respect to the standards
    * @return the created response validator
    */
   protected ResponseValidator createResponseValidator(final SignatureTrustEngine signatureTrustEngine,
@@ -283,20 +281,18 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * subclasses should create a {@code SwedishEidAssertionValidator} instance, see the opensaml-swedish-eid library
    * (https://github.com/swedenconnect/opensaml-swedish-eid).
    * </p>
-   * 
-   * @param signatureTrustEngine
-   *          the signature trust engine to be used when validating signatures
-   * @param signatureProfileValidator
-   *          validator for checking the a Signature is correct with respect to the standards
+   *
+   * @param signatureTrustEngine the signature trust engine to be used when validating signatures
+   * @param signatureProfileValidator validator for checking the a Signature is correct with respect to the standards
    * @return the created assertion validator
    */
   protected AssertionValidator createAssertionValidator(
       final SignatureTrustEngine signatureTrustEngine, final SignaturePrevalidator signatureProfileValidator) {
 
     return new AssertionValidator(signatureTrustEngine, signatureProfileValidator,
-      Arrays.asList(new BearerSubjectConfirmationValidator(), new HolderOfKeySubjectConfirmationValidator()),
-      Arrays.asList(new AudienceRestrictionConditionValidator()),
-      Arrays.asList(new AuthnStatementValidator()));
+        Arrays.asList(new BearerSubjectConfirmationValidator(), new HolderOfKeySubjectConfirmationValidator()),
+        Arrays.asList(new AudienceRestrictionConditionValidator()),
+        Arrays.asList(new AuthnStatementValidator()));
   }
 
   protected AbstractAssertionValidationParametersBuilder<?> getAssertionValidationParametersBuilder() {
@@ -305,23 +301,21 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /**
    * Decodes the received SAML response message into a {@link Response} object.
-   * 
-   * @param samlResponse
-   *          the Base64 encoded SAML response
+   *
+   * @param samlResponse the Base64 encoded SAML response
    * @return a {@code Response} object
-   * @throws ResponseProcessingException
-   *           for decoding errors
+   * @throws ResponseProcessingException for decoding errors
    */
   protected Response decodeResponse(final String samlResponse) throws ResponseProcessingException {
     try {
       final byte[] decodedBytes = Base64Support.decode(samlResponse);
       if (decodedBytes == null) {
-        log.error("Unable to Base64 decode SAML response message");
+        log.info("Unable to Base64 decode SAML response message");
         throw new MessageDecodingException("Unable to Base64 decode SAML response message");
       }
       return Response.class.cast(
-        XMLObjectSupport.unmarshallFromInputStream(
-          XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes)));
+          XMLObjectSupport.unmarshallFromInputStream(
+              XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes)));
     }
     catch (MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
       throw new ResponseProcessingException("Failed to decode message", e);
@@ -330,45 +324,42 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /**
    * Validates the response including its signature.
-   * 
-   * @param response
-   *          the response to verify
-   * @param relayState
-   *          the relay state that was received
-   * @param input
-   *          the processing input
-   * @param idpMetadata
-   *          the IdP metadata
-   * @param validationContext
-   *          optional validation context
-   * @throws ResponseValidationException
-   *           for validation errors
+   *
+   * @param response the response to verify
+   * @param relayState the relay state that was received
+   * @param input the processing input
+   * @param idpMetadata the IdP metadata
+   * @param validationContext optional validation context
+   * @throws ResponseValidationException for validation errors
    */
   protected void validateResponse(final Response response, final String relayState, final ResponseProcessingInput input,
-      final EntityDescriptor idpMetadata, final ValidationContext validationContext) throws ResponseValidationException {
+      final EntityDescriptor idpMetadata, final ValidationContext validationContext)
+      throws ResponseValidationException {
 
-    final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo()); 
+    final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
     if (authnRequest == null) {
       final String msg = String.format("No AuthnRequest available when processing Response [%s]", logId(response));
-      log.error("{}", msg);
+      log.info("{}", msg);
       throw new ResponseValidationException(msg);
     }
 
-    final IDPSSODescriptor descriptor = idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
+    final IDPSSODescriptor descriptor =
+        idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
       throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature");
     }
 
     final ResponseValidationParametersBuilder b = ResponseValidationParametersBuilder.builder()
-      .strictValidation(this.responseValidationSettings.isStrictValidation())
-      .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
-      .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
-      .signatureRequired(Boolean.TRUE)
-      .signatureValidationCriteriaSet(new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
-      .expectedIssuer(idpMetadata.getEntityID())
-      .receiveInstant(input.getReceiveInstant())
-      .receiveUrl(input.getReceiveURL())
-      .authnRequest(authnRequest);
+        .strictValidation(this.responseValidationSettings.isStrictValidation())
+        .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
+        .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
+        .signatureRequired(Boolean.TRUE)
+        .signatureValidationCriteriaSet(
+            new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
+        .expectedIssuer(idpMetadata.getEntityID())
+        .receiveInstant(input.getReceiveInstant())
+        .receiveUrl(input.getReceiveURL())
+        .authnRequest(authnRequest);
 
     if (validationContext != null) {
       b.addStaticParameters(validationContext.getStaticParameters());
@@ -385,72 +376,68 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       log.debug("Response was successfully validated [{}]", logId(response));
       break;
     case INDETERMINATE:
-      log.warn("Validation of Response was indeterminate - {} [{}]", context.getValidationFailureMessage(), logId(response));
+      log.info("Validation of Response was indeterminate - {} [{}]", context.getValidationFailureMessages(),
+          logId(response));
       break;
     case INVALID:
-      log.error("Validation of Response failed - {} [{}]", context.getValidationFailureMessage(), logId(response));
-      throw new ResponseValidationException(context.getValidationFailureMessage());
+      log.info("Validation of Response failed - {} [{}]", context.getValidationFailureMessages(), logId(response));
+      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()));
     }
   }
 
   /**
    * Validates the received relay state matches what we sent.
-   * 
-   * @param response
-   *          the response
-   * @param relayState
-   *          the received relay state
-   * @param input
-   *          the response processing input
-   * @throws ResponseValidationException
-   *           for validation errors
+   *
+   * @param response the response
+   * @param relayState the received relay state
+   * @param input the response processing input
+   * @throws ResponseValidationException for validation errors
    */
-  protected void validateRelayState(final Response response, final String relayState, final ResponseProcessingInput input)
+  protected void validateRelayState(final Response response, final String relayState,
+      final ResponseProcessingInput input)
       throws ResponseValidationException {
 
     final String requestRelayState = Optional.ofNullable(input.getRequestRelayState(response.getInResponseTo()))
-        .map(String::trim).filter(r -> !r.isEmpty()).orElse(null);    
-    final String _relayState = Optional.ofNullable(relayState).map(String::trim).filter(r -> !r.isEmpty()).orElse(null);         
-    final boolean relayStateMatch = Objects.equal(requestRelayState, _relayState); 
+        .map(String::trim).filter(r -> !r.isEmpty()).orElse(null);
+    final String _relayState = Optional.ofNullable(relayState).map(String::trim).filter(r -> !r.isEmpty()).orElse(null);
+    final boolean relayStateMatch = Objects.equal(requestRelayState, _relayState);
 
     if (!relayStateMatch) {
       final String msg =
           String.format("RelayState variable received with response (%s) does not match the sent one (%s)",
-            relayState, requestRelayState);
-      log.error("{} [{}]", msg, logId(response));
+              relayState, requestRelayState);
+      log.info("{} [{}]", msg, logId(response));
       throw new ResponseValidationException(msg);
     }
   }
 
   /**
    * Validates the assertion.
-   * 
-   * @param assertion
-   *          the assertion to validate
-   * @param response
-   *          the response that contained the assertion
-   * @param input
-   *          the processing input
-   * @param idpMetadata
-   *          the IdP metadat
-   * @param validationContext
-   *          optional validation context
-   * @throws ResponseValidationException
-   *           for validation errors
+   *
+   * @param assertion the assertion to validate
+   * @param response the response that contained the assertion
+   * @param input the processing input
+   * @param idpMetadata the IdP metadat
+   * @param validationContext optional validation context
+   * @throws ResponseValidationException for validation errors
    */
-  protected void validateAssertion(final Assertion assertion, final Response response, final ResponseProcessingInput input,
-      final EntityDescriptor idpMetadata, final ValidationContext validationContext) throws ResponseValidationException {
+  protected void validateAssertion(final Assertion assertion, final Response response,
+      final ResponseProcessingInput input,
+      final EntityDescriptor idpMetadata, final ValidationContext validationContext)
+      throws ResponseValidationException {
 
-    final IDPSSODescriptor descriptor = idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
+    final IDPSSODescriptor descriptor =
+        idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
       throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Assertion");
     }
 
     final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
     if (authnRequest == null) {
-      log.warn("No AuthnRequest available for ID: {}", response.getInResponseTo());
+      log.info("No AuthnRequest available for ID: {}", response.getInResponseTo());
     }
-    final String entityID = Optional.ofNullable(authnRequest).map(AuthnRequest::getIssuer).map(Issuer::getValue).orElse(null);
+    final String entityID =
+        Optional.ofNullable(authnRequest).map(AuthnRequest::getIssuer).map(Issuer::getValue).orElse(null);
 
     final AbstractAssertionValidationParametersBuilder<?> builder = this.getAssertionValidationParametersBuilder();
 
@@ -460,24 +447,26 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     }
 
     builder
-      .strictValidation(this.responseValidationSettings.isStrictValidation())
-      .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
-      .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
-      .signatureRequired(this.responseValidationSettings.isRequireSignedAssertions())
-      .signatureValidationCriteriaSet(new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))      
-      .idpMetadata(idpMetadata)
-      .receiveInstant(input.getReceiveInstant())
-      .receiveUrl(input.getReceiveURL())
-      .authnRequest(authnRequest)
-      .expectedIssuer(idpMetadata.getEntityID())
-      .responseIssueInstant(response.getIssueInstant().toEpochMilli())
-      .validAudiences(entityID)
-      .validRecipients(input.getReceiveURL(), entityID)
-      .validAddresses((String) input.getClientIpAddress())
-      .clientCertificate(input.getClientCertificate());
-    
+        .strictValidation(this.responseValidationSettings.isStrictValidation())
+        .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
+        .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
+        .signatureRequired(this.responseValidationSettings.isRequireSignedAssertions())
+        .signatureValidationCriteriaSet(
+            new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
+        .idpMetadata(idpMetadata)
+        .receiveInstant(input.getReceiveInstant())
+        .receiveUrl(input.getReceiveURL())
+        .authnRequest(authnRequest)
+        .expectedIssuer(idpMetadata.getEntityID())
+        .responseIssueInstant(response.getIssueInstant().toEpochMilli())
+        .validAudiences(entityID)
+        .validRecipients(input.getReceiveURL(), entityID)
+        .validAddresses(input.getClientIpAddress())
+        .clientCertificate(input.getClientCertificate());
+
     // TODO: We should really make sure that we honor all passed in validation context settings
-    if (validationContext == null || validationContext.getStaticParameters().get(CoreValidatorParameters.SP_METADATA) == null) {
+    if (validationContext == null
+        || validationContext.getStaticParameters().get(CoreValidatorParameters.SP_METADATA) == null) {
       builder.spMetadata(this.getSpMetadata(entityID));
     }
 
@@ -492,21 +481,20 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       log.debug("Assertion with ID '{}' was successfully validated", assertion.getID());
       break;
     case INDETERMINATE:
-      log.warn("Validation of Assertion with ID '{}' was indeterminate - {}", assertion.getID(), context.getValidationFailureMessage());
+      log.info("Validation of Assertion with ID '{}' was indeterminate - {}", assertion.getID(),
+          context.getValidationFailureMessages());
       break;
     case INVALID:
-      log.error("Validation of Assertion failed - {}", context.getValidationFailureMessage());
-      throw new ResponseValidationException(context.getValidationFailureMessage());
+      log.info("Validation of Assertion failed - {}", context.getValidationFailureMessages());
+      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()));
     }
   }
 
   /**
    * Gets the metadata for the given entityID and role (type).
-   * 
-   * @param entityID
-   *          the entity ID
-   * @param role
-   *          the role
+   *
+   * @param entityID the entity ID
+   * @param role the role
    * @return the entity descriptor or null if no metadata is found
    */
   protected EntityDescriptor getMetadata(final String entityID, final QName role) {
@@ -532,9 +520,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /**
    * Gets the SAML metadata for a given SP.
-   * 
-   * @param entityID
-   *          the SP entityID
+   *
+   * @param entityID the SP entityID
    * @return the SP metadata or null if none is found
    */
   protected EntityDescriptor getSpMetadata(final String entityID) {
@@ -554,57 +541,62 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /**
    * Assigns the metadata resolver to use.
-   * 
-   * @param metadataResolver
-   *          the metadata resolver
+   *
+   * @param metadataResolver the metadata resolver
    */
   public void setMetadataResolver(final MetadataResolver metadataResolver) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.metadataResolver = metadataResolver;
   }
 
   /**
    * Assigns the decrypter instance.
-   * 
-   * @param decrypter
-   *          the decrypter
+   *
+   * @param decrypter the decrypter
    */
   public void setDecrypter(final SAMLObjectDecrypter decrypter) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.decrypter = decrypter;
   }
 
   /**
    * Assigns the message replay checker to use.
-   * 
-   * @param messageReplayChecker
-   *          message replay checker
+   *
+   * @param messageReplayChecker message replay checker
    */
   public void setMessageReplayChecker(final MessageReplayChecker messageReplayChecker) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.messageReplayChecker = messageReplayChecker;
   }
 
   /**
    * Assigns the response validation settings.
-   * 
-   * @param responseValidationSettings
-   *          validation settings
+   *
+   * @param responseValidationSettings validation settings
    */
   public void setResponseValidationSettings(final ResponseValidationSettings responseValidationSettings) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.responseValidationSettings = responseValidationSettings;
   }
 
   /**
    * Assigns whether require assertions to be encrypted? The default is {@code true}.
-   * 
-   * @param requireEncryptedAssertions
-   *          boolean
+   *
+   * @param requireEncryptedAssertions boolean
    */
   public void setRequireEncryptedAssertions(boolean requireEncryptedAssertions) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.requireEncryptedAssertions = requireEncryptedAssertions;
+  }
+
+  /**
+   * Helper for a setter method to check the standard preconditions.
+   */
+  protected final void checkSetterPreconditions() {
+    if (!isInitialized()) {
+      throw new UninitializedComponentException(
+          "Unidentified Component has not yet been initialized and cannot be used.");
+    }
   }
 
   private static String logId(final Response response) {
@@ -613,17 +605,15 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   private static String logId(final Response response, final Assertion assertion) {
     return String.format("response-id:'%s',assertion-id:'%s'",
-      Optional.ofNullable(response.getID()).orElse("<empty>"),
-      Optional.ofNullable(assertion.getID()).orElse("<empty>"));
+        Optional.ofNullable(response.getID()).orElse("<empty>"),
+        Optional.ofNullable(assertion.getID()).orElse("<empty>"));
   }
 
   /**
    * Returns the given SAML object in its "pretty print" XML string form.
-   * 
-   * @param <T>
-   *          the type of object to "print"
-   * @param object
-   *          the object to display as a string
+   *
+   * @param <T> the type of object to "print"
+   * @param object the object to display as a string
    * @return the XML as a string
    */
   private static <T extends SAMLObject> String toString(final T object) {

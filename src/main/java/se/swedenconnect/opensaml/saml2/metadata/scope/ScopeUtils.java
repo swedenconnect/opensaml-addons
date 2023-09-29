@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class ScopeUtils {
 
   /**
    * Given an (IdP) {@link EntityDescriptor}, the method finds all {@code shibmd:Scope} elements.
-   * 
+   *
    * @param entityDescriptor
    *          the metadata object
    * @return a (possible empty) list of {@code shibmd:Scope} elements
@@ -56,7 +56,7 @@ public class ScopeUtils {
    * <p>
    * If an attribute that is not "scoped" (value@scope) the method returns {@code false}.
    * </p>
-   * 
+   *
    * @param scopedAttribute
    *          the attribute to test
    * @param scopes
@@ -148,7 +148,7 @@ public class ScopeUtils {
 
   /**
    * Gets the domain part (value@domain) from a scoped attribute value.
-   * 
+   *
    * @param attributeValue
    *          the attribute value
    * @return the domain part, or null

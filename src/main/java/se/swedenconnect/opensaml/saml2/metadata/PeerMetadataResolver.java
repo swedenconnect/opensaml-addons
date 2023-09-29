@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
 /**
  * Simple functional interface for obtaining the peer metadata.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 @FunctionalInterface
@@ -27,9 +27,8 @@ public interface PeerMetadataResolver {
 
   /**
    * Returns the metadata {@code EntityDescriptor} for the given entityID.
-   * 
-   * @param entityID
-   *          the IdP entityID
+   *
+   * @param entityID the IdP entityID
    * @return an EntityDescriptor object, or null if no metadata record can be found
    */
   EntityDescriptor getMetadata(final String entityID);

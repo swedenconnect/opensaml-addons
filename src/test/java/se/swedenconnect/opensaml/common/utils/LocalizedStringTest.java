@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package se.swedenconnect.opensaml.common.utils;
 
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for {@link LocalizedString}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class LocalizedStringTest {
@@ -30,45 +30,51 @@ public class LocalizedStringTest {
   @Test
   public void testDefaultConstructor() {
     final LocalizedString ls = new LocalizedString();
-    Assert.assertEquals(LocalizedString.DEFAULT_LANGUAGE_TAG, ls.getLanguage());
-    Assert.assertNull(ls.getLocalString());
+    Assertions.assertEquals(LocalizedString.DEFAULT_LANGUAGE_TAG, ls.getLanguage());
+    Assertions.assertNull(ls.getLocalString());
   }
-  
+
   @Test
   public void testParse() {
     final LocalizedString ls = new LocalizedString("sv-Hejsan");
-    Assert.assertEquals("sv", ls.getLanguage());
-    Assert.assertEquals("Hejsan", ls.getLocalString());
-    
+    Assertions.assertEquals("sv", ls.getLanguage());
+    Assertions.assertEquals("Hejsan", ls.getLocalString());
+
     final LocalizedString ls2 = new LocalizedString("sv-");
-    Assert.assertEquals("sv", ls2.getLanguage());
-    Assert.assertEquals("", ls2.getLocalString());
+    Assertions.assertEquals("sv", ls2.getLanguage());
+    Assertions.assertEquals("", ls2.getLocalString());
   }
-  
-  @Test(expected = IllegalArgumentException.class)
+
+  @Test
   public void testParseError1() {
-    new LocalizedString("");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      new LocalizedString("");
+    });
   }
-  
-  @Test(expected = IllegalArgumentException.class)
+
+  @Test
   public void testParseError2() {
-    new LocalizedString("sv+Hejsan");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      new LocalizedString("sv+Hejsan");
+    });
   }
-  
-  @Test(expected = IllegalArgumentException.class)
+
+  @Test
   public void testParseError3() {
-    new LocalizedString("english-Hello");
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      new LocalizedString("english-Hello");
+    });
   }
-  
+
   @Test
   public void testSetLocale() {
     final LocalizedString ls = new LocalizedString("Guten tag", Locale.GERMANY);
-    Assert.assertEquals("de", ls.getLanguage());
-    Assert.assertEquals("Guten tag", ls.getLocalString());
-    
-    final LocalizedString ls2 = new LocalizedString("Hello", (Locale)null);
-    Assert.assertEquals(Locale.ENGLISH.getLanguage(), ls2.getLanguage());
-    Assert.assertEquals("Hello", ls2.getLocalString());
+    Assertions.assertEquals("de", ls.getLanguage());
+    Assertions.assertEquals("Guten tag", ls.getLocalString());
+
+    final LocalizedString ls2 = new LocalizedString("Hello", (Locale) null);
+    Assertions.assertEquals(Locale.ENGLISH.getLanguage(), ls2.getLanguage());
+    Assertions.assertEquals("Hello", ls2.getLocalString());
   }
 
 }

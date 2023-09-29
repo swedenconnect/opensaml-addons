@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Validate;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -42,10 +45,10 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
-import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGenerationStrategy;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.ResolverException;
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 
 /**
  * A metadata provider that collects its metadata from multiple sources (providers).
@@ -53,7 +56,7 @@ import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGener
  * It is recommended that all providers installed have the {@code failFastInitialization} property set to {@code false}.
  * Otherwise a failing provider will shut down the entire compostite provider.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  * @see CompositeMetadataResolver
  */
@@ -81,7 +84,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
   private Instant compositeMetadataCreationTime;
 
   /** Generates ID. */
-  private RandomIdentifierGenerationStrategy idGenerator = new RandomIdentifierGenerationStrategy(20);
+  private RandomIdentifierGenerationStrategy idGenerator;
 
   /** Duration telling for how long the metadata returned by {@link #getMetadata()} should be valid. */
   private Duration validity;
@@ -96,22 +99,27 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    * The {@code id} parameter will also by used as the {@code Name} attribute for the {@code EntitiesDescriptor} that
    * will be returned by {@link #getMetadata()}.
    * </p>
-   * 
-   * @param id
-   *          the identifier for the provider (may not be changed later on)
-   * @param metadataProviders
-   *          a list of providers
+   *
+   * @param id the identifier for the provider (may not be changed later on)
+   * @param metadataProviders a list of providers
    */
   public CompositeMetadataProvider(final String id, final List<MetadataProvider> metadataProviders) {
     Validate.notNull(id, "id must not be null");
     Validate.notNull(metadataProviders, "metadataProviders must not be null");
     this.id = id;
     this.metadataProviders = metadataProviders;
+    try {
+      this.idGenerator = new RandomIdentifierGenerationStrategy(
+          new RandomIdentifierParameterSpec(new SecureRandom(), 20, new Hex()));
+    }
+    catch (final InvalidAlgorithmParameterException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
    * Gets the underlying providers.
-   * 
+   *
    * @return a list of the underlying metadata providers
    */
   public List<MetadataProvider> getProviders() {
@@ -163,7 +171,8 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
 
     final List<String> entityIds = new ArrayList<>();
 
-    final EntitiesDescriptor metadata = (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
+    final EntitiesDescriptor metadata =
+        (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
     metadata.setName(this.getID());
     metadata.setID("metadata_" + this.idGenerator.generateIdentifier(true));
 
@@ -196,8 +205,10 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
       while (it.hasNext()) {
         final EntityDescriptor ed = it.next();
         if (entityIds.contains(ed.getEntityID())) {
-          log.warn("EntityDescriptor for '{}' already exists in metadata. Entry read from provider '{}' will be ignored.", ed.getEntityID(),
-            provider.getID());
+          log.warn(
+              "EntityDescriptor for '{}' already exists in metadata. Entry read from provider '{}' will be ignored.",
+              ed.getEntityID(),
+              provider.getID());
           continue;
         }
         try {
@@ -295,9 +306,9 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
     // and we can install them.
     //
     final List<MetadataResolver> resolvers = this.metadataProviders
-      .stream()
-      .map(MetadataProvider::getMetadataResolver)
-      .collect(Collectors.toList());
+        .stream()
+        .map(MetadataProvider::getMetadataResolver)
+        .collect(Collectors.toList());
 
     if (resolvers.isEmpty()) {
       log.warn("No metadata sources installed for CompositeMetadataProvider '{}'", this.getID());
@@ -347,7 +358,8 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    */
   @Override
   public void setFailFastInitialization(final boolean failFast) {
-    throw new UnsupportedOperationException("Cannot configure 'failFastInitialization' for a CompositeMetadataResolver");
+    throw new UnsupportedOperationException(
+        "Cannot configure 'failFastInitialization' for a CompositeMetadataResolver");
   }
 
   /**
@@ -374,7 +386,8 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    */
   @Override
   public void setSignatureVerificationCertificate(final X509Certificate signatureVerificationCertificate) {
-    throw new UnsupportedOperationException("Cannot configure 'signatureVerificationCertificate' for a CompositeMetadataResolver");
+    throw new UnsupportedOperationException(
+        "Cannot configure 'signatureVerificationCertificate' for a CompositeMetadataResolver");
   }
 
   /**
@@ -383,19 +396,19 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    */
   @Override
   public void setPerformSchemaValidation(final boolean performSchemaValidation) {
-    throw new UnsupportedOperationException("Cannot configure 'performSchemaValidation' for a CompositeMetadataResolver");
+    throw new UnsupportedOperationException(
+        "Cannot configure 'performSchemaValidation' for a CompositeMetadataResolver");
   }
 
   /**
    * Assigns how long the aggregated metadata (returned via {@link #getMetadata()}) should be valid. If not assigned,
    * the provider will calculate the {@code validUntil} based on the lowest {@code validUntil} value from the underlying
    * providers.
-   * 
-   * @param validity
-   *          the validity
+   *
+   * @param validity the validity
    */
   public void setValidity(final Duration validity) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.validity = validity;
   }
 
@@ -403,12 +416,11 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    * Assigns the {@code cacheDuration} to assign to the aggregated metadata (returned via {@link #getMetadata()}). If
    * not assigned the {@code cacheDuration} will be based on the lowest {@code cacheDuration} value from the underlying
    * providers.
-   * 
-   * @param cacheDuration
-   *          the cache duration
+   *
+   * @param cacheDuration the cache duration
    */
   public void setCacheDuration(final Duration cacheDuration) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.cacheDuration = cacheDuration;
   }
 

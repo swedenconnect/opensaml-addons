@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.net.URIComparator;
-import net.shibboleth.utilities.java.support.net.URIException;
-import net.shibboleth.utilities.java.support.net.impl.BasicURLComparator;
+import net.shibboleth.shared.net.URIComparator;
+import net.shibboleth.shared.net.URIException;
+import net.shibboleth.shared.net.impl.BasicURLComparator;
 import se.swedenconnect.opensaml.common.validation.AbstractSignableObjectValidator;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport;
@@ -83,10 +83,8 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Constructor.
    *
-   * @param trustEngine
-   *          the trust used to validate the object's signature
-   * @param signaturePrevalidator
-   *          the signature pre-validator used to pre-validate the object's signature
+   * @param trustEngine the trust used to validate the object's signature
+   * @param signaturePrevalidator the signature pre-validator used to pre-validate the object's signature
    */
   public ResponseValidator(final SignatureTrustEngine trustEngine, final SignaturePrevalidator signaturePrevalidator) {
     super(trustEngine, signaturePrevalidator);
@@ -96,8 +94,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Assigns a custom {@link URIComparator} to be used when checking URL:s against eachother. The default is
    * {@link BasicURLComparator}.
    *
-   * @param uriComparator
-   *          the customized URIComparator
+   * @param uriComparator the customized URIComparator
    */
   public void setUriComparator(final URIComparator uriComparator) {
     if (uriComparator != null) {
@@ -132,15 +129,13 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Validates that the {@code Response} object has an ID attribute.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateID(final Response response, final ValidationContext context) {
     if (StringUtils.isBlank(response.getID())) {
-      context.setValidationFailureMessage("Missing ID attribute in Response");
+      context.getValidationFailureMessages().add("Missing ID attribute in Response");
       return ValidationResult.INVALID;
     }
     return ValidationResult.VALID;
@@ -149,15 +144,13 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Validates that the {@code Response} object has a valid Version attribute.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateVersion(final Response response, final ValidationContext context) {
     if (response.getVersion() == null || !response.getVersion().toString().equals(SAMLVersion.VERSION_20.toString())) {
-      context.setValidationFailureMessage("Invalid SAML version in Response");
+      context.getValidationFailureMessages().add("Invalid SAML version in Response");
       return ValidationResult.INVALID;
     }
     return ValidationResult.VALID;
@@ -166,17 +159,15 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   /**
    * Validates that the {@code Response} object has a {@code Status} attribute.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateStatus(final Response response, final ValidationContext context) {
     if (response.getStatus() == null
         || response.getStatus().getStatusCode() == null
         || response.getStatus().getStatusCode().getValue() == null) {
-      context.setValidationFailureMessage("Missing Status/StatusCode in Response");
+      context.getValidationFailureMessages().add("Missing Status/StatusCode in Response");
       return ValidationResult.INVALID;
     }
     return ValidationResult.VALID;
@@ -187,15 +178,13 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * {@link CoreValidatorParameters#MAX_AGE_MESSAGE} and {@link CoreValidatorParameters#RECEIVE_INSTANT} context
    * parameters.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateIssueInstant(final Response response, final ValidationContext context) {
     if (response.getIssueInstant() == null) {
-      context.setValidationFailureMessage("Missing IssueInstant attribute in Response");
+      context.getValidationFailureMessages().add("Missing IssueInstant attribute in Response");
       return ValidationResult.INVALID;
     }
 
@@ -210,8 +199,8 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     //
     if (Duration.between(receiveInstant, issueInstant).compareTo(maxAgeResponse.plus(allowedClockSkew)) > 0) {
       final String msg = String.format("Received Response message is too old - issue-instant: %s - receive-time: %s",
-        response.getIssueInstant(), receiveInstant);
-      context.setValidationFailureMessage(msg);
+          response.getIssueInstant(), receiveInstant);
+      context.getValidationFailureMessages().add(msg);
       return ValidationResult.INVALID;
     }
 
@@ -219,9 +208,10 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     // issueInstant - receiveInstant > allowedClockSkew
     //
     if (Duration.between(issueInstant, receiveInstant).compareTo(allowedClockSkew) > 0) {
-      final String msg = String.format("Issue-instant of Response message (%s) is newer than receive time (%s) - Non accepted clock skew",
-        response.getIssueInstant(), receiveInstant);
-      context.setValidationFailureMessage(msg);
+      final String msg = String.format(
+          "Issue-instant of Response message (%s) is newer than receive time (%s) - Non accepted clock skew",
+          response.getIssueInstant(), receiveInstant);
+      context.getValidationFailureMessages().add(msg);
       return ValidationResult.INVALID;
     }
 
@@ -233,34 +223,35 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * The ID is found in the {@code context} parameter under the key {@link CoreValidatorParameters#AUTHN_REQUEST_ID} or
    * from the object stored under {@link CoreValidatorParameters#AUTHN_REQUEST}.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateInResponseTo(final Response response, final ValidationContext context) {
     if (response.getInResponseTo() == null) {
-      context.setValidationFailureMessage("Missing InResponseTo attribute in Response");
+      context.getValidationFailureMessages().add("Missing InResponseTo attribute in Response");
       return ValidationResult.INVALID;
     }
     String expectedInResponseTo = (String) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST_ID);
     if (expectedInResponseTo == null) {
-      AuthnRequest authnRequest = (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
+      AuthnRequest authnRequest =
+          (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
       if (authnRequest != null) {
         expectedInResponseTo = authnRequest.getID();
       }
     }
     if (expectedInResponseTo != null) {
       if (!response.getInResponseTo().equals(expectedInResponseTo)) {
-        final String msg = String.format("Expected Response message for AuthnRequest with ID '%s', but this Response is for '%s'",
-          expectedInResponseTo, response.getInResponseTo());
-        context.setValidationFailureMessage(msg);
+        final String msg =
+            String.format("Expected Response message for AuthnRequest with ID '%s', but this Response is for '%s'",
+                expectedInResponseTo, response.getInResponseTo());
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
     else {
-      context.setValidationFailureMessage("Could not validate InResponseTo of Response (no AuthnRequest ID available)");
+      context.getValidationFailureMessages()
+          .add("Could not validate InResponseTo of Response (no AuthnRequest ID available)");
       return ValidationResult.INDETERMINATE;
     }
 
@@ -271,15 +262,13 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Ensures that the {@code Destination} attribute is present and matches the URL on which we received the message.
    * This value is found in the context under the {@link CoreValidatorParameters#RECEIVE_URL} key.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateDestination(final Response response, final ValidationContext context) {
     if (response.getDestination() == null) {
-      context.setValidationFailureMessage("Missing Destination attribute in Response");
+      context.getValidationFailureMessages().add("Missing Destination attribute in Response");
       return ValidationResult.INVALID;
     }
 
@@ -288,22 +277,23 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       try {
         if (!this.uriComparator.compare(response.getDestination(), receiveUrl)) {
           final String msg = String.format(
-            "Destination attribute (%s) of Response does not match URL on which response was received (%s)",
-            response.getDestination(), receiveUrl);
-          context.setValidationFailureMessage(msg);
+              "Destination attribute (%s) of Response does not match URL on which response was received (%s)",
+              response.getDestination(), receiveUrl);
+          context.getValidationFailureMessages().add(msg);
           return ValidationResult.INVALID;
         }
       }
       catch (final URIException e) {
         final String msg = String.format(
-          "Error when comparing Destination attribute (%s) with URL on which the response was received (%s) - %s",
-          response.getDestination(), receiveUrl, e.getMessage(), e);
-        context.setValidationFailureMessage(msg);
+            "Error when comparing Destination attribute (%s) with URL on which the response was received (%s) - %s",
+            response.getDestination(), receiveUrl, e.getMessage(), e);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
     else {
-      context.setValidationFailureMessage("Could not validate Destination of Response (no receive URL available)");
+      context.getValidationFailureMessages()
+          .add("Could not validate Destination of Response (no receive URL available)");
       return ValidationResult.INDETERMINATE;
     }
 
@@ -314,10 +304,8 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Validates the {@code Consent} attribute. The default implementation returns {@link ValidationResult#VALID} since
    * the attribute is optional according to the SAML 2.0 Core specifications.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateConsent(final Response response, final ValidationContext context) {
@@ -328,24 +316,22 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Ensures that the {@code Issuer} element is present and matches the expected issuer (if set in the context under the
    * {@link CoreValidatorParameters#EXPECTED_ISSUER} key).
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateIssuer(final Response response, final ValidationContext context) {
     final String issuer = this.getIssuer(response);
     if (issuer == null) {
-      context.setValidationFailureMessage("Missing Issuer element in Response");
+      context.getValidationFailureMessages().add("Missing Issuer element in Response");
       return ValidationResult.INVALID;
     }
     final String expectedIssuer = (String) context.getStaticParameters().get(CoreValidatorParameters.EXPECTED_ISSUER);
     if (expectedIssuer != null) {
       if (!response.getIssuer().getValue().equals(expectedIssuer)) {
         final String msg = String.format("Issuer of Response (%s) did not match expected issuer (%s)",
-          response.getIssuer().getValue(), expectedIssuer);
-        context.setValidationFailureMessage(msg);
+            response.getIssuer().getValue(), expectedIssuer);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
@@ -363,22 +349,22 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * <li>Else - No assertions are present.</li>
    * </ul>
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateAssertions(final Response response, final ValidationContext context) {
     if (StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
       if (response.getAssertions().isEmpty() && response.getEncryptedAssertions().isEmpty()) {
-        context.setValidationFailureMessage("Response message has success status but does not contain any assertions - invalid");
+        context.getValidationFailureMessages().add(
+            "Response message has success status but does not contain any assertions - invalid");
         return ValidationResult.INVALID;
       }
     }
     else {
       if (response.getAssertions().size() > 0 || response.getEncryptedAssertions().size() > 0) {
-        context.setValidationFailureMessage("Response message has failure status but contains assertions - invalid");
+        context.getValidationFailureMessages()
+            .add("Response message has failure status but contains assertions - invalid");
         return ValidationResult.INVALID;
       }
     }
@@ -389,10 +375,8 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
    * Validates the {@code Extensions} element. The default implementation returns {@link ValidationResult#VALID} since
    * the element is optional according to the SAML 2.0 Core specifications.
    *
-   * @param response
-   *          the response
-   * @param context
-   *          the validation context
+   * @param response the response
+   * @param context the validation context
    * @return a validation result
    */
   protected ValidationResult validateExtensions(final Response response, final ValidationContext context) {

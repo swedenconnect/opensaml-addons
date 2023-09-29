@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import java.util.Map;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.CriteriaSet;
 
 /**
  * Abstract base class for building the {@link ValidationContext} object using a builder pattern. These settings are
  * parameters that control the validation of an object.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractValidationParametersBuilder<T extends AbstractValidationParametersBuilder<T>> implements
@@ -50,11 +50,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Generic method that adds a static validation parameter.
-   * 
-   * @param name
-   *          the parameter name
-   * @param value
-   *          the parameter value
+   *
+   * @param name the parameter name
+   * @param value the parameter value
    * @return the builder
    */
   public T staticParameter(final String name, final Object value) {
@@ -64,11 +62,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Generic method that adds a dynamic validation parameter.
-   * 
-   * @param name
-   *          the parameter name
-   * @param value
-   *          the parameter value
+   *
+   * @param name the parameter name
+   * @param value the parameter value
    * @return the builder
    */
   public T dynamicParameter(final String name, final Object value) {
@@ -78,9 +74,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Tells whether strict validation should be performed.
-   * 
-   * @param flag
-   *          true/false
+   *
+   * @param flag true/false
    * @return the builder
    */
   public T strictValidation(final boolean flag) {
@@ -90,9 +85,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Gives the duration that is the maximum allowed clock skew when verifying time stamps.
-   * 
-   * @param skew
-   *          duration
+   *
+   * @param skew duration
    * @return the builder
    */
   public T allowedClockSkew(final Duration skew) {
@@ -102,9 +96,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Gives the number of milliseconds that is the maximum allowed clock skew when verifying time stamps.
-   * 
-   * @param millis
-   *          number of milliseconds
+   *
+   * @param millis number of milliseconds
    * @return the builder
    */
   public T allowedClockSkew(final long millis) {
@@ -114,9 +107,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
   /**
    * Gives the maximum age (difference between issuance time and the validation time) that a received message is allowed
    * to have.
-   * 
-   * @param maxAge
-   *          maximum allowed age on messages
+   *
+   * @param maxAge maximum allowed age on messages
    * @return the builder
    */
   public T maxAgeReceivedMessage(final Duration maxAge) {
@@ -127,9 +119,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
   /**
    * Gives the maximum age (difference between issuance time and the validation time) that a received message is allowed
    * to have.
-   * 
-   * @param millis
-   *          number of milliseconds
+   *
+   * @param millis number of milliseconds
    * @return the builder
    */
   public T maxAgeReceivedMessage(final long millis) {
@@ -138,9 +129,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Sets the receive instant (i.e., when a message being validated was received).
-   * 
-   * @param instant
-   *          the receive instant
+   *
+   * @param instant the receive instant
    * @return the builder
    */
   public T receiveInstant(final Instant instant) {
@@ -150,9 +140,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Sets the receive instant (i.e., when a message being validated was received).
-   * 
-   * @param instant
-   *          the receive instant
+   *
+   * @param instant the receive instant
    * @return the builder
    */
   public T receiveInstant(final long instant) {
@@ -161,9 +150,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Tells whether we require an object being validated to be signed.
-   * 
-   * @param required
-   *          true/false
+   *
+   * @param required true/false
    * @return the builder
    */
   public T signatureRequired(final boolean required) {
@@ -173,9 +161,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Gives the trust basis criteria set to use when verifying signatures ({@code SignatureTrustEngine.validate}).
-   * 
-   * @param criteriaSet
-   *          the criteria set
+   *
+   * @param criteriaSet the criteria set
    * @return the builder
    */
   public T signatureValidationCriteriaSet(final CriteriaSet criteriaSet) {
@@ -187,18 +174,16 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Returns 'this' object.
-   * 
+   *
    * @return this object (the concrete builder}
    */
   protected abstract T getThis();
 
   /**
    * Adds a static validation parameter.
-   * 
-   * @param name
-   *          the name of the parameter
-   * @param value
-   *          the value of the parameter
+   *
+   * @param name the name of the parameter
+   * @param value the value of the parameter
    */
   public final void addStaticParameter(final String name, final Object value) {
     if (name != null) {
@@ -208,11 +193,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Adds a static validation parameter if it is not set yet.
-   * 
-   * @param name
-   *          the name of the parameter
-   * @param value
-   *          the value of the parameter
+   *
+   * @param name the name of the parameter
+   * @param value the value of the parameter
    */
   public final void addStaticParameterIfMissing(final String name, final Object value) {
     if (name != null && !this.staticParameters.containsKey(name)) {
@@ -222,9 +205,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Adds static validation parameters.
-   * 
-   * @param pars
-   *          static validation parameters
+   *
+   * @param pars static validation parameters
    */
   public final void addStaticParameters(final Map<String, Object> pars) {
     if (pars != null) {
@@ -234,11 +216,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Adds a dynamic validation parameter.
-   * 
-   * @param name
-   *          the name of the parameter
-   * @param value
-   *          the value of the parameter
+   *
+   * @param name the name of the parameter
+   * @param value the value of the parameter
    */
   public final void addDynamicParameter(final String name, final Object value) {
     if (name != null) {
@@ -248,9 +228,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Adds dynamic validation parameters.
-   * 
-   * @param pars
-   *          dynamic validation parameters
+   *
+   * @param pars dynamic validation parameters
    */
   public final void addDynamicParameters(final Map<String, Object> pars) {
     if (pars != null) {
@@ -260,9 +239,8 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Gets a static parameter.
-   * 
-   * @param name
-   *          the parameter name
+   *
+   * @param name the parameter name
    * @return the value or null
    */
   protected final Object getStaticParameter(final String name) {
@@ -271,13 +249,12 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
 
   /**
    * Gets a dynamic parameter.
-   * 
-   * @param name
-   *          the parameter name
+   *
+   * @param name the parameter name
    * @return the value or null
    */
   protected final Object getDynamicParameter(final String name) {
     return this.dynamicParameters.get(name);
   }
-  
+
 }

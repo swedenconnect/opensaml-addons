@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.core.io.Resource;
  * <p>
  * See {@link BaseMetadataProviderTest} for test cases.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class FilesystemMetadataProviderTest extends BaseMetadataProviderTest {

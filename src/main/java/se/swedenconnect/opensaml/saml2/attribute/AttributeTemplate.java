@@ -26,7 +26,7 @@ import org.opensaml.saml.saml2.core.Attribute;
  * <p>
  * A template may be useful when defining attribute sets and/or attribute release policies.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AttributeTemplate implements Serializable {
@@ -48,11 +48,9 @@ public class AttributeTemplate implements Serializable {
   /**
    * Creates an attribute template with the given name and friendly name, the default name format
    * {@code urn:oasis:names:tc:SAML:2.0:attrname-format:uri} ({@link Attribute#URI_REFERENCE}) and not multi-valued.
-   * 
-   * @param name
-   *          the attribute name
-   * @param friendlyName
-   *          the attribute friendly name (optional)
+   *
+   * @param name the attribute name
+   * @param friendlyName the attribute friendly name (optional)
    */
   public AttributeTemplate(final String name, final String friendlyName) {
     this(name, friendlyName, Attribute.URI_REFERENCE);
@@ -60,13 +58,10 @@ public class AttributeTemplate implements Serializable {
 
   /**
    * Creates an attribute template with the given name, friendly name and name format.
-   * 
-   * @param name
-   *          the attribute name
-   * @param friendlyName
-   *          the attribute friendly name
-   * @param nameFormat
-   *          the name format
+   *
+   * @param name the attribute name
+   * @param friendlyName the attribute friendly name
+   * @param nameFormat the name format
    */
   public AttributeTemplate(final String name, final String friendlyName, final String nameFormat) {
     this.name = Optional.ofNullable(name).orElseThrow(() -> new IllegalArgumentException("'name' must not be null"));
@@ -76,7 +71,7 @@ public class AttributeTemplate implements Serializable {
 
   /**
    * Get the name of this attribute template.
-   * 
+   *
    * @return the name of this attribute template
    */
   public String getName() {
@@ -85,7 +80,7 @@ public class AttributeTemplate implements Serializable {
 
   /**
    * Get the friendly name of this attribute template.
-   * 
+   *
    * @return the friendly name of this attribute template
    */
   public String getFriendlyName() {
@@ -94,7 +89,7 @@ public class AttributeTemplate implements Serializable {
 
   /**
    * Get the name format of this attribute template.
-   * 
+   *
    * @return the name format of this attribute template
    */
   public String getNameFormat() {
@@ -103,7 +98,7 @@ public class AttributeTemplate implements Serializable {
 
   /**
    * Based on the attribute template an {@link AttributeBuilder} object is created.
-   * 
+   *
    * @return a builder
    */
   public AttributeBuilder createBuilder() {

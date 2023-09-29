@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code RequestedAuthnContext} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<RequestedAuthnContext> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static RequestedAuthnContextBuilder builder() {
@@ -44,9 +44,8 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
 
   /**
    * Assigns the {@code Comparison} attribute to the {@code RequestedAuthnContext} object.
-   * 
-   * @param type
-   *          the type of comparison
+   *
+   * @param type the type of comparison
    * @return the builder
    */
   public RequestedAuthnContextBuilder comparison(final AuthnContextComparisonTypeEnumeration type) {
@@ -56,9 +55,8 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
 
   /**
    * Assigns {@code AuthnContextClassRef} elements to the {@code RequestedAuthnContext} object.
-   * 
-   * @param classRefs
-   *          authentication context class references
+   *
+   * @param classRefs authentication context class references
    * @return the builder
    */
   public RequestedAuthnContextBuilder authnContextClassRefs(final List<String> classRefs) {
@@ -77,9 +75,8 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
 
   /**
    * See {@link #authnContextClassRefs(List)}.
-   * 
-   * @param classRefs
-   *          authentication context class references
+   *
+   * @param classRefs authentication context class references
    * @return the builder
    */
   public RequestedAuthnContextBuilder authnContextClassRefs(final String... classRefs) {
@@ -88,9 +85,8 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
 
   /**
    * Assigns {@code AuthnContextDeclRef} elements to the {@code RequestedAuthnContext} object.
-   * 
-   * @param declRefs
-   *          authentication context declaration references
+   *
+   * @param declRefs authentication context declaration references
    * @return the builder
    */
   public RequestedAuthnContextBuilder authnContextDeclRefs(final List<String> declRefs) {
@@ -99,7 +95,7 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
       return this;
     }
     for (final String dr : declRefs) {
-      final AuthnContextDeclRef acdr = 
+      final AuthnContextDeclRef acdr =
           (AuthnContextDeclRef) XMLObjectSupport.buildXMLObject(AuthnContextDeclRef.DEFAULT_ELEMENT_NAME);
       acdr.setURI(dr);
       this.object().getAuthnContextDeclRefs().add(acdr);
@@ -109,9 +105,8 @@ public class RequestedAuthnContextBuilder extends AbstractSAMLObjectBuilder<Requ
 
   /**
    * See {@link #authnContextDeclRefs(List)}.
-   * 
-   * @param declRefs
-   *          authentication context declaration references
+   *
+   * @param declRefs authentication context declaration references
    * @return the builder
    */
   public RequestedAuthnContextBuilder authnContextDeclRefs(final String... declRefs) {

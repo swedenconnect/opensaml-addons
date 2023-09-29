@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code alg:DigestMethod} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class DigestMethodBuilder extends AbstractSAMLObjectBuilder<DigestMethod> {
 
   /**
    * Creates a new {@code DigestMethodBuilder} instance.
-   * 
+   *
    * @return a SigningMethodBuilder instance
    */
   public static DigestMethodBuilder builder() {
@@ -37,9 +37,8 @@ public class DigestMethodBuilder extends AbstractSAMLObjectBuilder<DigestMethod>
 
   /**
    * Utility method that creates a {@code DigestMethod}.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return a DigestMethod instance
    */
   public static DigestMethod digestMethod(final String algorithm) {
@@ -54,9 +53,8 @@ public class DigestMethodBuilder extends AbstractSAMLObjectBuilder<DigestMethod>
 
   /**
    * Assigns the algorithm.
-   * 
-   * @param algorithm
-   *          the algorithm
+   *
+   * @param algorithm the algorithm
    * @return the builder
    */
   public DigestMethodBuilder algorithm(final String algorithm) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,15 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
  * <p>
  * It is valid to add a value to a requested attribute but this rarely happens so this builder does not support that.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class RequestedAttributeBuilder extends AbstractSAMLObjectBuilder<RequestedAttribute> {
 
   /**
    * Constructor setting the attribute name.
-   * 
-   * @param name
-   *          the attribute name
+   *
+   * @param name the attribute name
    */
   public RequestedAttributeBuilder(final String name) {
     super();
@@ -45,9 +44,8 @@ public class RequestedAttributeBuilder extends AbstractSAMLObjectBuilder<Request
 
   /**
    * Creates a builder.
-   * 
-   * @param name
-   *          the attribute name
+   *
+   * @param name the attribute name
    * @return a builder
    */
   public static RequestedAttributeBuilder builder(final String name) {
@@ -56,9 +54,8 @@ public class RequestedAttributeBuilder extends AbstractSAMLObjectBuilder<Request
 
   /**
    * Assigns the attribute friendly name.
-   * 
-   * @param friendlyName
-   *          the friendly name
+   *
+   * @param friendlyName the friendly name
    * @return the builder
    */
   public RequestedAttributeBuilder friendlyName(final String friendlyName) {
@@ -68,9 +65,8 @@ public class RequestedAttributeBuilder extends AbstractSAMLObjectBuilder<Request
 
   /**
    * Assigns the attribute name format.
-   * 
-   * @param nameFormat
-   *          the name format URI
+   *
+   * @param nameFormat the name format URI
    * @return the builder
    */
   public RequestedAttributeBuilder nameFormat(final String nameFormat) {
@@ -80,9 +76,8 @@ public class RequestedAttributeBuilder extends AbstractSAMLObjectBuilder<Request
 
   /**
    * Assigns the {@code isRequired} attribute value.
-   * 
-   * @param required
-   *          flag
+   *
+   * @param required flag
    * @return the builder
    */
   public RequestedAttributeBuilder isRequired(final Boolean required) {

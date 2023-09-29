@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
 
 /**
  * A builder for {@link EntityAttributes} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAttributes> {
@@ -45,7 +45,7 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
 
   /**
    * Creates a builder instance.
-   * 
+   *
    * @return a builder instance
    */
   public static EntityAttributesBuilder builder() {
@@ -57,9 +57,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
    * <p>
    * If {@code null} is supplied, the attributes are cleared.
    * </p>
-   * 
-   * @param attributes
-   *          the attributes to add to the entity attributes object
+   *
+   * @param attributes the attributes to add to the entity attributes object
    * @return the builder
    */
   public EntityAttributesBuilder attributes(final List<Attribute> attributes) {
@@ -75,9 +74,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
 
   /**
    * Adds an attribute to this {@code mdattr:EntityAttributes}.
-   * 
-   * @param attribute
-   *          the attribute to add
+   *
+   * @param attribute the attribute to add
    * @return the builder
    */
   public EntityAttributesBuilder attribute(final Attribute attribute) {
@@ -101,21 +99,20 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
    * <p>
    * If {@code null} is supplied an already existing attribute is removed.
    * </p>
-   * 
-   * @param uris
-   *          the assurance URI values that should be added
+   *
+   * @param uris the assurance URI values that should be added
    * @return the builder
    */
   public EntityAttributesBuilder assuranceCertificationAttribute(final List<String> uris) {
     Attribute assuranceCertification = this.object().getAttributes().stream()
-      .filter(a -> AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME.equals(a.getName()))
-      .findFirst()
-      .orElse(null);
+        .filter(a -> AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME.equals(a.getName()))
+        .findFirst()
+        .orElse(null);
 
     if (assuranceCertification == null) {
       if (uris != null && !uris.isEmpty()) {
         assuranceCertification = AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE
-          .createBuilder().value(uris).build();
+            .createBuilder().value(uris).build();
         return this.attribute(assuranceCertification);
       }
     }
@@ -124,7 +121,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
         assuranceCertification.getAttributeValues().clear();
         for (final String u : uris) {
           final XSString sv = XSString.class.cast(
-            XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME));
+              XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
+                  XSString.TYPE_NAME));
           sv.setValue(u);
           assuranceCertification.getAttributeValues().add(sv);
         }
@@ -139,9 +137,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
 
   /**
    * See {@link #assuranceCertificationAttribute(List)}.
-   * 
-   * @param uris
-   *          the assurance URI values that should be added
+   *
+   * @param uris the assurance URI values that should be added
    * @return the builder
    */
   public EntityAttributesBuilder assuranceCertificationAttribute(final String... uris) {
@@ -157,16 +154,15 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
    * <p>
    * If {@code null} is supplied an already existing attribute is removed.
    * </p>
-   * 
-   * @param uris
-   *          the entity category URI values that should be added
+   *
+   * @param uris the entity category URI values that should be added
    * @return the builder
    */
   public EntityAttributesBuilder entityCategoriesAttribute(final List<String> uris) {
     Attribute entityCategories = this.object().getAttributes().stream()
-      .filter(a -> AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME.equals(a.getName()))
-      .findFirst()
-      .orElse(null);
+        .filter(a -> AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME.equals(a.getName()))
+        .findFirst()
+        .orElse(null);
 
     if (entityCategories == null) {
       if (uris != null && !uris.isEmpty()) {
@@ -179,7 +175,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
         entityCategories.getAttributeValues().clear();
         for (final String u : uris) {
           final XSString sv = XSString.class.cast(
-            XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME));
+              XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
+                  XSString.TYPE_NAME));
           sv.setValue(u);
           entityCategories.getAttributeValues().add(sv);
         }
@@ -194,9 +191,8 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
 
   /**
    * See {@link #entityCategoriesAttribute(List)}.
-   * 
-   * @param uris
-   *          the entity category URI values that should be added
+   *
+   * @param uris the entity category URI values that should be added
    * @return the builder
    */
   public EntityAttributesBuilder entityCategoriesAttribute(final String... uris) {

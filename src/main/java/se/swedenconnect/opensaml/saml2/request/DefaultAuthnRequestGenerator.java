@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ import org.opensaml.security.x509.X509Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 
 /**
  * A default implementation of the {@link AuthnRequestGenerator} where a metadata resolver is used to locate metadata.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class DefaultAuthnRequestGenerator extends AbstractAuthnRequestGenerator {
@@ -46,42 +46,36 @@ public class DefaultAuthnRequestGenerator extends AbstractAuthnRequestGenerator 
 
   /**
    * Constructor.
-   * 
-   * @param spEntityID
-   *          the SP entityID
-   * @param signCredential
-   *          the signing credential
-   * @param metadataResolver
-   *          the metadata resolver
+   *
+   * @param spEntityID the SP entityID
+   * @param signCredential the signing credential
+   * @param metadataResolver the metadata resolver
    */
   public DefaultAuthnRequestGenerator(final String spEntityID, final X509Credential signCredential,
       final MetadataResolver metadataResolver) {
     super(spEntityID, signCredential);
     this.metadataResolver = Optional.ofNullable(metadataResolver).orElseThrow(
-      () -> new IllegalArgumentException("metadataResolver must not be null"));
+        () -> new IllegalArgumentException("metadataResolver must not be null"));
   }
 
   /**
    * Constructor.
-   * 
-   * @param spMetadata
-   *          the SP metadata
-   * @param signCredential
-   *          the signing credential
-   * @param metadataResolver
-   *          the metadata resolver
+   *
+   * @param spMetadata the SP metadata
+   * @param signCredential the signing credential
+   * @param metadataResolver the metadata resolver
    */
   public DefaultAuthnRequestGenerator(final EntityDescriptor spMetadata, final X509Credential signCredential,
       final MetadataResolver metadataResolver) {
     super(spMetadata.getEntityID(), signCredential);
     this.metadataResolver = Optional.ofNullable(metadataResolver).orElseThrow(
-      () -> new IllegalArgumentException("metadataResolver must not be null"));
+        () -> new IllegalArgumentException("metadataResolver must not be null"));
     this.spMetadata = spMetadata;
   }
 
   /**
    * Gets the metadata resolver that this generator uses to find IdP (and SP) metadata.
-   * 
+   *
    * @return a metadata resolver
    */
   protected MetadataResolver getMetadataResolver() {

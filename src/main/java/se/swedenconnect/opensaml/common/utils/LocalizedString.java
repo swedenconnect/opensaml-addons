@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import com.google.common.base.Objects;
 
 /**
  * Utility class for a localized string.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @see Locale
  */
@@ -36,24 +36,23 @@ public class LocalizedString {
 
   /** Language of the localized string. */
   private String language;
-  
+
   /**
    * Default constructor.
    */
-  public LocalizedString() {    
+  public LocalizedString() {
   }
 
   /**
    * Creates an instance by parsing the source string that must be on the format {@code <lang-tag>-<string according to
    * language>}. The string "en-Hello" will give a LocalizedString where:
-   * 
+   *
    * <pre>{@code
    * ls.getLanguage() => "en"
    * ls.getLocalString() => "Hello"}
    * </pre>
-   * 
-   * @param source
-   *          the string to parse
+   *
+   * @param source the string to parse
    */
   public LocalizedString(final String source) {
     String _source = source.trim();
@@ -68,10 +67,8 @@ public class LocalizedString {
   /**
    * Constructor.
    *
-   * @param localString
-   *          the localized string
-   * @param language
-   *          the language of the string
+   * @param localString the localized string
+   * @param language the language of the string
    */
   public LocalizedString(final String localString, final String language) {
     this.localizedString = localString;
@@ -81,10 +78,8 @@ public class LocalizedString {
   /**
    * Constructor.
    *
-   * @param localString
-   *          the localized string
-   * @param locale
-   *          the locale (the language is obtained using {@link Locale#getLanguage()})
+   * @param localString the localized string
+   * @param locale the locale (the language is obtained using {@link Locale#getLanguage()})
    */
   public LocalizedString(final String localString, final Locale locale) {
     this.localizedString = localString;
@@ -103,8 +98,7 @@ public class LocalizedString {
   /**
    * Sets the localized string.
    *
-   * @param newString
-   *          the localized string
+   * @param newString the localized string
    */
   public void setLocalizedString(final String newString) {
     this.localizedString = newString;
@@ -122,8 +116,7 @@ public class LocalizedString {
   /**
    * Sets the language of the string.
    *
-   * @param newLanguage
-   *          the language of the string
+   * @param newLanguage the language of the string
    */
   public void setLanguage(final String newLanguage) {
     this.language = newLanguage;
@@ -142,8 +135,7 @@ public class LocalizedString {
    * Determines if two LocalizedStrings are equal, that is, if both thier localized string and language have
    * case-sentivite equality.
    *
-   * @param obj
-   *          the object this object is compared with
+   * @param obj the object this object is compared with
    *
    * @return true if the objects are equal, false if not
    */
@@ -154,7 +146,7 @@ public class LocalizedString {
     }
     if (obj instanceof LocalizedString) {
       LocalizedString otherLString = (LocalizedString) obj;
-      return Objects.equal(this.localizedString, otherLString.getLocalString()) 
+      return Objects.equal(this.localizedString, otherLString.getLocalString())
           && Objects.equal(this.getLanguage(), otherLString.getLanguage());
     }
     return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.impl.FilesystemMetadataResolver;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.ResolverException;
 
 /**
  * A metadata provider that reads its metadata from a file.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @see FilesystemMetadataResolver
  */
@@ -42,9 +42,8 @@ public class FilesystemMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * Constructor assigning the file holding the metadata.
-   * 
-   * @param metadataFile
-   *          metadata source
+   *
+   * @param metadataFile metadata source
    */
   public FilesystemMetadataProvider(final File metadataFile) {
     Validate.notNull(metadataFile, "metadataFile must not be null");
@@ -72,7 +71,7 @@ public class FilesystemMetadataProvider extends AbstractMetadataProvider {
     this.metadataResolver.setRequireValidMetadata(requireValidMetadata);
     this.metadataResolver.setFailFastInitialization(failFastInitialization);
     this.metadataResolver.setMetadataFilter(filter);
-    this.metadataResolver.setParserPool(XMLObjectProviderRegistrySupport.getParserPool());    
+    this.metadataResolver.setParserPool(XMLObjectProviderRegistrySupport.getParserPool());
   }
 
   /** {@inheritDoc} */

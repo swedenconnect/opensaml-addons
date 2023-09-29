@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.opensaml.saml.common.assertion.ValidationResult;
 
 /**
  * Support methods and functions for validator implementations.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ValidationSupport {
@@ -30,11 +30,9 @@ public class ValidationSupport {
 
   /**
    * Checks if the result is VALID. If not a {@code ValidationResultException} is thrown.
-   * 
-   * @param result
-   *          the result to check
-   * @throws ValidationResultException
-   *           for non VALID results
+   *
+   * @param result the result to check
+   * @throws ValidationResultException for non VALID results
    */
   public static void check(final ValidationResult result) throws ValidationResultException {
     if (!ValidationResult.VALID.equals(result)) {
@@ -55,9 +53,8 @@ public class ValidationSupport {
 
     /**
      * Constructor.
-     * 
-     * @param result
-     *          the validation result - must not be {@link ValidationResult#VALID}
+     *
+     * @param result the validation result - must not be {@link ValidationResult#VALID}
      */
     public ValidationResultException(final ValidationResult result) {
       if (ValidationResult.VALID.equals(result)) {
@@ -71,7 +68,7 @@ public class ValidationSupport {
 
     /**
      * Returns the validation result.
-     * 
+     *
      * @return the validation result
      */
     public ValidationResult getResult() {

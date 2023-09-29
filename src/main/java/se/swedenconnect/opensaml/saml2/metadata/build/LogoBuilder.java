@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code mdui:Logo} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Creates a new {@code LogoBuilder} instance.
-   * 
+   *
    * @return a LogoBuilder instance
    */
   public static LogoBuilder builder() {
@@ -37,43 +37,36 @@ public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Utility method that builds a {@code mdui:Logo} object.
-   * 
-   * @param url
-   *          the Logo URL
-   * @param height
-   *          the height
-   * @param width
-   *          the width
+   *
+   * @param url the Logo URL
+   * @param height the height
+   * @param width the width
    * @return a {@code Logo} instance
    */
   public static Logo logo(final String url, final Integer height, final Integer width) {
     return builder()
-      .url(url)
-      .height(height)
-      .width(width)
-      .build();
+        .url(url)
+        .height(height)
+        .width(width)
+        .build();
   }
-  
+
   /**
    * Utility method that builds a {@code mdui:Logo} object.
-   * 
-   * @param url
-   *          the Logo URL
-   * @param language
-   *          the language
-   * @param height
-   *          the height
-   * @param width
-   *          the width
+   *
+   * @param url the Logo URL
+   * @param language the language
+   * @param height the height
+   * @param width the width
    * @return a Logo instance
    */
   public static Logo logo(final String url, final String language, final Integer height, final Integer width) {
     return builder()
-      .url(url)
-      .language(language)
-      .height(height)
-      .width(width)
-      .build();
+        .url(url)
+        .language(language)
+        .height(height)
+        .width(width)
+        .build();
   }
 
   /** {@inheritDoc} */
@@ -84,9 +77,8 @@ public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Assigns the URL of the {@code Logo}.
-   * 
-   * @param url
-   *          the URL
+   *
+   * @param url the URL
    * @return the builder
    */
   public LogoBuilder url(final String url) {
@@ -96,9 +88,8 @@ public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Assigns the language tag of the {@code Logo}.
-   * 
-   * @param language
-   *          the language tag
+   *
+   * @param language the language tag
    * @return the builder
    */
   public LogoBuilder language(final String language) {
@@ -108,9 +99,8 @@ public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Assigns the height of the {@code Logo}.
-   * 
-   * @param height
-   *          the height (in pixels)
+   *
+   * @param height the height (in pixels)
    * @return the builder
    */
   public LogoBuilder height(final Integer height) {
@@ -120,9 +110,8 @@ public class LogoBuilder extends AbstractSAMLObjectBuilder<Logo> {
 
   /**
    * Assigns the width of the {@code Logo}.
-   * 
-   * @param width
-   *          the width (in pixels)
+   *
+   * @param width the width (in pixels)
    * @return the builder
    */
   public LogoBuilder width(final Integer width) {
