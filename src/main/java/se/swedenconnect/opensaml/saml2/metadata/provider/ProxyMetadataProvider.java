@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
 import org.opensaml.saml.metadata.resolver.impl.AbstractMetadataResolver;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
+import net.shibboleth.shared.component.ComponentInitializationException;
 
 /**
  * A metadata provider that is constructed by assigning an OpenSAML {@link MetadataResolver} instance.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ProxyMetadataProvider extends AbstractMetadataProvider {
@@ -42,49 +41,48 @@ public class ProxyMetadataProvider extends AbstractMetadataProvider {
    * <p>
    * The supplied instance must extend the {@link AbstractMetadataResolver} class.
    * </p>
-   * 
-   * @param metadataResolver
-   *          the metadata resolver to proxy
+   *
+   * @param metadataResolver the metadata resolver to proxy
    */
   public ProxyMetadataProvider(final MetadataResolver metadataResolver) {
     Validate.notNull(metadataResolver, "metadataResolver must not be null");
-    Validate.isTrue(AbstractMetadataResolver.class.isInstance(metadataResolver), 
-      "Supplied metadata resolver must extend AbstractMetadataResolver");
+    Validate.isTrue(AbstractMetadataResolver.class.isInstance(metadataResolver),
+        "Supplied metadata resolver must extend AbstractMetadataResolver");
     this.metadataResolver = (AbstractMetadataResolver) metadataResolver;
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public String getID() {
     return this.metadataResolver.getId();
   }
-    
+
   /** {@inheritDoc} */
   @Override
   public MetadataResolver getMetadataResolver() {
     return this.metadataResolver;
   }
 
-  /** {@inheritDoc} */  
+  /** {@inheritDoc} */
   @Override
-  protected void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization,
-      final MetadataFilter filter) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
-    
+  protected void createMetadataResolver(
+      final boolean requireValidMetadata, final boolean failFastInitialization, final MetadataFilter filter) {
+    this.checkSetterPreconditions();
+
     this.metadataResolver.setRequireValidMetadata(requireValidMetadata);
     this.metadataResolver.setFailFastInitialization(failFastInitialization);
     final MetadataFilter installedFilter = this.metadataResolver.getMetadataFilter();
     if (installedFilter == null) {
       this.metadataResolver.setMetadataFilter(filter);
     }
-    else { 
+    else {
       final List<MetadataFilter> chain = new ArrayList<>();
       if (filter instanceof MetadataFilterChain) {
         chain.addAll(((MetadataFilterChain) installedFilter).getFilters());
       }
       else {
         chain.add(filter);
-      }      
+      }
       if (installedFilter instanceof MetadataFilterChain) {
         chain.addAll(((MetadataFilterChain) installedFilter).getFilters());
       }
@@ -93,17 +91,17 @@ public class ProxyMetadataProvider extends AbstractMetadataProvider {
       }
       final MetadataFilterChain newFilter = new MetadataFilterChain();
       newFilter.setFilters(chain);
-      this.metadataResolver.setMetadataFilter(newFilter);      
+      this.metadataResolver.setMetadataFilter(newFilter);
     }
   }
 
-  /** {@inheritDoc} */  
+  /** {@inheritDoc} */
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
     this.metadataResolver.initialize();
   }
 
-  /** {@inheritDoc} */  
+  /** {@inheritDoc} */
   @Override
   protected void destroyMetadataResolver() {
     this.metadataResolver.destroy();

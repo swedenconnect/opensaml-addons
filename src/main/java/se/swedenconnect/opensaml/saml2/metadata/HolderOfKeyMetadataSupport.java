@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 
 /**
  * Support methods for holder-of-key specific metadata elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class HolderOfKeyMetadataSupport {
@@ -36,33 +36,32 @@ public class HolderOfKeyMetadataSupport {
   public static final String HOK_WEBSSO_PROFILE_URI = "urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser";
 
   /** The QName for the HoK ProtocolBinding attribute. */
-  public static final QName HOK_PROTOCOL_BINDING_ATTRIBUTE = new QName(HOK_WEBSSO_PROFILE_URI, "ProtocolBinding", "hoksso");
+  public static final QName HOK_PROTOCOL_BINDING_ATTRIBUTE =
+      new QName(HOK_WEBSSO_PROFILE_URI, "ProtocolBinding", "hoksso");
 
   /**
    * Given an {@link IDPSSODescriptor} element the method locates all {@code SingleSignOnService} elements that have a
    * {@code Binding} attribute set to {@value HOK_WEBSSO_PROFILE_URI}, i.e., a service element for Holder-of-key.
-   * 
-   * @param ssoDescriptor
-   *          the IDPSSODescriptor
+   *
+   * @param ssoDescriptor the IDPSSODescriptor
    * @return a (possible empty) list of matching SingleSignOnService objects
    */
   public static List<SingleSignOnService> getHokSingleSignOnServices(final IDPSSODescriptor ssoDescriptor) {
     return ssoDescriptor.getSingleSignOnServices().stream()
-      .filter(s -> HOK_WEBSSO_PROFILE_URI.equals(s.getBinding()))
-      .collect(Collectors.toList());
+        .filter(s -> HOK_WEBSSO_PROFILE_URI.equals(s.getBinding()))
+        .collect(Collectors.toList());
   }
 
   /**
    * Given an {@link IDPSSODescriptor} element and a binding (redirect/post), the method locates a matching
    * {@code SingleSignOnService} Holder-of-key element.
-   * 
-   * @param ssoDescriptor
-   *          the IDPSSODescriptor
-   * @param binding
-   *          the actual binding URI
+   *
+   * @param ssoDescriptor the IDPSSODescriptor
+   * @param binding the actual binding URI
    * @return a SingleSignOnService or null if no matching element is found
    */
-  public static SingleSignOnService getHoKSingleSignOnService(final IDPSSODescriptor ssoDescriptor, final String binding) {
+  public static SingleSignOnService getHoKSingleSignOnService(final IDPSSODescriptor ssoDescriptor,
+      final String binding) {
     for (final SingleSignOnService sso : getHokSingleSignOnServices(ssoDescriptor)) {
       final String protocolBinding = sso.getUnknownAttributes().get(HOK_PROTOCOL_BINDING_ATTRIBUTE);
       if (binding.equals(protocolBinding)) {
@@ -74,9 +73,8 @@ public class HolderOfKeyMetadataSupport {
 
   /**
    * Predicate that tells if the supplied {@code SingleSignOnService} is a HoK endpoint.
-   * 
-   * @param sso
-   *          the SingleSignOnService to test
+   *
+   * @param sso the SingleSignOnService to test
    * @return true if the supplied object is a HoK endpoint and false otherwise
    */
   public static boolean isHoKSingleSignOnService(final SingleSignOnService sso) {
@@ -86,28 +84,26 @@ public class HolderOfKeyMetadataSupport {
   /**
    * Given an {@link SPSSODescriptor} element the method locates all {@code AssertionConsumerService} elements that have
    * a {@code Binding} attribute set to {@value HOK_WEBSSO_PROFILE_URI}, i.e., an endpoint for Holder-of-key.
-   * 
-   * @param ssoDescriptor
-   *          the SPSSODescriptor
+   *
+   * @param ssoDescriptor the SPSSODescriptor
    * @return a (possible empty) list of matching AssertionConsumerService objects
    */
   public static List<AssertionConsumerService> getHokAssertionConsumerServices(final SPSSODescriptor ssoDescriptor) {
     return ssoDescriptor.getAssertionConsumerServices().stream()
-      .filter(a -> HOK_WEBSSO_PROFILE_URI.equals(a.getBinding()))
-      .collect(Collectors.toList());
+        .filter(a -> HOK_WEBSSO_PROFILE_URI.equals(a.getBinding()))
+        .collect(Collectors.toList());
   }
 
   /**
    * Given an {@link SPSSODescriptor} element and a binding URI, the method locates a matching
    * {@code AssertionConsumerService} Holder-of-key element.
-   * 
-   * @param ssoDescriptor
-   *          the SPSSODescriptor
-   * @param binding
-   *          the actual binding URI
+   *
+   * @param ssoDescriptor the SPSSODescriptor
+   * @param binding the actual binding URI
    * @return a AssertionConsumerService or null if no matching element is found
    */
-  public static AssertionConsumerService getHokAssertionConsumerService(final SPSSODescriptor ssoDescriptor, final String binding) {
+  public static AssertionConsumerService getHokAssertionConsumerService(final SPSSODescriptor ssoDescriptor,
+      final String binding) {
     for (final AssertionConsumerService acs : getHokAssertionConsumerServices(ssoDescriptor)) {
       final String protocolBinding = acs.getUnknownAttributes().get(HOK_PROTOCOL_BINDING_ATTRIBUTE);
       if (binding.equals(protocolBinding)) {
@@ -116,12 +112,11 @@ public class HolderOfKeyMetadataSupport {
     }
     return null;
   }
-  
+
   /**
    * Predicate that tells if the supplied {@code AssertionConsumerService} is a HoK endpoint.
-   * 
-   * @param acs
-   *          the AssertionConsumerService to test
+   *
+   * @param acs the AssertionConsumerService to test
    * @return true if the supplied object is a HoK endpoint and false otherwise
    */
   public static boolean isHoKAssertionConsumerService(final AssertionConsumerService acs) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Sweden Connect
+ * Copyright 2021-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 
 /**
  * Builder for {@link IDPSSODescriptor} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSODescriptor, IDPSSODescriptorBuilder> {
@@ -38,7 +38,7 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
   public IDPSSODescriptorBuilder() {
     super();
   }
-  
+
   /**
    * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
    * elements and attributes of the template object using the assignment methods of the builder.
@@ -46,17 +46,17 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
    * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
    * modifications will have no effect on the passed object.
    * </p>
-   * 
+   *
    * @param template the template object
    * @param clone whether the template object should be cloned
    */
   public IDPSSODescriptorBuilder(final IDPSSODescriptor template, final boolean clone) {
     super(template, clone);
-  }  
+  }
 
   /**
    * Utility method that creates a {@code IDPSSODescriptorBuilder} instance.
-   * 
+   *
    * @return a IDPSSODescriptorBuilder instance
    */
   public static IDPSSODescriptorBuilder builder() {
@@ -65,9 +65,8 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
 
   /**
    * Assigns the {@code WantAuthnRequestsSigned} attribute of the {@code md:IDPSSODescriptor} element.
-   * 
-   * @param b
-   *          boolean
+   *
+   * @param b boolean
    * @return the builder
    */
   public IDPSSODescriptorBuilder wantAuthnRequestsSigned(final Boolean b) {
@@ -77,9 +76,8 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
 
   /**
    * Adds {@code md:SingleSignOnService} elements to the {@code IDPSSODescriptor}.
-   * 
-   * @param singleSignOnServices
-   *          single sign on service objects (cloned before assignment)
+   *
+   * @param singleSignOnServices single sign on service objects (cloned before assignment)
    * @return the builder
    */
   public IDPSSODescriptorBuilder singleSignOnServices(final List<SingleSignOnService> singleSignOnServices) {
@@ -100,9 +98,8 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
 
   /**
    * See {@link #singleSignOnServices(List)}.
-   * 
-   * @param singleSignOnServices
-   *          single sign on service objects (cloned before assignment)
+   *
+   * @param singleSignOnServices single sign on service objects (cloned before assignment)
    * @return the builder
    */
   public IDPSSODescriptorBuilder singleSignOnServices(final SingleSignOnService... singleSignOnServices) {
@@ -111,9 +108,8 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
 
   /**
    * Adds {@code Attribute} elements to the {@code IDPSSODescriptor}.
-   * 
-   * @param attributes
-   *          the attributes to add
+   *
+   * @param attributes the attributes to add
    * @return the builder
    */
   public IDPSSODescriptorBuilder attributes(final List<Attribute> attributes) {
@@ -134,9 +130,8 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
 
   /**
    * See {@link #attributes(List)}.
-   * 
-   * @param attributes
-   *          the attributes to add
+   *
+   * @param attributes the attributes to add
    * @return the builder
    */
   public IDPSSODescriptorBuilder attributes(final Attribute... attributes) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.schema.XSBoolean;
 import org.opensaml.core.xml.schema.XSBooleanValue;
 import org.opensaml.core.xml.schema.XSDateTime;
@@ -34,7 +34,7 @@ import se.swedenconnect.opensaml.OpenSAMLTestBase;
 
 /**
  * Test cases for {@link AttributeUtils}.
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class AttributeUtilsTest extends OpenSAMLTestBase {
@@ -50,10 +50,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     List<String> values = AttributeUtils.getAttributeStringValues(attribute);
-    Assert.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"), values);
+    Assertions.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"), values);
 
     // Using the AttributeUtils.getAttributeStringValue method only gives the first value.
-    Assert.assertEquals("martin@litsec.se", AttributeUtils.getAttributeStringValue(attribute));
+    Assertions.assertEquals("martin@litsec.se", AttributeUtils.getAttributeStringValue(attribute));
   }
 
   @Test
@@ -66,10 +66,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     String value = AttributeUtils.getAttributeStringValue(attribute);
-    Assert.assertEquals("Eriksson", value);
+    Assertions.assertEquals("Eriksson", value);
 
     // Using the AttributeUtils.getAttributeStringValues method gives a list with one element.
-    Assert.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
+    Assertions.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
   }
 
   @Test
@@ -82,10 +82,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
     Attribute attribute = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
 
     String value = AttributeUtils.getAttributeStringValue(attribute);
-    Assert.assertEquals("Eriksson", value);
+    Assertions.assertEquals("Eriksson", value);
 
     // Using the AttributeUtils.getAttributeStringValues method gives a list with one element.
-    Assert.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
+    Assertions.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
   }
 
   @Test
@@ -98,10 +98,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .nameFormat(Attribute.URI_REFERENCE)
       .value(bool)
       .build();
-    
+
     XSBoolean value = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
-    Assert.assertNotNull(value);
-    Assert.assertTrue(value.getValue().getValue());
+    Assertions.assertNotNull(value);
+    Assertions.assertTrue(value.getValue().getValue());
 
     // Try the same, but with no xsi:type declaration
     //
@@ -112,13 +112,13 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
 
     Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
     XSBoolean value2 = AttributeUtils.getAttributeValue(attribute2, XSBoolean.class);
-    Assert.assertNotNull(value2);
-    Assert.assertTrue(value2.getValue().getValue());
-    
+    Assertions.assertNotNull(value2);
+    Assertions.assertTrue(value2.getValue().getValue());
+
     // Should not work
-    Assert.assertNull(AttributeUtils.getAttributeValue(attribute2, XSInteger.class));
+    Assertions.assertNull(AttributeUtils.getAttributeValue(attribute2, XSInteger.class));
   }
-  
+
   @Test
   public void testGetAttributeValueInteger() throws Exception {
     XSInteger integer = AttributeBuilder.createValueObject(XSInteger.class);
@@ -129,10 +129,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .nameFormat(Attribute.URI_REFERENCE)
       .value(integer)
       .build();
-    
+
     XSInteger value = AttributeUtils.getAttributeValue(attribute, XSInteger.class);
-    Assert.assertNotNull(value);
-    Assert.assertEquals(42, value.getValue().intValue());
+    Assertions.assertNotNull(value);
+    Assertions.assertEquals(42, value.getValue().intValue());
 
     // Try the same, but with no xsi:type declaration
     //
@@ -142,45 +142,45 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
 
     Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
     XSInteger value2 = AttributeUtils.getAttributeValue(attribute2, XSInteger.class);
-    Assert.assertNotNull(value2);
-    Assert.assertEquals(42, value2.getValue().intValue());
-    
+    Assertions.assertNotNull(value2);
+    Assertions.assertEquals(42, value2.getValue().intValue());
+
     // Should not work
-    Assert.assertNull(AttributeUtils.getAttributeValue(attribute2, XSBoolean.class));
+    Assertions.assertNull(AttributeUtils.getAttributeValue(attribute2, XSBoolean.class));
   }
-  
+
   @Test
   public void testGetAttributeValueDateTime() throws Exception {
-    
+
     Instant date = Instant.parse("2018-12-10T15:10:21Z");
     XSDateTime xmlDate = AttributeBuilder.createValueObject(XSDateTime.class);
     xmlDate.setValue(date);
-    
+
     Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/date")
       .friendlyName("LitsecDate")
       .nameFormat(Attribute.URI_REFERENCE)
       .value(xmlDate)
       .build();
-    
+
     XSDateTime value = AttributeUtils.getAttributeValue(attribute, XSDateTime.class);
-    Assert.assertNotNull(value);
-    Assert.assertEquals(date, value.getValue());
-    
+    Assertions.assertNotNull(value);
+    Assertions.assertEquals(date, value.getValue());
+
     // Try the same, but with no xsi:type declaration
     //
     String xml = "<saml2:Attribute FriendlyName=\"LitsecDate\" Name=\"http://id.litsec.se/attr/date\" " +
         "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\"> " +
         "<saml2:AttributeValue>2018-12-10T15:10:21.000Z</saml2:AttributeValue> </saml2:Attribute>";
-    
+
     Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
     XSDateTime value2 = AttributeUtils.getAttributeValue(attribute2, XSDateTime.class);
-    Assert.assertNotNull(value2);
-    Assert.assertEquals(date, value2.getValue());
-    
+    Assertions.assertNotNull(value2);
+    Assertions.assertEquals(date, value2.getValue());
+
     // Should not work
-    Assert.assertNull(AttributeUtils.getAttributeValue(attribute2, XSBoolean.class));
-    Assert.assertNull(AttributeUtils.getAttributeValue(attribute2, XSInteger.class));
-  }  
+    Assertions.assertNull(AttributeUtils.getAttributeValue(attribute2, XSBoolean.class));
+    Assertions.assertNull(AttributeUtils.getAttributeValue(attribute2, XSInteger.class));
+  }
 
   @Test
   public void testGetAttributeValues() {
@@ -193,8 +193,8 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     List<XSString> values = AttributeUtils.getAttributeValues(attribute, XSString.class);
-    Assert.assertTrue(values.size() == 2);
-    Assert.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"),
+    Assertions.assertTrue(values.size() == 2);
+    Assertions.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"),
       values.stream()
         .filter(a -> XSString.class.isInstance(a))
         .map(XSString.class::cast)
@@ -214,8 +214,8 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     List<XSBoolean> bvalues = AttributeUtils.getAttributeValues(attribute, XSBoolean.class);
-    Assert.assertTrue(values.size() == 2);
-    Assert.assertEquals(Arrays.asList(Boolean.TRUE, Boolean.FALSE),
+    Assertions.assertTrue(values.size() == 2);
+    Assertions.assertEquals(Arrays.asList(Boolean.TRUE, Boolean.FALSE),
       bvalues.stream()
         .filter(a -> XSBoolean.class.isInstance(a))
         .map(XSBoolean.class::cast)
@@ -233,7 +233,7 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     XSString value = AttributeUtils.getAttributeValue(attribute, XSString.class);
-    Assert.assertEquals("Eriksson", value.getValue());
+    Assertions.assertEquals("Eriksson", value.getValue());
 
     XSBoolean bvalue = AttributeBuilder.createValueObject(XSBoolean.class);
     bvalue.setValue(XSBooleanValue.valueOf("true"));
@@ -245,7 +245,7 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .build();
 
     XSBoolean b = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
-    Assert.assertEquals(Boolean.TRUE, b.getValue().getValue());
+    Assertions.assertEquals(Boolean.TRUE, b.getValue().getValue());
   }
 
   @Test
@@ -259,15 +259,15 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_SN).value("Eriksson").build());
 
     Attribute attr = AttributeUtils.getAttribute("http://eid.litsec.se/types/boolean", attributes);
-    Assert.assertNull(attr);
+    Assertions.assertNull(attr);
 
     attr = AttributeUtils.getAttribute(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL, attributes);
-    Assert.assertNotNull(attr);
-    Assert.assertEquals(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL, attr.getName());
+    Assertions.assertNotNull(attr);
+    Assertions.assertEquals(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL, attr.getName());
 
     attr = AttributeUtils.getAttribute(AttributeBuilderTest.ATTRIBUTE_NAME_SN, attributes);
-    Assert.assertNotNull(attr);
-    Assert.assertEquals(AttributeBuilderTest.ATTRIBUTE_NAME_SN, attr.getName());
+    Assertions.assertNotNull(attr);
+    Assertions.assertEquals(AttributeBuilderTest.ATTRIBUTE_NAME_SN, attr.getName());
   }
 
 }

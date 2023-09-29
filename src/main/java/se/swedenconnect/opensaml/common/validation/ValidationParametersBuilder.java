@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 
 /**
  * Interface for a {@link ValidationContext} builder.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface ValidationParametersBuilder {
 
   /**
    * Builds a {@code ValidationContext} object.
-   * 
+   *
    * @return the ValidationContext object
    */
   ValidationContext build();

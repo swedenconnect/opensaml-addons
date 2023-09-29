@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,17 @@ import org.opensaml.security.x509.X509Credential;
 /**
  * A {@code MetadataContainer} for {@code EntityDescriptor} elements. This class is useful for an entity wishing to
  * publicize its metadata.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntitiesDescriptorContainer extends AbstractMetadataContainer<EntitiesDescriptor> {
 
   /**
    * Constructor assigning the encapsulated descriptor element.
-   * 
-   * @param descriptor
-   *          the descriptor object
-   * @param signatureCredentials
-   *          the signature credentials for signing the descriptor. May be null, but then no signing will be possible
+   *
+   * @param descriptor the descriptor object
+   * @param signatureCredentials the signature credentials for signing the descriptor. May be null, but then no signing
+   *          will be possible
    */
   public EntitiesDescriptorContainer(final EntitiesDescriptor descriptor, final X509Credential signatureCredentials) {
     super(descriptor, signatureCredentials);

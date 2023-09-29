@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.resolver.ResolverException;
 import se.swedenconnect.opensaml.common.builder.SAMLObjectBuilder;
 
 /**
@@ -34,15 +34,16 @@ import se.swedenconnect.opensaml.common.builder.SAMLObjectBuilder;
  * configuration of the builder factory, but it is also possible to control the request by using chaining calls as
  * illustrated below:
  * </p>
- * 
+ *
  * <pre>{@code
- * RequestHttpObject request = builder.relayState("hello").binding("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST").build();}
+ * RequestHttpObject request =
+ *     builder.relayState("hello").binding("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST").build();
+ * }
  * </pre>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
- * @param <T>
- *          the concrete request type
+ * @param <T> the concrete request type
  */
 public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends SAMLObjectBuilder<T> {
 
@@ -50,43 +51,39 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
    * Compiles the request by invoking {@link #build()}, optionally signs it and encodes it according to the configured
    * binding and returns a RequestHttpObject that can be used by the SP application to send the request to the Identity
    * Provider.
-   * 
+   *
    * @return a RequestHttpObject object
-   * @throws SignatureException
-   *           for signature creation errors
-   * @throws ResolverException
-   *           for metadata errors
-   * @throws MessageEncodingException
-   *           for encoding errors
+   * @throws SignatureException for signature creation errors
+   * @throws ResolverException for metadata errors
+   * @throws MessageEncodingException for encoding errors
    */
   RequestHttpObject<T> buildHttpObject() throws SignatureException, ResolverException, MessageEncodingException;
 
   /**
    * Returns the entityID of the Service Provider that this builder is serving.
-   * 
+   *
    * @return entityID of the Service Provider
    */
   String entityID();
 
   /**
    * Returns the entityID for the IdP to which we are constructing the request.
-   * 
+   *
    * @return entityID of the Identity Provider
    */
   String idpEntityID();
 
   /**
    * Installs the SAML RelayState to use when sending the request.
-   * 
-   * @param relayState
-   *          the RelayState
+   *
+   * @param relayState the RelayState
    * @return an updated builder object
    */
   RequestHttpObjectBuilder<T> relayState(final String relayState);
 
   /**
    * Returns the SAML RelayState that has been configured for this builder.
-   * 
+   *
    * @return the SAML RelayState or null if none has been configured
    */
   String relayState();
@@ -98,9 +95,8 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
    * should be modified it is generally better to use the {@link #request()} method that returns a reference to the
    * contained request message, or the special purpose methods for this purpose.
    * </p>
-   * 
-   * @param request
-   *          the request object to install to the builder
+   *
+   * @param request the request object to install to the builder
    * @return an updated builder object
    * @see #request()
    */
@@ -112,7 +108,7 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
    * <p>
    * Also see the methods that directly modifies attributes and elements.
    * </p>
-   * 
+   *
    * @return a reference to the request object
    */
   T request();
@@ -120,18 +116,16 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
   /**
    * The builder is created with the SAML binding to use when sending the request message (redirect or post). This
    * method may be used to override this setting.
-   * 
-   * @param binding
-   *          the URI of the SAML binding to use (e.g., "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect")
+   *
+   * @param binding the URI of the SAML binding to use (e.g., "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect")
    * @return an updated builder object
-   * @throws ResolverException
-   *           if the binding supplied does not match a binding found in the IdP:s entity descriptor
+   * @throws ResolverException if the binding supplied does not match a binding found in the IdP:s entity descriptor
    */
   RequestHttpObjectBuilder<T> binding(final String binding) throws ResolverException;
 
   /**
    * Returns the SAML binding that should be used when sending the request.
-   * 
+   *
    * @return the URI of the SAML binding to use
    */
   String binding();
@@ -143,16 +137,15 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
    * Using this method it is possible to override the default behaviour by explicitly state the request should be
    * signed, or not signed.
    * </p>
-   * 
-   * @param signatureFlag
-   *          flag telling whether the request being created should be signed or not
+   *
+   * @param signatureFlag flag telling whether the request being created should be signed or not
    * @return an updated builder object
    */
   RequestHttpObjectBuilder<T> performSignature(final boolean signatureFlag);
 
   /**
    * Predicate that tells whether the request being created will be signed or not.
-   * 
+   *
    * @return if the request being created will be signed true is returned, and false otherwise
    */
   boolean performSignature();
@@ -160,16 +153,15 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
   /**
    * Using this method the signature credentials for the builder object may be changed. This is typically useful when
    * the SP has more than one signature key, or for testing purposes.
-   * 
-   * @param signatureCredentials
-   *          the "new" signature credentials
+   *
+   * @param signatureCredentials the "new" signature credentials
    * @return an updated builder object
    */
   RequestHttpObjectBuilder<T> signatureCredentials(final X509Credential signatureCredentials);
 
   /**
    * Returns the signature credentials this builder object has been configured to use during request signing.
-   * 
+   *
    * @return the signature credentials
    */
   X509Credential signatureCredentials();
@@ -180,9 +172,8 @@ public interface RequestHttpObjectBuilder<T extends RequestAbstractType> extends
    * The method will change the endpoint to where the request will be sent, but will <b>not</b> modify the
    * {@code Destination} attribute of the request element.
    * </p>
-   * 
-   * @param url
-   *          the endpoint to assign
+   *
+   * @param url the endpoint to assign
    * @return an updated builder object
    */
   RequestHttpObjectBuilder<T> endpoint(final String url);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,14 +31,14 @@ import se.swedenconnect.opensaml.common.utils.LocalizedString;
 
 /**
  * Builder for {@code md:AttributeConsumingService} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<AttributeConsumingService> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static AttributeConsumingServiceBuilder builder() {
@@ -47,9 +47,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * Assigns the {@code Index} attribute.
-   * 
-   * @param index
-   *          the index
+   *
+   * @param index the index
    * @return the builder
    */
   public AttributeConsumingServiceBuilder index(final Integer index) {
@@ -59,9 +58,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * Sets the {@code isDefault} attribute of the service.
-   * 
-   * @param flag
-   *          the Boolean
+   *
+   * @param flag the Boolean
    * @return the builder
    */
   public AttributeConsumingServiceBuilder isDefault(final Boolean flag) {
@@ -71,9 +69,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * Assigns the service names.
-   * 
-   * @param names
-   *          the service names
+   *
+   * @param names the service names
    * @return the builder.
    */
   public AttributeConsumingServiceBuilder serviceNames(final List<LocalizedString> names) {
@@ -92,9 +89,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * @see #serviceNames(List)
-   * 
-   * @param names
-   *          the service names
+   *
+   * @param names the service names
    * @return the builder.
    */
   public AttributeConsumingServiceBuilder serviceNames(final LocalizedString... names) {
@@ -103,9 +99,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * Assigns the descriptions.
-   * 
-   * @param descriptions
-   *          the descriptions
+   *
+   * @param descriptions the descriptions
    * @return the builder
    */
   public AttributeConsumingServiceBuilder descriptions(final List<LocalizedString> descriptions) {
@@ -114,7 +109,7 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
       return this;
     }
     for (final LocalizedString description : descriptions) {
-      final ServiceDescription serviceDescription = 
+      final ServiceDescription serviceDescription =
           (ServiceDescription) XMLObjectSupport.buildXMLObject(ServiceDescription.DEFAULT_ELEMENT_NAME);
       serviceDescription.setValue(description.getLocalString());
       serviceDescription.setXMLLang(description.getLanguage());
@@ -125,9 +120,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * @see #descriptions(List)
-   * 
-   * @param descriptions
-   *          the descriptions
+   *
+   * @param descriptions the descriptions
    * @return the builder
    */
   public AttributeConsumingServiceBuilder descriptions(final LocalizedString... descriptions) {
@@ -136,9 +130,8 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * Assigns the {@code md:RequestedAttribute} elements.
-   * 
-   * @param attributes
-   *          the requested attributes
+   *
+   * @param attributes the requested attributes
    * @return the builder
    */
   public AttributeConsumingServiceBuilder requestedAttributes(final List<RequestedAttribute> attributes) {
@@ -159,11 +152,10 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
 
   /**
    * @see #requestedAttributes(List)
-   * 
-   * @param attributes
-   *          the requested attributes
+   *
+   * @param attributes the requested attributes
    * @return the builder
-   */  
+   */
   public AttributeConsumingServiceBuilder requestedAttributes(final RequestedAttribute... attributes) {
     return this.requestedAttributes(attributes != null ? Arrays.asList(attributes) : null);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package se.swedenconnect.opensaml.saml2.core.build;
 
 /**
  * Builder for {@code AuthnRequest} messages.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @see AbstractAuthnRequestBuilder
  */
@@ -25,7 +25,7 @@ public class AuthnRequestBuilder extends AbstractAuthnRequestBuilder<AuthnReques
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static AuthnRequestBuilder builder() {

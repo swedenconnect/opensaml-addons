@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.opensaml.saml.saml2.core.Statement;
 
 /**
  * Abstract validator for {@link AttributeStatement}s.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractAttributeStatementValidator implements StatementValidator {
@@ -46,33 +46,32 @@ public abstract class AbstractAttributeStatementValidator implements StatementVa
    * Validates that all required attributes were received in the {@code AttributeStatement}.
    */
   @Override
-  public ValidationResult validate(final Statement statement, final Assertion assertion, final ValidationContext context)
+  public ValidationResult validate(final Statement statement, final Assertion assertion,
+      final ValidationContext context)
       throws AssertionValidationException {
 
     if (statement instanceof AttributeStatement) {
       final AttributeStatement attributeStatement = (AttributeStatement) statement;
-      final List<Attribute> list = attributeStatement.getAttributes() != null ? attributeStatement.getAttributes() : Collections.emptyList();
+      final List<Attribute> list =
+          attributeStatement.getAttributes() != null ? attributeStatement.getAttributes() : Collections.emptyList();
       return this.validateRequiredAttributes(list, attributeStatement, assertion, context);
     }
     else {
-      throw new AssertionValidationException("Illegal call - statement is of type " + statement.getClass().getSimpleName());
+      throw new AssertionValidationException(
+          "Illegal call - statement is of type " + statement.getClass().getSimpleName());
     }
   }
 
   /**
    * Validates that the attribute statement contains all attributes that we require.
-   * 
-   * @param attributes
-   *          the attributes
-   * @param statement
-   *          the attribute statement
-   * @param assertion
-   *          the assertion
-   * @param context
-   *          the validation context
+   *
+   * @param attributes the attributes
+   * @param statement the attribute statement
+   * @param assertion the assertion
+   * @param context the validation context
    * @return validation result
    */
-  protected abstract ValidationResult validateRequiredAttributes(final List<Attribute> attributes, 
+  protected abstract ValidationResult validateRequiredAttributes(final List<Attribute> attributes,
       final AttributeStatement statement, final Assertion assertion, final ValidationContext context);
 
 }

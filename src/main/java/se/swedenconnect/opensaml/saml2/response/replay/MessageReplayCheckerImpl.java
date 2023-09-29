@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,22 +48,21 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
   /**
    * Constructor.
    *
-   * @param replayCache
-   *          the OpenSAML {@link ReplayCache} object to use
-   * @param replayCacheName
-   *          the name of the replay cache
+   * @param replayCache the OpenSAML {@link ReplayCache} object to use
+   * @param replayCacheName the name of the replay cache
    */
   public MessageReplayCheckerImpl(final ReplayCache replayCache, final String replayCacheName) {
     this.replayCache = Optional.ofNullable(replayCache)
-      .orElseThrow(() -> new IllegalArgumentException("replayCache must not be null"));
+        .orElseThrow(() -> new IllegalArgumentException("replayCache must not be null"));
     this.replayCacheName = Optional.ofNullable(replayCacheName)
-      .orElseThrow(() -> new IllegalArgumentException("replayCacheName must not be null"));
+        .orElseThrow(() -> new IllegalArgumentException("replayCacheName must not be null"));
   }
 
   /** {@inheritDoc} */
   @Override
   public void checkReplay(final String id) throws MessageReplayException {
-    if (!this.replayCache.check(this.replayCacheName, id, Instant.ofEpochMilli(this.replayCacheExpiration + System.currentTimeMillis()))) {
+    if (!this.replayCache.check(this.replayCacheName, id,
+        Instant.ofEpochMilli(this.replayCacheExpiration + System.currentTimeMillis()))) {
       String msg = String.format("Replay check of ID '%s' failed", id);
       log.warn(msg);
       throw new MessageReplayException(msg);
@@ -93,8 +92,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
   /**
    * Assigns the replay cache to use when checking against replay attacks.
    *
-   * @param replayCache
-   *          the cache
+   * @param replayCache the cache
    */
   public void setReplayCache(final ReplayCache replayCache) {
     this.replayCache = replayCache;
@@ -103,8 +101,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
   /**
    * Assigns the name of the replay cache.
    *
-   * @param replayCacheName
-   *          the name
+   * @param replayCacheName the name
    */
   public void setReplayCacheName(final String replayCacheName) {
     this.replayCacheName = replayCacheName;
@@ -113,8 +110,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
   /**
    * Assigns the number of milliseconds each stored ID should be kept in the cache. The default is 5 minutes.
    *
-   * @param replayCacheExpiration
-   *          number of millis
+   * @param replayCacheExpiration number of millis
    */
   public void setReplayCacheExpiration(final long replayCacheExpiration) {
     if (replayCacheExpiration < 0) {

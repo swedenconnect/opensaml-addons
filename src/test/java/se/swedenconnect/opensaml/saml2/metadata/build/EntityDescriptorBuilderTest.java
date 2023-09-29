@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.ext.idpdisco.DiscoveryResponse;
@@ -51,7 +51,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.xml.SerializeSupport;
+import net.shibboleth.shared.xml.SerializeSupport;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.common.utils.LocalizedString;
 import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
@@ -60,7 +60,7 @@ import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
 
 /**
  * Test cases for building a complete metadata file.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
@@ -225,98 +225,97 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
         ContactPersonBuilder.builder(contactPersonTemplate).type(ContactPersonTypeEnumeration.SUPPORT).build())
       .build();
 
-    Element elm = XMLObjectSupport.marshall(ed);
-    System.out.println(SerializeSupport.prettyPrintXML(elm));
+    // System.out.println(SerializeSupport.prettyPrintXML(XMLObjectSupport.marshall(ed)));
 
-    Assert.assertEquals(metadataId, ed.getID());
-    Assert.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
-    Assert.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
+    Assertions.assertEquals(metadataId, ed.getID());
+    Assertions.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
+    Assertions.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
 
     EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
-    Assert.assertNotNull(entityAttributes);
+    Assertions.assertNotNull(entityAttributes);
     Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
-    Assert.assertNotNull(entityCategoryAttribute);
-    Assert.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
+    Assertions.assertNotNull(entityCategoryAttribute);
+    Assertions.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
 
-    Assert.assertEquals(3, EntityDescriptorUtils.getDigestMethods(ed).size());
-    Assert.assertEquals(3, ed.getExtensions().getUnknownXMLObjects(DigestMethod.DEFAULT_ELEMENT_NAME).size());
+    Assertions.assertEquals(3, EntityDescriptorUtils.getDigestMethods(ed).size());
+    Assertions.assertEquals(3, ed.getExtensions().getUnknownXMLObjects(DigestMethod.DEFAULT_ELEMENT_NAME).size());
 
-    Assert.assertEquals(2, EntityDescriptorUtils.getSigningMethods(ed).size());
-    Assert.assertTrue(ed.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).isEmpty());
+    Assertions.assertEquals(2, EntityDescriptorUtils.getSigningMethods(ed).size());
+    Assertions.assertTrue(ed.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).isEmpty());
 
     List<DigestMethod> digestList = EntityDescriptorUtils.getDigestMethods(ed);
-    Assert.assertEquals(digestMethods[0].getAlgorithm(), digestList.get(0).getAlgorithm());
-    Assert.assertEquals(digestMethods[1].getAlgorithm(), digestList.get(1).getAlgorithm());
-    Assert.assertEquals(digestMethods[2].getAlgorithm(), digestList.get(2).getAlgorithm());
+    Assertions.assertEquals(digestMethods[0].getAlgorithm(), digestList.get(0).getAlgorithm());
+    Assertions.assertEquals(digestMethods[1].getAlgorithm(), digestList.get(1).getAlgorithm());
+    Assertions.assertEquals(digestMethods[2].getAlgorithm(), digestList.get(2).getAlgorithm());
 
     SPSSODescriptor ssoDescriptor = ed.getSPSSODescriptor(SAMLConstants.SAML20P_NS);
 
-    Assert.assertEquals(2, ssoDescriptor.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).size());
-    Assert.assertTrue(ssoDescriptor.getExtensions().getUnknownXMLObjects(DigestMethod.DEFAULT_ELEMENT_NAME).isEmpty());
+    Assertions.assertEquals(2, ssoDescriptor.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).size());
+    Assertions.assertTrue(ssoDescriptor.getExtensions().getUnknownXMLObjects(DigestMethod.DEFAULT_ELEMENT_NAME).isEmpty());
 
     List<SigningMethod> signingList = EntityDescriptorUtils.getSigningMethods(ed);
-    Assert.assertEquals(signingMethods[0].getAlgorithm(), signingList.get(0).getAlgorithm());
-    Assert.assertEquals(signingMethods[0].getMinKeySize(), signingList.get(0).getMinKeySize());
-    Assert.assertEquals(signingMethods[1].getAlgorithm(), signingList.get(1).getAlgorithm());
+    Assertions.assertEquals(signingMethods[0].getAlgorithm(), signingList.get(0).getAlgorithm());
+    Assertions.assertEquals(signingMethods[0].getMinKeySize(), signingList.get(0).getMinKeySize());
+    Assertions.assertEquals(signingMethods[1].getAlgorithm(), signingList.get(1).getAlgorithm());
 
-    Assert.assertTrue(ssoDescriptor.isAuthnRequestsSigned());
-    Assert.assertTrue(ssoDescriptor.getWantAssertionsSigned());
+    Assertions.assertTrue(ssoDescriptor.isAuthnRequestsSigned());
+    Assertions.assertTrue(ssoDescriptor.getWantAssertionsSigned());
 
     UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
-    Assert.assertNotNull(uiInfo);
-    Assert.assertEquals(Arrays.asList(uiDisplayNames),
+    Assertions.assertNotNull(uiInfo);
+    Assertions.assertEquals(Arrays.asList(uiDisplayNames),
       uiInfo.getDisplayNames().stream().map(dn -> new LocalizedString(dn.getValue(), dn.getXMLLang())).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiDescriptions),
+    Assertions.assertEquals(Arrays.asList(uiDescriptions),
       uiInfo.getDescriptions().stream().map(d -> new LocalizedString(d.getValue(), d.getXMLLang())).collect(Collectors.toList()));
     // The Logo class is buggy. Its hashcode assumes that there is a language set, so we'll have to check all
     // attributes.
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getURI()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getURI()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getURI()).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getHeight()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getHeight()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getHeight()).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getWidth()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getWidth()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getWidth()).collect(Collectors.toList()));
 
     List<DiscoveryResponse> discoResponses =
         EntityDescriptorUtils.getMetadataExtensions(ssoDescriptor.getExtensions(), DiscoveryResponse.class);
-    Assert.assertTrue(discoResponses.size() == 2);
-    Assert.assertEquals(1, (int) discoResponses.get(0).getIndex());
-    Assert.assertEquals(discoveryResponses[0].getLocation(), discoResponses.get(0).getLocation());
-    Assert.assertEquals(2, (int) discoResponses.get(1).getIndex());
-    Assert.assertEquals(discoveryResponses[1].getLocation(), discoResponses.get(1).getLocation());
+    Assertions.assertTrue(discoResponses.size() == 2);
+    Assertions.assertEquals(1, (int) discoResponses.get(0).getIndex());
+    Assertions.assertEquals(discoveryResponses[0].getLocation(), discoResponses.get(0).getLocation());
+    Assertions.assertEquals(2, (int) discoResponses.get(1).getIndex());
+    Assertions.assertEquals(discoveryResponses[1].getLocation(), discoResponses.get(1).getLocation());
 
-    Assert.assertEquals(UsageType.SIGNING, ssoDescriptor.getKeyDescriptors().get(0).getUse());
-    Assert.assertEquals("Litsec Signing", ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getKeyNames().get(0).getValue());
-    Assert.assertTrue(ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
+    Assertions.assertEquals(UsageType.SIGNING, ssoDescriptor.getKeyDescriptors().get(0).getUse());
+    Assertions.assertEquals("Litsec Signing", ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getKeyNames().get(0).getValue());
+    Assertions.assertTrue(ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
 
-    Assert.assertEquals(UsageType.ENCRYPTION, ssoDescriptor.getKeyDescriptors().get(1).getUse());
-    Assert.assertEquals("Litsec Encrypt", ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getKeyNames().get(0).getValue());
-    Assert.assertTrue(ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
-    Assert.assertEquals(4, ssoDescriptor.getKeyDescriptors().get(1).getEncryptionMethods().size());
+    Assertions.assertEquals(UsageType.ENCRYPTION, ssoDescriptor.getKeyDescriptors().get(1).getUse());
+    Assertions.assertEquals("Litsec Encrypt", ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getKeyNames().get(0).getValue());
+    Assertions.assertTrue(ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
+    Assertions.assertEquals(4, ssoDescriptor.getKeyDescriptors().get(1).getEncryptionMethods().size());
 
-    Assert.assertEquals(Arrays.asList(nameIDFormats), ssoDescriptor.getNameIDFormats().stream().map(n -> n.getURI()).collect(Collectors
+    Assertions.assertEquals(Arrays.asList(nameIDFormats), ssoDescriptor.getNameIDFormats().stream().map(n -> n.getURI()).collect(Collectors
       .toList()));
 
-    Assert.assertEquals(2, ssoDescriptor.getAssertionConsumerServices().size());
+    Assertions.assertEquals(2, ssoDescriptor.getAssertionConsumerServices().size());
 
-    Assert.assertEquals(Boolean.TRUE, ssoDescriptor.getAssertionConsumerServices().get(0).isDefault());
-    Assert.assertNull(ssoDescriptor.getAssertionConsumerServices().get(1).isDefaultXSBoolean());
-    Assert.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getAssertionConsumerServices().get(0).getBinding());
-    Assert.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getAssertionConsumerServices().get(1).getBinding());
-    Assert.assertEquals(0, (int) ssoDescriptor.getAssertionConsumerServices().get(0).getIndex());
-    Assert.assertEquals(1, (int) ssoDescriptor.getAssertionConsumerServices().get(1).getIndex());
-    Assert.assertEquals("https://eid.litsec.se/svelegtest-sp/saml2/post/11", ssoDescriptor.getAssertionConsumerServices()
+    Assertions.assertEquals(Boolean.TRUE, ssoDescriptor.getAssertionConsumerServices().get(0).isDefault());
+    Assertions.assertNull(ssoDescriptor.getAssertionConsumerServices().get(1).isDefaultXSBoolean());
+    Assertions.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getAssertionConsumerServices().get(0).getBinding());
+    Assertions.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getAssertionConsumerServices().get(1).getBinding());
+    Assertions.assertEquals(0, (int) ssoDescriptor.getAssertionConsumerServices().get(0).getIndex());
+    Assertions.assertEquals(1, (int) ssoDescriptor.getAssertionConsumerServices().get(1).getIndex());
+    Assertions.assertEquals("https://eid.litsec.se/svelegtest-sp/saml2/post/11", ssoDescriptor.getAssertionConsumerServices()
       .get(0)
       .getLocation());
-    Assert.assertEquals("https://localhost:8443/svelegtest-sp/saml2/post/11", ssoDescriptor.getAssertionConsumerServices()
+    Assertions.assertEquals("https://localhost:8443/svelegtest-sp/saml2/post/11", ssoDescriptor.getAssertionConsumerServices()
       .get(1)
       .getLocation());
 
-    Assert.assertEquals(requestedAttributes,
+    Assertions.assertEquals(requestedAttributes,
       ssoDescriptor.getAttributeConsumingServices().get(0).getRequestedAttributes().stream().map(a -> a.getName()).collect(Collectors
         .toList()));
-    Assert.assertEquals(Arrays.asList(serviceNames),
+    Assertions.assertEquals(Arrays.asList(serviceNames),
       ssoDescriptor.getAttributeConsumingServices()
         .get(0)
         .getNames()
@@ -324,25 +323,25 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
         .map(s -> new LocalizedString(s.getValue(), s.getXMLLang()))
         .collect(Collectors.toList()));
 
-    Assert.assertEquals(Arrays.asList(organizationNames),
+    Assertions.assertEquals(Arrays.asList(organizationNames),
       ed.getOrganization().getOrganizationNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assert.assertEquals(Arrays.asList(organizationDisplayNames),
+    Assertions.assertEquals(Arrays.asList(organizationDisplayNames),
       ed.getOrganization().getDisplayNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assert.assertEquals(Arrays.asList(organizationURL),
+    Assertions.assertEquals(Arrays.asList(organizationURL),
       ed.getOrganization().getURLs().stream().map(n -> new LocalizedString(n.getURI(), n.getXMLLang())).collect(Collectors.toList()));
 
-    Assert.assertEquals(2, ed.getContactPersons().size());
-    Assert.assertEquals(ContactPersonTypeEnumeration.TECHNICAL, ed.getContactPersons().get(0).getType());
-    Assert.assertEquals(ContactPersonTypeEnumeration.SUPPORT, ed.getContactPersons().get(1).getType());
+    Assertions.assertEquals(2, ed.getContactPersons().size());
+    Assertions.assertEquals(ContactPersonTypeEnumeration.TECHNICAL, ed.getContactPersons().get(0).getType());
+    Assertions.assertEquals(ContactPersonTypeEnumeration.SUPPORT, ed.getContactPersons().get(1).getType());
     for (int i = 0; i < 2; i++) {
-      Assert.assertEquals("Litsec AB", ed.getContactPersons().get(i).getCompany().getValue());
-      Assert.assertEquals("Martin", ed.getContactPersons().get(i).getGivenName().getValue());
-      Assert.assertEquals("Lindström", ed.getContactPersons().get(i).getSurName().getValue());
-      Assert.assertEquals(Arrays.asList("martin.lindstrom@litsec.se"),
+      Assertions.assertEquals("Litsec AB", ed.getContactPersons().get(i).getCompany().getValue());
+      Assertions.assertEquals("Martin", ed.getContactPersons().get(i).getGivenName().getValue());
+      Assertions.assertEquals("Lindström", ed.getContactPersons().get(i).getSurName().getValue());
+      Assertions.assertEquals(Arrays.asList("martin.lindstrom@litsec.se"),
         ed.getContactPersons().get(i).getEmailAddresses().stream().map(m -> m.getURI()).collect(Collectors.toList()));
-      Assert.assertEquals(Arrays.asList("+46 (0)70 361 98 80"),
+      Assertions.assertEquals(Arrays.asList("+46 (0)70 361 98 80"),
         ed.getContactPersons().get(i).getTelephoneNumbers().stream().map(t -> t.getValue()).collect(Collectors.toList()));
     }
   }
@@ -458,73 +457,74 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Element elm = XMLObjectSupport.marshall(ed);
     System.out.println(SerializeSupport.prettyPrintXML(elm));
 
-    Assert.assertEquals(metadataId, ed.getID());
-    Assert.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
-    Assert.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
+    Assertions.assertEquals(metadataId, ed.getID());
+    Assertions.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
+    Assertions.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
 
     EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
-    Assert.assertNotNull(entityAttributes);
+    Assertions.assertNotNull(entityAttributes);
 
     Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
-    Assert.assertNotNull(entityCategoryAttribute);
-    Assert.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
+    Assertions.assertNotNull(entityCategoryAttribute);
+    Assertions.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
 
     Attribute assuranceCertificationAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, entityAttributes.getAttributes());
-    Assert.assertNotNull(assuranceCertificationAttribute);
-    Assert.assertEquals(Arrays.asList(assuranceCertificationUris), AttributeUtils.getAttributeStringValues(assuranceCertificationAttribute));
+    Assertions.assertNotNull(assuranceCertificationAttribute);
+    Assertions.assertEquals(Arrays.asList(assuranceCertificationUris), AttributeUtils.getAttributeStringValues(assuranceCertificationAttribute));
 
     IDPSSODescriptor ssoDescriptor = ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
 
-    Assert.assertEquals(Boolean.TRUE, ssoDescriptor.getWantAuthnRequestsSigned());
+    Assertions.assertEquals(Boolean.TRUE, ssoDescriptor.getWantAuthnRequestsSigned());
 
     UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
-    Assert.assertNotNull(uiInfo);
-    Assert.assertEquals(Arrays.asList(uiDisplayNames),
+    Assertions.assertNotNull(uiInfo);
+    Assertions.assertEquals(Arrays.asList(uiDisplayNames),
       uiInfo.getDisplayNames().stream().map(dn -> new LocalizedString(dn.getValue(), dn.getXMLLang())).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiDescriptions),
+    Assertions.assertEquals(Arrays.asList(uiDescriptions),
       uiInfo.getDescriptions().stream().map(d -> new LocalizedString(d.getValue(), d.getXMLLang())).collect(Collectors.toList()));
     // The Logo class is buggy. Its hashcode assumes that there is a language set, so we'll have to check all
     // attributes.
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getURI()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getURI()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getURI()).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getHeight()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getHeight()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getHeight()).collect(Collectors.toList()));
-    Assert.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getWidth()).collect(Collectors.toList()),
+    Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getWidth()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getWidth()).collect(Collectors.toList()));
 
-    Assert.assertEquals(UsageType.SIGNING, ssoDescriptor.getKeyDescriptors().get(0).getUse());
-    Assert.assertTrue(ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
+    Assertions.assertEquals(UsageType.SIGNING, ssoDescriptor.getKeyDescriptors().get(0).getUse());
+    Assertions.assertTrue(ssoDescriptor.getKeyDescriptors().get(0).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
 
-    Assert.assertEquals(UsageType.ENCRYPTION, ssoDescriptor.getKeyDescriptors().get(1).getUse());
-    Assert.assertTrue(ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
+    Assertions.assertEquals(UsageType.ENCRYPTION, ssoDescriptor.getKeyDescriptors().get(1).getUse());
+    Assertions.assertTrue(ssoDescriptor.getKeyDescriptors().get(1).getKeyInfo().getX509Datas().get(0).getX509Certificates().size() == 1);
 
-    Assert.assertEquals(Arrays.asList(nameIDFormats),
+    Assertions.assertEquals(Arrays.asList(nameIDFormats),
       ssoDescriptor.getNameIDFormats().stream().map(n -> n.getURI()).collect(Collectors.toList()));
 
-    Assert.assertEquals(SAMLConstants.SAML2_REDIRECT_BINDING_URI, ssoDescriptor.getSingleSignOnServices().get(0).getBinding());
-    Assert.assertEquals("https://idp.svelegtest.se/idp/profile/SAML2/Redirect/SSO",
+    Assertions.assertEquals(SAMLConstants.SAML2_REDIRECT_BINDING_URI, ssoDescriptor.getSingleSignOnServices().get(0).getBinding());
+    Assertions.assertEquals("https://idp.svelegtest.se/idp/profile/SAML2/Redirect/SSO",
       ssoDescriptor.getSingleSignOnServices().get(0).getLocation());
-    Assert.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getSingleSignOnServices().get(1).getBinding());
-    Assert.assertEquals("https://idp.svelegtest.se/idp/profile/SAML2/POST/SSO",
+    Assertions.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI, ssoDescriptor.getSingleSignOnServices().get(1).getBinding());
+    Assertions.assertEquals("https://idp.svelegtest.se/idp/profile/SAML2/POST/SSO",
       ssoDescriptor.getSingleSignOnServices().get(1).getLocation());
 
-    Assert.assertEquals(Arrays.asList(organizationNames),
+    Assertions.assertEquals(Arrays.asList(organizationNames),
       ed.getOrganization().getOrganizationNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assert.assertEquals(Arrays.asList(organizationDisplayNames),
+    Assertions.assertEquals(Arrays.asList(organizationDisplayNames),
       ed.getOrganization().getDisplayNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assert.assertEquals(Arrays.asList(organizationURL),
+    Assertions.assertEquals(Arrays.asList(organizationURL),
       ed.getOrganization().getURLs().stream().map(n -> new LocalizedString(n.getURI(), n.getXMLLang())).collect(Collectors.toList()));
 
-    Assert.assertEquals(2, ed.getContactPersons().size());
-    Assert.assertEquals(ContactPersonTypeEnumeration.TECHNICAL, ed.getContactPersons().get(0).getType());
-    Assert.assertEquals(ContactPersonTypeEnumeration.SUPPORT, ed.getContactPersons().get(1).getType());
+    Assertions.assertEquals(2, ed.getContactPersons().size());
+    Assertions.assertEquals(ContactPersonTypeEnumeration.TECHNICAL, ed.getContactPersons().get(0).getType());
+    Assertions.assertEquals(ContactPersonTypeEnumeration.SUPPORT, ed.getContactPersons().get(1).getType());
     for (int i = 0; i < 2; i++) {
-      Assert.assertEquals("E-legitimationsnämnden", ed.getContactPersons().get(i).getCompany().getValue());
-      Assert.assertEquals(Arrays.asList("stefan@aaa-sec.com"),
+      Assertions.assertEquals("E-legitimationsnämnden", ed.getContactPersons().get(i).getCompany().getValue());
+      Assertions
+          .assertEquals(Arrays.asList("stefan@aaa-sec.com"),
         ed.getContactPersons().get(i).getEmailAddresses().stream().map(m -> m.getURI()).collect(Collectors.toList()));
     }
   }

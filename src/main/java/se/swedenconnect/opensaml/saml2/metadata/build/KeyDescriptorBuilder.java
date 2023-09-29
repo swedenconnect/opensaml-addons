@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,14 +43,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
  * This builder only supports a subset of the possible elements of a key descriptor, but should be sufficient for most
  * cases.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescriptor> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static KeyDescriptorBuilder builder() {
@@ -65,9 +65,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * Assigns the usage type for the key descriptor.
-   * 
-   * @param usageType
-   *          the usage type
+   *
+   * @param usageType the usage type
    * @return the builder
    */
   public KeyDescriptorBuilder use(final UsageType usageType) {
@@ -82,9 +81,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * Assigns the key name of the {@code KeyInfo} element within the key descriptor.
-   * 
-   * @param name
-   *          the key name
+   *
+   * @param name the key name
    * @return the builder
    */
   public KeyDescriptorBuilder keyName(final String name) {
@@ -97,7 +95,7 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
       this.object().setKeyInfo((KeyInfo) XMLObjectSupport.buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME));
     }
     this.object().getKeyInfo().getKeyNames().clear();
-    final KeyName keyName = (KeyName) XMLObjectSupport.buildXMLObject(KeyName.DEFAULT_ELEMENT_NAME); 
+    final KeyName keyName = (KeyName) XMLObjectSupport.buildXMLObject(KeyName.DEFAULT_ELEMENT_NAME);
     keyName.setValue(name);
     this.object().getKeyInfo().getKeyNames().add(keyName);
     return this;
@@ -105,15 +103,14 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * Assigns a certificate to be used as a X.509 data element of the {@code KeyInfo} element within the key descriptor.
-   * 
-   * @param certificate
-   *          the certificate
+   *
+   * @param certificate the certificate
    * @return the builder
    */
   public KeyDescriptorBuilder certificate(final X509Certificate certificate) {
     try {
       return this.certificate(
-        certificate != null ? Base64.getEncoder().encodeToString(certificate.getEncoded()) : null);
+          certificate != null ? Base64.getEncoder().encodeToString(certificate.getEncoded()) : null);
     }
     catch (CertificateEncodingException e) {
       throw new SecurityException(e);
@@ -123,16 +120,15 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   /**
    * Assigns an input stream to a certificate resource that is to be used as a X.509 data element of the {@code KeyInfo}
    * element within the key descriptor.
-   * 
-   * @param certificate
-   *          the certificate resource
+   *
+   * @param certificate the certificate resource
    * @return the builder
    */
   public KeyDescriptorBuilder certificate(final InputStream certificate) {
     try {
       return this.certificate(
-        certificate != null ? Base64.getEncoder().encodeToString(
-          CertificateFactory.getInstance("X.509").generateCertificate(certificate).getEncoded()) : null);
+          certificate != null ? Base64.getEncoder().encodeToString(
+              CertificateFactory.getInstance("X.509").generateCertificate(certificate).getEncoded()) : null);
     }
     catch (CertificateException e) {
       throw new SecurityException(e);
@@ -142,9 +138,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   /**
    * Assigns a certificate (in Base64-encoded format) to be used as a X.509 data element of the {@code KeyInfo} element
    * within the key descriptor.
-   * 
-   * @param base64Encoding
-   *          the base64 encoding (note: not PEM-format)
+   *
+   * @param base64Encoding the base64 encoding (note: not PEM-format)
    * @return the builder
    */
   public KeyDescriptorBuilder certificate(final String base64Encoding) {
@@ -158,8 +153,9 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
     }
     this.object().getKeyInfo().getX509Datas().clear();
     final X509Data x509Data = (X509Data) XMLObjectSupport.buildXMLObject(X509Data.DEFAULT_ELEMENT_NAME);
-    org.opensaml.xmlsec.signature.X509Certificate cert = (org.opensaml.xmlsec.signature.X509Certificate)
-        XMLObjectSupport.buildXMLObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+    org.opensaml.xmlsec.signature.X509Certificate cert =
+        (org.opensaml.xmlsec.signature.X509Certificate) XMLObjectSupport
+            .buildXMLObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
     cert.setValue(base64Encoding);
     x509Data.getX509Certificates().add(cert);
     this.object().getKeyInfo().getX509Datas().add(x509Data);
@@ -169,9 +165,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   /**
    * Assigns a certificate in OpenSAML credential format to be used as a X.509 data element of the {@code KeyInfo}
    * element within the key descriptor.
-   * 
-   * @param credential
-   *          the credential
+   *
+   * @param credential the credential
    * @return the builder
    */
   public KeyDescriptorBuilder certificate(final X509Credential credential) {
@@ -184,15 +179,15 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
    * Note: the method only accepts algorithm URI:s. If you need to assign other parts of an {@code EncryptionMethod}
    * object you must use {@link #encryptionMethodsExt(List)}.
    * </p>
-   * 
-   * @param algorithms
-   *          list of algorithms
+   *
+   * @param algorithms list of algorithms
    * @return the builder
    */
   public KeyDescriptorBuilder encryptionMethods(final List<String> algorithms) {
     if (algorithms != null && !algorithms.isEmpty()) {
       for (final String algo : algorithms) {
-        final EncryptionMethod method = (EncryptionMethod) XMLObjectSupport.buildXMLObject(EncryptionMethod.DEFAULT_ELEMENT_NAME);
+        final EncryptionMethod method =
+            (EncryptionMethod) XMLObjectSupport.buildXMLObject(EncryptionMethod.DEFAULT_ELEMENT_NAME);
         method.setAlgorithm(algo);
         this.object().getEncryptionMethods().add(method);
       }
@@ -205,9 +200,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * See {@link #encryptionMethods(List)}.
-   * 
-   * @param algorithms
-   *          list of algorithms
+   *
+   * @param algorithms list of algorithms
    * @return the builder
    */
   public KeyDescriptorBuilder encryptionMethods(final String... algorithms) {
@@ -216,9 +210,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * Assigns a list of encryption methods.
-   * 
-   * @param algorithms
-   *          ordered list of encryption methods
+   *
+   * @param algorithms ordered list of encryption methods
    * @return the builder
    */
   public KeyDescriptorBuilder encryptionMethodsExt(final List<EncryptionMethod> algorithms) {
@@ -240,9 +233,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
 
   /**
    * See {@link #encryptionMethodsExt(List)}.
-   * 
-   * @param algorithms
-   *          ordered list of encryption methods
+   *
+   * @param algorithms ordered list of encryption methods
    * @return the builder
    */
   public KeyDescriptorBuilder encryptionMethods(final EncryptionMethod... algorithms) {

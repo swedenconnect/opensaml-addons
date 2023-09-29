@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package se.swedenconnect.opensaml.saml2.metadata.provider;
 
 import java.security.KeyStore;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.core.io.Resource;
 
 import se.swedenconnect.opensaml.TestWebServer;
@@ -51,10 +51,9 @@ public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
   /**
    * Starts the "remote" metadata service.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
-  @BeforeClass
+  @BeforeAll
   static public void startServer() throws Exception {
 
     // Since our test CA cert is missing BasicConstraints extension ...
@@ -66,10 +65,9 @@ public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
   /**
    * Stops the "remote" metadata service.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
-  @AfterClass
+  @AfterAll
   static public void stopServer() throws Exception {
     server.stop();
 
@@ -81,7 +79,8 @@ public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
   protected AbstractMetadataProvider createMetadataProvider(final Resource resource) throws Exception {
 
     resourceProvider.setResource(resource);
-    return new HTTPMetadataProvider(server.getUrl(), null, HTTPMetadataProvider.createDefaultHttpClient(trustStore, null));
+    return new HTTPMetadataProvider(server.getUrl(), null,
+        HTTPMetadataProvider.createDefaultHttpClient(trustStore, null));
   }
 
   /**

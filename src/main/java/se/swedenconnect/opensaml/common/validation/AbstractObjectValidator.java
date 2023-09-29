@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 
-import net.shibboleth.utilities.java.support.primitive.DeprecationSupport;
-import net.shibboleth.utilities.java.support.primitive.DeprecationSupport.ObjectType;
+import net.shibboleth.shared.primitive.DeprecationSupport;
+import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
 
 /**
  * Abstract base class for {@link ObjectValidator}.
- * 
+ *
  * <p>
  * Supports the following {@link ValidationContext} static parameters:
  * </p>
@@ -43,7 +43,7 @@ import net.shibboleth.utilities.java.support.primitive.DeprecationSupport.Object
  * <li>{@link CoreValidatorParameters#RECEIVE_INSTANT}: Optional. Instant giving the time when the message was received.
  * If not set, the current time is used.</li>
  * </ul>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractObjectValidator<T extends XMLObject> implements ObjectValidator<T> {
@@ -54,9 +54,8 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
   /**
    * Tells whether this validator runs in "strict" mode. This value is read from the static validation context parameter
    * {@link CoreValidatorParameters#STRICT_VALIDATION}. If this parameter is not available {@code false} is returned.
-   * 
-   * @param context
-   *          the validation context
+   *
+   * @param context the validation context
    * @return {@code true} for strict mode, and {@code false} otherwise
    */
   public static boolean isStrictValidation(final ValidationContext context) {
@@ -68,9 +67,8 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
    * Returns the duration that is the maximum allowed clock skew that we accept when comparing time stamps. The value is
    * read from the static validation context parameter {@link SAML2AssertionValidationParameters#CLOCK_SKEW}. If this
    * parameter is not available {@link SAML20AssertionValidator#DEFAULT_CLOCK_SKEW} is used.
-   * 
-   * @param context
-   *          the validation context
+   *
+   * @param context the validation context
    * @return the duration that is the maximum allowed clock skew
    */
   public static Duration getAllowedClockSkew(final ValidationContext context) {
@@ -80,7 +78,8 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
         return Duration.class.cast(object);
       }
       else if (Long.class.isInstance(object)) {
-        DeprecationSupport.warn(ObjectType.CONFIGURATION, SAML2AssertionValidationParameters.CLOCK_SKEW, null, Duration.class.getName());        
+        DeprecationSupport.warn(ObjectType.CONFIGURATION, SAML2AssertionValidationParameters.CLOCK_SKEW, null,
+            Duration.class.getName());
         return Duration.ofMillis(Long.class.cast(object));
       }
     }
@@ -91,9 +90,8 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
    * Returns the duration that a received message (or element) is allowed to less than the current time. The value is
    * read from the static validation context parameter {@link CoreValidatorParameters#MAX_AGE_MESSAGE}. If this
    * parameter is not available, {@link #DEFAULT_MAX_AGE_RECEIVED_MESSAGE} is used.
-   * 
-   * @param context
-   *          the validation context
+   *
+   * @param context the validation context
    * @return the duration that may have elapsed since the issuance of a message and validation of it
    */
   public static Duration getMaxAgeReceivedMessage(final ValidationContext context) {
@@ -103,7 +101,8 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
         return Duration.class.cast(object);
       }
       else if (Long.class.isInstance(object)) {
-        DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.MAX_AGE_MESSAGE, null, Duration.class.getName());
+        DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.MAX_AGE_MESSAGE, null,
+            Duration.class.getName());
         return Duration.ofMillis(Long.class.cast(object));
       }
     }
@@ -111,12 +110,10 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
   }
 
   /**
-   * Returns the timestamp for when the message being validated was received. The value is
-   * read from {@link CoreValidatorParameters#RECEIVE_INSTANT}. If the parameter is not available the current time is
-   * returned.
-   * 
-   * @param context
-   *          the validation context.
+   * Returns the timestamp for when the message being validated was received. The value is read from
+   * {@link CoreValidatorParameters#RECEIVE_INSTANT}. If the parameter is not available the current time is returned.
+   *
+   * @param context the validation context.
    * @return the timestamp for when the message being validated was received
    */
   public static Instant getReceiveInstant(final ValidationContext context) {
@@ -126,11 +123,12 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
         return Instant.class.cast(object);
       }
       else if (Long.class.isInstance(object)) {
-        DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.RECEIVE_INSTANT, null, Duration.class.getName());
+        DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.RECEIVE_INSTANT, null,
+            Duration.class.getName());
         return Instant.ofEpochMilli(Long.class.cast(object));
       }
     }
-    return Instant.now(); 
+    return Instant.now();
   }
 
 }

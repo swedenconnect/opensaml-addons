@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeValue;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Implements the build pattern to create {@link Attribute} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
@@ -45,9 +45,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Constructor setting the attribute name.
-   * 
-   * @param name
-   *          the attribute name
+   *
+   * @param name the attribute name
    */
   public AttributeBuilder(final String name) {
     super();
@@ -59,9 +58,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Static utility method that creates a default {@code AttributeBuilder}.
-   * 
-   * @param name
-   *          the attribute name
+   *
+   * @param name the attribute name
    * @return an AttributeBuilder instance.
    * @see #AttributeBuilder(String)
    */
@@ -71,13 +69,10 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Constructor setting up the builder given an attribute template.
-   * 
-   * @param template
-   *          the attribute template
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws MarshallingException
-   *           for marshalling errors
+   *
+   * @param template the attribute template
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws MarshallingException for marshalling errors
    * @see AbstractSAMLObjectBuilder#AbstractSAMLObjectBuilder(XMLObject)
    */
   public AttributeBuilder(final Attribute template) throws MarshallingException, UnmarshallingException {
@@ -86,28 +81,23 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Static utility method that creates a {@code AttributeBuilder} given a template attribute.
-   * 
-   * @param attribute
-   *          the attribute template
+   *
+   * @param attribute the attribute template
    * @return an attribute builder
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws MarshallingException
-   *           for marshalling errors
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws MarshallingException for marshalling errors
    */
-  public static AttributeBuilder builder(final Attribute attribute) throws MarshallingException, UnmarshallingException {
+  public static AttributeBuilder builder(final Attribute attribute)
+      throws MarshallingException, UnmarshallingException {
     return new AttributeBuilder(attribute);
   }
 
   /**
    * Constructor setting up the builder with a template attribute that is read from an input stream.
-   * 
-   * @param resource
-   *          the attribute template
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws XMLParserException
-   *           for XML parsing errors
+   *
+   * @param resource the attribute template
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws XMLParserException for XML parsing errors
    * @see AbstractSAMLObjectBuilder#AbstractSAMLObjectBuilder(InputStream)
    */
   public AttributeBuilder(final InputStream resource) throws XMLParserException, UnmarshallingException {
@@ -116,14 +106,11 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Static utility method that creates a {@code AttributeBuilder} given a template attribute read from an input stream.
-   * 
-   * @param resource
-   *          the attribute template
+   *
+   * @param resource the attribute template
    * @return an attribute builder
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
-   * @throws XMLParserException
-   *           for XML parsing errors
+   * @throws UnmarshallingException for unmarshalling errors
+   * @throws XMLParserException for XML parsing errors
    */
   public static AttributeBuilder builder(final InputStream resource) throws XMLParserException, UnmarshallingException {
     return new AttributeBuilder(resource);
@@ -146,9 +133,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Assigns the attribute name.
-   * 
-   * @param name
-   *          the attribute name
+   *
+   * @param name the attribute name
    * @return the builder
    */
   public AttributeBuilder name(final String name) {
@@ -158,9 +144,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Assigns the attribute friendly name.
-   * 
-   * @param friendlyName
-   *          the friendly name
+   *
+   * @param friendlyName the friendly name
    * @return the builder
    */
   public AttributeBuilder friendlyName(final String friendlyName) {
@@ -170,9 +155,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Assigns the attribute name format.
-   * 
-   * @param nameFormat
-   *          the name format URI
+   *
+   * @param nameFormat the name format URI
    * @return the builder
    */
   public AttributeBuilder nameFormat(final String nameFormat) {
@@ -182,13 +166,12 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Assigns one (or more) attribute string values.
-   * 
+   *
    * <p>
    * Note: if {@code null} is passed as a parameter, any previous attribute values are cleared.
    * </p>
-   * 
-   * @param values
-   *          the string value(s) to add
+   *
+   * @param values the string value(s) to add
    * @return the builder
    */
   public AttributeBuilder value(final String... values) {
@@ -197,9 +180,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * @see #value(String...)
-   * 
-   * @param values
-   *          the string value(s) to add
+   *
+   * @param values the string value(s) to add
    * @return the builder
    */
   public AttributeBuilder value(final List<String> values) {
@@ -217,11 +199,9 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
 
   /**
    * Assigns an attribute value.
-   * 
-   * @param value
-   *          the value to add
-   * @param <T>
-   *          the value type
+   *
+   * @param value the value to add
+   * @param <T> the value type
    * @return the builder
    */
   public <T extends XMLObject> AttributeBuilder value(final T value) {
@@ -241,10 +221,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
    * {@link #value(String...)} method may be used directly.
    * </p>
    *
-   * @param <T>
-   *          the type
-   * @param clazz
-   *          the type of attribute value
+   * @param <T> the type
+   * @param clazz the type of attribute value
    * @return the attribute value
    * @see #createValueObject(QName, Class)
    */
@@ -268,18 +246,17 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
    * Note: For attribute having string values, there is no need to explictly create an attribute value. Instead the
    * {@link #value(String...)} method may be used directly.
    * </p>
-   * 
-   * @param <T>
-   *          the type
-   * @param schemaType
-   *          the schema type that should be assigned to the attribute value, i.e., {@code xsi:type="ns:ValueType"}
-   * @param clazz
-   *          the type of the attribute value
+   *
+   * @param <T> the type
+   * @param schemaType the schema type that should be assigned to the attribute value, i.e.,
+   *          {@code xsi:type="ns:ValueType"}
+   * @param clazz the type of the attribute value
    * @return the attribute value
    * @see #createValueObject(Class)
    */
   public static <T extends XMLObject> T createValueObject(final QName schemaType, final Class<T> clazz) {
-    return clazz.cast(XMLObjectSupport.getBuilder(schemaType).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, schemaType));
+    return clazz
+        .cast(XMLObjectSupport.getBuilder(schemaType).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, schemaType));
   }
 
   /** {@inheritDoc} */

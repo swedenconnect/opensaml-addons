@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,16 @@ public class ResponseStatusErrorException extends Exception {
 
   /** The Response ID. */
   private final String responseId;
-  
+
   /** The entityID of the issuer of the response. */
   private final String issuer;
 
   /**
    * Constructor taking the error status and the response ID.
-   * 
-   * @param status
-   *          status
-   * @param responseId
-   *          the response ID
-   * @param issuer
-   *          the issuer of the response
+   *
+   * @param status status
+   * @param responseId the response ID
+   * @param issuer the issuer of the response
    */
   public ResponseStatusErrorException(final Status status, final String responseId, final String issuer) {
     super(statusToString(status));
@@ -60,7 +57,7 @@ public class ResponseStatusErrorException extends Exception {
 
   /**
    * Returns the status object.
-   * 
+   *
    * @return the status object
    */
   public Status getStatus() {
@@ -69,16 +66,16 @@ public class ResponseStatusErrorException extends Exception {
 
   /**
    * Returns the ID of the Response.
-   * 
+   *
    * @return the response ID
    */
   public String getResponseId() {
     return this.responseId;
   }
-  
+
   /**
    * Gets the issuer of the response.
-   * 
+   *
    * @return the issuer entityID
    */
   public String getIssuer() {
@@ -87,9 +84,8 @@ public class ResponseStatusErrorException extends Exception {
 
   /**
    * Returns a textual representation of the status.
-   * 
-   * @param status
-   *          the Status to print
+   *
+   * @param status the Status to print
    * @return a status string
    */
   public static String statusToString(final Status status) {

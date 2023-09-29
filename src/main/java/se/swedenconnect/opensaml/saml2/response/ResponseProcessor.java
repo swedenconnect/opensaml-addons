@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,22 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 
 /**
  * Interface for a SAML response processor.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface ResponseProcessor {
 
   /**
    * Processes a SAML response including signature validation and assertion decryption.
-   * 
-   * @param samlResponse
-   *          the base64 encoded SAML response
-   * @param relayState
-   *          the received relay state
-   * @param input
-   *          the processing input
-   * @param validationContext
-   *          optional validation context for controlling the validation and assertion validation process
+   *
+   * @param samlResponse the base64 encoded SAML response
+   * @param relayState the received relay state
+   * @param input the processing input
+   * @param validationContext optional validation context for controlling the validation and assertion validation
+   *          process
    * @return a result
-   * @throws ResponseStatusErrorException
-   *           if the response indicates a non-successful {@code Status}
-   * @throws ResponseProcessingException
-   *           for other processing errors
+   * @throws ResponseStatusErrorException if the response indicates a non-successful {@code Status}
+   * @throws ResponseProcessingException for other processing errors
    */
   ResponseProcessingResult processSamlResponse(final String samlResponse, final String relayState,
       final ResponseProcessingInput input, final ValidationContext validationContext)

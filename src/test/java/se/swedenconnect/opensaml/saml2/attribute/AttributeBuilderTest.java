@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package se.swedenconnect.opensaml.saml2.attribute;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.schema.XSBase64Binary;
 import org.opensaml.core.xml.schema.XSBoolean;
 import org.opensaml.core.xml.schema.XSBooleanValue;
@@ -29,18 +29,18 @@ import se.swedenconnect.opensaml.OpenSAMLTestBase;
 
 /**
  * Tests for the {@link AttributeBuilder}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AttributeBuilderTest extends OpenSAMLTestBase {
-  
+
   public static final String ATTRIBUTE_NAME_SN = "urn:oid:2.5.4.4";
-  
-  public static final String ATTRIBUTE_FRIENDLY_NAME_SN = "sn";  
-  
+
+  public static final String ATTRIBUTE_FRIENDLY_NAME_SN = "sn";
+
   public static final String ATTRIBUTE_NAME_MAIL = "urn:oid:2.5.4.10";
 
-  public static final String ATTRIBUTE_FRIENDLY_NAME_MAIL = "mail";  
+  public static final String ATTRIBUTE_FRIENDLY_NAME_MAIL = "mail";
 
   @Test
   public void testCreateStringValueAttribute() {
@@ -49,14 +49,14 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
         .nameFormat(Attribute.URI_REFERENCE)
         .value("Eriksson")
         .build();
-    
-    Assert.assertEquals(ATTRIBUTE_NAME_SN, attribute.getName());
-    Assert.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
-    Assert.assertEquals(ATTRIBUTE_FRIENDLY_NAME_SN, attribute.getFriendlyName());
-    Assert.assertTrue(attribute.getAttributeValues().size() == 1);
-    Assert.assertEquals("Eriksson", AttributeUtils.getAttributeStringValue(attribute));
+
+    Assertions.assertEquals(ATTRIBUTE_NAME_SN, attribute.getName());
+    Assertions.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
+    Assertions.assertEquals(ATTRIBUTE_FRIENDLY_NAME_SN, attribute.getFriendlyName());
+    Assertions.assertTrue(attribute.getAttributeValues().size() == 1);
+    Assertions.assertEquals("Eriksson", AttributeUtils.getAttributeStringValue(attribute));
   }
-  
+
   @Test
   public void testCreateMultipleStringValuesAttribute() {
     Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_MAIL)
@@ -65,73 +65,73 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
         .value("martin@litsec.se")
         .value("martin.lindstrom@litsec.se")
         .build();
-    
-    Assert.assertEquals(ATTRIBUTE_NAME_MAIL, attribute.getName());
-    Assert.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
-    Assert.assertEquals(ATTRIBUTE_FRIENDLY_NAME_MAIL, attribute.getFriendlyName());
-    Assert.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"), AttributeUtils.getAttributeStringValues(attribute));
+
+    Assertions.assertEquals(ATTRIBUTE_NAME_MAIL, attribute.getName());
+    Assertions.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
+    Assertions.assertEquals(ATTRIBUTE_FRIENDLY_NAME_MAIL, attribute.getFriendlyName());
+    Assertions.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"), AttributeUtils.getAttributeStringValues(attribute));
   }
-  
+
   @Test
   public void testCreateNonStringAttribute() {
-   
-    // We pretend that there is a attribute that holds a boolean ...    
+
+    // We pretend that there is a attribute that holds a boolean ...
     XSBoolean value = AttributeBuilder.createValueObject(XSBoolean.class);
     value.setValue(XSBooleanValue.valueOf("true"));
-    
+
     Attribute attribute = AttributeBuilder.builder("http://eid.litsec.se/types/boolean")
         .friendlyName("booleanAttribute")
         .nameFormat(Attribute.URI_REFERENCE)
         .value(value)
         .build();
-    
-    Assert.assertEquals("http://eid.litsec.se/types/boolean", attribute.getName());
-    Assert.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
-    Assert.assertEquals("booleanAttribute", attribute.getFriendlyName());
-    Assert.assertTrue(AttributeUtils.getAttributeValues(attribute, XSBoolean.class).size() == 1);
-    Assert.assertEquals(AttributeUtils.getAttributeValue(attribute, XSBoolean.class).getValue().getValue(), Boolean.TRUE);    
+
+    Assertions.assertEquals("http://eid.litsec.se/types/boolean", attribute.getName());
+    Assertions.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
+    Assertions.assertEquals("booleanAttribute", attribute.getFriendlyName());
+    Assertions.assertTrue(AttributeUtils.getAttributeValues(attribute, XSBoolean.class).size() == 1);
+    Assertions.assertEquals(AttributeUtils.getAttributeValue(attribute, XSBoolean.class).getValue().getValue(), Boolean.TRUE);
   }
-  
+
   @Test
   public void testDefaultNameFormat() {
     Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
         .value("Eriksson")
         .build();
-    
-    Assert.assertEquals(ATTRIBUTE_NAME_SN, attribute.getName());
-    Assert.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
-    Assert.assertEquals("Eriksson", AttributeUtils.getAttributeStringValue(attribute));
+
+    Assertions.assertEquals(ATTRIBUTE_NAME_SN, attribute.getName());
+    Assertions.assertEquals(Attribute.URI_REFERENCE, attribute.getNameFormat());
+    Assertions.assertEquals("Eriksson", AttributeUtils.getAttributeStringValue(attribute));
   }
-  
+
   @Test
   public void testCreateValueObject() {
     XSBase64Binary value = AttributeBuilder.createValueObject(XSBase64Binary.class);
-    Assert.assertEquals(XSBase64Binary.TYPE_NAME, value.getSchemaType());
-    Assert.assertEquals(AttributeValue.DEFAULT_ELEMENT_NAME, value.getElementQName());
+    Assertions.assertEquals(XSBase64Binary.TYPE_NAME, value.getSchemaType());
+    Assertions.assertEquals(AttributeValue.DEFAULT_ELEMENT_NAME, value.getElementQName());
   }
-  
+
   @Test
   public void testRequiredName() {
-    
+
     try {
       new AttributeBuilder((String)null);
-      Assert.fail("Expected IllegalArgumentException");
+      Assertions.fail("Expected IllegalArgumentException");
     }
-    catch (IllegalArgumentException e) {      
+    catch (IllegalArgumentException e) {
     }
-    
+
     AttributeBuilder builder = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
         .friendlyName(ATTRIBUTE_FRIENDLY_NAME_SN)
         .nameFormat(Attribute.URI_REFERENCE)
         .value("Eriksson");
-    
+
     builder.name(null);
-    
+
     try {
       builder.build();
-      Assert.fail("Expected RuntimeException");
+      Assertions.fail("Expected RuntimeException");
     }
-    catch (RuntimeException e) {      
+    catch (RuntimeException e) {
     }
   }
 

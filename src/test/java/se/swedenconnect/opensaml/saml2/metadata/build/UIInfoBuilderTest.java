@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.ext.saml2mdui.Keywords;
 import org.opensaml.saml.ext.saml2mdui.Logo;
@@ -35,7 +35,7 @@ import se.swedenconnect.opensaml.common.utils.LocalizedString;
 
 /**
  * Test cases for {@code UIInfoBuilder}.
- * 
+ *
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public class UIInfoBuilderTest extends OpenSAMLTestBase {
@@ -71,7 +71,7 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
 
   /**
    * Tests creating a full UIINfo with all elements set.
-   * 
+   *
    * @throws Exception
    *           for errors
    */
@@ -92,7 +92,7 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
 
   /**
    * Test where not all elements and attributes are set.
-   * 
+   *
    * @throws Exception
    *           for errors
    */
@@ -137,47 +137,47 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
   public static void assertUIInfo(UIInfo uiInfo, LocalizedString[] displayNames, Map<String, List<String>> keywords, String[] keywordsArray,
       LocalizedString[] descriptions, Logo[] logos, LocalizedString[] informationURLs, LocalizedString[] privayStatementURLs) {
 
-    Assert.assertEquals(displayNames != null ? displayNames.length : 0, uiInfo.getDisplayNames().size());
+    Assertions.assertEquals(displayNames != null ? displayNames.length : 0, uiInfo.getDisplayNames().size());
     for (int i = 0; i < uiInfo.getDisplayNames().size(); i++) {
-      Assert.assertEquals(displayNames[i].getLanguage(), uiInfo.getDisplayNames().get(i).getXMLLang());
-      Assert.assertEquals(displayNames[i].getLocalString(), uiInfo.getDisplayNames().get(i).getValue());
+      Assertions.assertEquals(displayNames[i].getLanguage(), uiInfo.getDisplayNames().get(i).getXMLLang());
+      Assertions.assertEquals(displayNames[i].getLocalString(), uiInfo.getDisplayNames().get(i).getValue());
     }
 
     if (keywords != null) {
-      Assert.assertEquals(keywords.keySet().size(), uiInfo.getKeywords().size());
+      Assertions.assertEquals(keywords.keySet().size(), uiInfo.getKeywords().size());
       for (Keywords kw : uiInfo.getKeywords()) {
         List<String> words = keywords.get(kw.getXMLLang());
-        Assert.assertNotNull(words);
-        Assert.assertEquals(words, kw.getKeywords());
+        Assertions.assertNotNull(words);
+        Assertions.assertEquals(words, kw.getKeywords());
       }
     }
     if (keywordsArray != null) {
-      Assert.assertEquals(1, uiInfo.getKeywords().size());
-      Assert.assertNull(uiInfo.getKeywords().get(0).getXMLLang());
-      Assert.assertEquals(Arrays.asList(keywordsArray), uiInfo.getKeywords().get(0).getKeywords());
+      Assertions.assertEquals(1, uiInfo.getKeywords().size());
+      Assertions.assertNull(uiInfo.getKeywords().get(0).getXMLLang());
+      Assertions.assertEquals(Arrays.asList(keywordsArray), uiInfo.getKeywords().get(0).getKeywords());
     }
 
-    Assert.assertEquals(descriptions != null ? descriptions.length : 0, uiInfo.getDescriptions().size());
+    Assertions.assertEquals(descriptions != null ? descriptions.length : 0, uiInfo.getDescriptions().size());
     for (int i = 0; i < uiInfo.getDescriptions().size(); i++) {
-      Assert.assertEquals(descriptions[i].getLanguage(), uiInfo.getDescriptions().get(i).getXMLLang());
-      Assert.assertEquals(descriptions[i].getLocalString(), uiInfo.getDescriptions().get(i).getValue());
+      Assertions.assertEquals(descriptions[i].getLanguage(), uiInfo.getDescriptions().get(i).getXMLLang());
+      Assertions.assertEquals(descriptions[i].getLocalString(), uiInfo.getDescriptions().get(i).getValue());
     }
 
-    Assert.assertEquals(logos != null ? logos.length : 0, uiInfo.getLogos().size());
+    Assertions.assertEquals(logos != null ? logos.length : 0, uiInfo.getLogos().size());
     for (int i = 0; i < uiInfo.getLogos().size(); i++) {
-      Assert.assertTrue(equals(logos[i], uiInfo.getLogos().get(i)));
+      Assertions.assertTrue(equals(logos[i], uiInfo.getLogos().get(i)));
     }
 
-    Assert.assertEquals(informationURLs != null ? informationURLs.length : 0, uiInfo.getInformationURLs().size());
+    Assertions.assertEquals(informationURLs != null ? informationURLs.length : 0, uiInfo.getInformationURLs().size());
     for (int i = 0; i < uiInfo.getInformationURLs().size(); i++) {
-      Assert.assertEquals(informationURLs[i].getLanguage(), uiInfo.getInformationURLs().get(i).getXMLLang());
-      Assert.assertEquals(informationURLs[i].getLocalString(), uiInfo.getInformationURLs().get(i).getURI());
+      Assertions.assertEquals(informationURLs[i].getLanguage(), uiInfo.getInformationURLs().get(i).getXMLLang());
+      Assertions.assertEquals(informationURLs[i].getLocalString(), uiInfo.getInformationURLs().get(i).getURI());
     }
 
-    Assert.assertEquals(privayStatementURLs != null ? privayStatementURLs.length : 0, uiInfo.getPrivacyStatementURLs().size());
+    Assertions.assertEquals(privayStatementURLs != null ? privayStatementURLs.length : 0, uiInfo.getPrivacyStatementURLs().size());
     for (int i = 0; i < uiInfo.getPrivacyStatementURLs().size(); i++) {
-      Assert.assertEquals(privayStatementURLs[i].getLanguage(), uiInfo.getPrivacyStatementURLs().get(i).getXMLLang());
-      Assert.assertEquals(privayStatementURLs[i].getLocalString(), uiInfo.getPrivacyStatementURLs().get(i).getURI());
+      Assertions.assertEquals(privayStatementURLs[i].getLanguage(), uiInfo.getPrivacyStatementURLs().get(i).getXMLLang());
+      Assertions.assertEquals(privayStatementURLs[i].getLocalString(), uiInfo.getPrivacyStatementURLs().get(i).getURI());
     }
   }
 

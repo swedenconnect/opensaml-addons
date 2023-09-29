@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
  */
 package se.swedenconnect.opensaml.common.builder;
 
+import se.swedenconnect.opensaml.common.LibraryVersion;
+
 /**
  * Runtime exception class for errors when using builders.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class SAMLObjectBuilderRuntimeException extends RuntimeException {
 
   /** For serializing. */
-  private static final long serialVersionUID = -2665398281671943709L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
    * Constructor assigning the error message.
-   * 
-   * @param message
-   *          the error message
+   *
+   * @param message the error message
    */
   public SAMLObjectBuilderRuntimeException(final String message) {
     super(message);
@@ -37,9 +38,8 @@ public class SAMLObjectBuilderRuntimeException extends RuntimeException {
 
   /**
    * Constructor assigning the cause of the error
-   * 
-   * @param cause
-   *          the cause of the error
+   *
+   * @param cause the cause of the error
    */
   public SAMLObjectBuilderRuntimeException(final Throwable cause) {
     super(cause);
@@ -47,11 +47,9 @@ public class SAMLObjectBuilderRuntimeException extends RuntimeException {
 
   /**
    * Constructor assinging the error message and the cause of the error.
-   * 
-   * @param message
-   *          the error message
-   * @param cause
-   *          the cause of the error
+   *
+   * @param message the error message
+   * @param cause the cause of the error
    */
   public SAMLObjectBuilderRuntimeException(final String message, final Throwable cause) {
     super(message, cause);

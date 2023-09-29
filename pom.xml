@@ -6,10 +6,10 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.8</version>
+  <version>2.0.0-SNAPSHOT</version>
 
-  <name>Sweden Connect :: OpenSAML 4.X utility extensions</name>
-  <description>OpenSAML 4.X utility extension library</description>
+  <name>Sweden Connect :: OpenSAML 5.X utility extensions</name>
+  <description>OpenSAML 5.X utility extension library</description>
   <url>https://github.com/swedenconnect/opensaml-addons</url>
 
   <licenses>
@@ -42,11 +42,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
 
-    <opensaml.min.version>4.2.0</opensaml.min.version>
-    <junit.version>4.13.2</junit.version>
-    <slf4j.version>1.7.36</slf4j.version>
+    <opensaml.version>5.0.0</opensaml.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <jackson.version>2.15.2</jackson.version>
   </properties>
   
   <repositories>
@@ -81,41 +81,32 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>compile</scope>
       </dependency>
       
       <dependency>
-        <groupId>org.cryptacular</groupId>
-        <artifactId>cryptacular</artifactId>
-        <version>1.2.5</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.16.0</version>
       </dependency>
       
       <dependency>
-        <groupId>org.apache.santuario</groupId>
-        <artifactId>xmlsec</artifactId>
-        <version>2.3.3</version>
-        <exclusions>
-          <!-- Version included has reported vulnerabilities -->
-          <exclusion>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.apache.httpcomponents.core5</groupId>
+        <artifactId>httpcore5</artifactId>
+        <version>5.2.2</version>
       </dependency>
       
       <dependency>
-        <groupId>com.fasterxml.woodstox</groupId>
-        <artifactId>woodstox-core</artifactId>
-        <version>6.5.1</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
-    
+      
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>      
+          
     </dependencies>
   
   </dependencyManagement>
@@ -131,61 +122,57 @@
     <dependency>
       <groupId>se.swedenconnect.opensaml</groupId>
       <artifactId>opensaml-security-ext</artifactId>
-      <version>[3.1.2,)</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>4.0.0-SNAPSHOT</version>
     </dependency>
     
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-storage-api</artifactId>
-      <version>[${opensaml.min.version}, 5.0.0)</version>
+      <version>${opensaml.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
+      <scope>provided</scope>
     </dependency>
         
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>[3.9,)</version>
+      <version>3.13.0</version>
     </dependency>    
-    
-    <!-- Referenced by OpenSAML -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
-    </dependency>    
-        
+            
     <!-- For testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.0</version>
       <scope>test</scope>
-      <type>jar</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
+    </dependency>    
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.5.0</version>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>se.swedenconnect.security</groupId>
       <artifactId>credentials-support</artifactId>
-      <version>1.2.6</version>
+      <version>1.3.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
      
-    <dependency>
-      <groupId>pl.pragmatists</groupId>
-      <artifactId>JUnitParams</artifactId>
-      <version>1.1.1</version>
-      <scope>test</scope>
-      <type>jar</type>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>      
-    </dependency>
-    
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
@@ -244,6 +231,12 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
       </plugin>
 
       <plugin>
@@ -307,6 +300,20 @@
       </plugin>      
 
     </plugins>
+    
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+      </testResource>      
+    </testResources>    
 
   </build>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
@@ -36,21 +36,21 @@ import org.opensaml.security.httpclient.HttpClientSecurityParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
-import net.shibboleth.utilities.java.support.httpclient.HttpClientSupport;
-import net.shibboleth.utilities.java.support.httpclient.TLSSocketFactoryBuilder;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.httpclient.HttpClientBuilder;
+import net.shibboleth.shared.httpclient.HttpClientSupport;
+import net.shibboleth.shared.httpclient.TLSSocketFactoryBuilder;
+import net.shibboleth.shared.resolver.ResolverException;
 
 /**
  * A provider that downloads metadata from a HTTP resource.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  * @see HTTPMetadataResolver
  * @see FileBackedHTTPMetadataResolver
  */
 public class HTTPMetadataProvider extends AbstractMetadataProvider {
-  
+
   /** Logging instance. */
   private Logger log = LoggerFactory.getLogger(HTTPMetadataProvider.class);
 
@@ -64,7 +64,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * This constructor will initialize the underlying {@code MetadataResolver} with a default {@code HttpClient} instance
    * that is initialized according to {@link #createDefaultHttpClient()}.
    * </p>
-   * 
+   *
    * @param metadataUrl
    *          the URL to use when downloading metadata
    * @param backupFile
@@ -79,7 +79,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
   /**
    * Creates a provider that periodically downloads data from the URL given by {@code metadataUrl}. If the
    * {@code backupFile} parameter is given the provider also stores the downloaded metadata on disk as backup.
-   * 
+   *
    * @param metadataUrl
    *          the URL to use when downloading metadata
    * @param backupFile
@@ -106,7 +106,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * TLS security parameters, such as a trust engine, may later be added by assigning a configured
    * {@link HttpClientSecurityParameters} instance in the constructor.
    * </p>
-   * 
+   *
    * @return a default {@code HttpClient} instance
    * @throws ResolverException
    *           for errors creating the client
@@ -119,7 +119,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * Creates a {@link HttpClient} instance that sets up a trust manager that accepts all certificates supplied in the
    * {@code trustKeyStore} parameter. The {@code hostnameVerifier} parameter tells which hostname verifier that should
    * be used. If not supplied, a {@link DefaultHostnameVerifier} will be used.
-   * 
+   *
    * @param trustKeyStore
    *          a KeyStore holding the certificates that should be accepted (if null, all certificates are accepted)
    * @param hostnameVerifier
@@ -185,14 +185,14 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
   /** {@inheritDoc} */
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
-    
+
     final String url = this.metadataResolver.getMetadataURI();
     if (url != null && url.startsWith("http:")) {
       if (this.getSignatureVerificationCertificates() == null) {
         log.warn("Metadata is downloaded using HTTP and signature verification is not configured - metadata cannot be trusted");
       }
     }
-    
+
     this.metadataResolver.initialize();
   }
 

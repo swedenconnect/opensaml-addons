@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,29 +31,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.CriteriaSet;
 
 /**
  * Abstract object validator that supports validating signatures.
- * 
+ *
  * <p>
  * Supports the following {@link ValidationContext} static parameters:
  * </p>
  * <ul>
  * <li>The static parameters defined in {@link AbstractObjectValidator}.</li>
- * <li>{@link SAML2AssertionValidationParameters#SIGNATURE_REQUIRED}: Optional. If not supplied, defaults to 'true'. If an object
- * is signed, the signature is always evaluated and the result factored into the overall validation result, regardless
- * of the value of this setting.</li>
- * <li>{@link SAML2AssertionValidationParameters#SIGNATURE_VALIDATION_CRITERIA_SET}: Optional. If not supplied, a minimal criteria
- * set will be constructed which contains an {@link EntityIdCriterion} containing the Issuer entityID, and a
- * {@link UsageCriterion} of {@link UsageType#SIGNING}. If it is supplied, but either of those criteria are absent from
- * the criteria set, they will be added with the above values.</li>
+ * <li>{@link SAML2AssertionValidationParameters#SIGNATURE_REQUIRED}: Optional. If not supplied, defaults to 'true'. If
+ * an object is signed, the signature is always evaluated and the result factored into the overall validation result,
+ * regardless of the value of this setting.</li>
+ * <li>{@link SAML2AssertionValidationParameters#SIGNATURE_VALIDATION_CRITERIA_SET}: Optional. If not supplied, a
+ * minimal criteria set will be constructed which contains an {@link EntityIdCriterion} containing the Issuer entityID,
+ * and a {@link UsageCriterion} of {@link UsageType#SIGNING}. If it is supplied, but either of those criteria are absent
+ * from the criteria set, they will be added with the above values.</li>
  * </ul>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
- * @param <T>
- *          the type of the object that is to be validated
+ * @param <T> the type of the object that is to be validated
  */
 public abstract class AbstractSignableObjectValidator<T extends SignableXMLObject> extends AbstractObjectValidator<T> {
 
@@ -68,29 +67,27 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
 
   /**
    * Constructor.
-   * 
-   * @param trustEngine
-   *          the trust used to validate the object's signature
-   * @param signaturePrevalidator
-   *          the signature pre-validator used to pre-validate the object's signature
+   *
+   * @param trustEngine the trust used to validate the object's signature
+   * @param signaturePrevalidator the signature pre-validator used to pre-validate the object's signature
    */
-  public AbstractSignableObjectValidator(final SignatureTrustEngine trustEngine, final SignaturePrevalidator signaturePrevalidator) {
+  public AbstractSignableObjectValidator(final SignatureTrustEngine trustEngine,
+      final SignaturePrevalidator signaturePrevalidator) {
     this.trustEngine = trustEngine;
     this.signaturePrevalidator = signaturePrevalidator;
   }
 
   /**
    * Validates the signature of the assertion, if it is signed.
-   * 
-   * @param token
-   *          assertion whose signature will be validated
-   * @param context
-   *          current validation context
+   *
+   * @param token assertion whose signature will be validated
+   * @param context current validation context
    * @return the result of the signature validation
    */
   protected ValidationResult validateSignature(final T token, final ValidationContext context) {
 
-    Boolean signatureRequired = (Boolean) context.getStaticParameters().get(SAML2AssertionValidationParameters.SIGNATURE_REQUIRED);
+    Boolean signatureRequired =
+        (Boolean) context.getStaticParameters().get(SAML2AssertionValidationParameters.SIGNATURE_REQUIRED);
     if (signatureRequired == null) {
       signatureRequired = Boolean.TRUE;
     }
@@ -98,20 +95,22 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
     // Validate params and requirements.
     if (!token.isSigned()) {
       if (signatureRequired) {
-        context.setValidationFailureMessage(String.format("%s was required to be signed, but was not", this.getObjectName()));
+        context.getValidationFailureMessages().add(
+            String.format("%s was required to be signed, but was not", this.getObjectName()));
         return ValidationResult.INVALID;
       }
       else {
-        log.debug(String.format("%s was not required to be signed, and was not signed. Skipping further signature evaluation",
-          this.getObjectName()));
+        log.debug(
+            String.format("%s was not required to be signed, and was not signed. Skipping further signature evaluation",
+                this.getObjectName()));
         return ValidationResult.VALID;
       }
     }
 
     if (trustEngine == null) {
       log.warn("Signature validation was necessary, but no signature trust engine was available");
-      context.setValidationFailureMessage(String.format(
-        "%s signature could not be evaluated due to internal error", this.getObjectName()));
+      context.getValidationFailureMessages().add(String.format(
+          "%s signature could not be evaluated due to internal error", this.getObjectName()));
       return ValidationResult.INDETERMINATE;
     }
 
@@ -120,12 +119,10 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
 
   /**
    * Handles the actual signature validation.
-   * 
-   * @param token
-   *          object whose signature will be validated
-   * @param context
-   *          current validation context
-   * 
+   *
+   * @param token object whose signature will be validated
+   * @param context current validation context
+   *
    * @return the validation result
    */
   protected ValidationResult performSignatureValidation(final T token, final ValidationContext context) {
@@ -142,7 +139,7 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
     final String tokenIssuer = this.getIssuer(token);
 
     log.debug("Attempting signature validation on {} '{}' from Issuer '{}'",
-      this.getObjectName(), this.getID(token), tokenIssuer);
+        this.getObjectName(), this.getID(token), tokenIssuer);
 
     try {
       signaturePrevalidator.validate(signature);
@@ -150,7 +147,7 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
     catch (SignatureException e) {
       final String msg = String.format("%s Signature failed pre-validation: %s", this.getObjectName(), e.getMessage());
       log.warn(msg);
-      context.setValidationFailureMessage(msg);
+      context.getValidationFailureMessages().add(msg);
       return ValidationResult.INVALID;
     }
 
@@ -159,22 +156,23 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
     try {
       if (trustEngine.validate(signature, criteriaSet)) {
         log.debug("Validation of signature of {} '{}' from Issuer '{}' was successful",
-          this.getObjectName(), this.getID(token), tokenIssuer);
+            this.getObjectName(), this.getID(token), tokenIssuer);
         return ValidationResult.VALID;
       }
       else {
         final String msg = String.format(
-          "Signature of %s '%s' from Issuer '%s' was not valid", this.getObjectName(), this.getID(token), tokenIssuer);
+            "Signature of %s '%s' from Issuer '%s' was not valid", this.getObjectName(), this.getID(token),
+            tokenIssuer);
         log.warn(msg);
-        context.setValidationFailureMessage(msg);
+        context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
     }
     catch (SecurityException e) {
       final String msg = String.format("A problem was encountered evaluating the signature over %s with ID '%s': %s",
-        this.getObjectName(), this.getID(token), e.getMessage());
+          this.getObjectName(), this.getID(token), e.getMessage());
       log.warn(msg);
-      context.setValidationFailureMessage(msg);
+      context.getValidationFailureMessages().add(msg);
       return ValidationResult.INVALID;
     }
 
@@ -182,11 +180,9 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
 
   /**
    * Get the criteria set that will be used in evaluating the Assertion signature via the supplied trust engine.
-   * 
-   * @param token
-   *          object whose signature will be validated
-   * @param context
-   *          current validation context
+   *
+   * @param token object whose signature will be validated
+   * @param context current validation context
    * @return the criteria set to use
    */
   protected CriteriaSet getSignatureValidationCriteriaSet(final T token, final ValidationContext context) {
@@ -213,25 +209,23 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
 
   /**
    * Returns the issuer of the signable object.
-   * 
-   * @param signableObject
-   *          the object being verified
+   *
+   * @param signableObject the object being verified
    * @return the issuer
    */
   protected abstract String getIssuer(final T signableObject);
 
   /**
    * Returns the ID of the signable object.
-   * 
-   * @param signableObject
-   *          the object being verified
+   *
+   * @param signableObject the object being verified
    * @return the ID
    */
   protected abstract String getID(final T signableObject);
 
   /**
    * Returns the name of the object being validated, e.g. "Assertion". Used for logging.
-   * 
+   *
    * @return the object name
    */
   protected abstract String getObjectName();

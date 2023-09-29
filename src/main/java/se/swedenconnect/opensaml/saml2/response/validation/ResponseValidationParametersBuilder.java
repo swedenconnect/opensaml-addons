@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,15 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 /**
  * Builder class for building the {@link ValidationContext} object for use as validation input to the
  * {@link ResponseValidator}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
-public class ResponseValidationParametersBuilder extends AbstractResponseValidationParametersBuilder<ResponseValidationParametersBuilder> {
+public class ResponseValidationParametersBuilder
+    extends AbstractResponseValidationParametersBuilder<ResponseValidationParametersBuilder> {
 
   /**
    * Utility method that returns a builder instance.
-   * 
+   *
    * @return a builder
    */
   public static ResponseValidationParametersBuilder builder() {

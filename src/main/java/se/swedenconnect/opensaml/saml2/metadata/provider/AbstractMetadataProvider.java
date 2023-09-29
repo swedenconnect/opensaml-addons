@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,10 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.RefreshableMetadataResolver;
+import org.opensaml.saml.metadata.resolver.filter.FilterException;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
+import org.opensaml.saml.metadata.resolver.filter.MetadataFilterContext;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter.Direction;
 import org.opensaml.saml.metadata.resolver.filter.impl.SchemaValidationFilter;
@@ -55,21 +57,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.component.AbstractInitializableComponent;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.component.ComponentSupport;
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.component.AbstractInitializableComponent;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 
 /**
  * Abstract base class for the {@link MetadataProvider} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractMetadataProvider extends AbstractInitializableComponent implements MetadataProvider {
 
   /** Logging instance. */
-  private Logger log = LoggerFactory.getLogger(AbstractMetadataProvider.class);
+  private final Logger log = LoggerFactory.getLogger(AbstractMetadataProvider.class);
 
   /** Whether the metadata returned by queries must be valid. Default: true. */
   private boolean requireValidMetadata = true;
@@ -136,7 +137,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
       ((RefreshableMetadataResolver) this.getMetadataResolver()).refresh();
     }
     else {
-      log.debug("Refresh of metadata is not supported by {}", this.getClass().getName());
+      this.log.debug("Refresh of metadata is not supported by {}", this.getClass().getName());
     }
   }
 
@@ -192,9 +193,8 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /**
    * Assigns the metadata that was downloaded.
-   * 
-   * @param metadata
-   *          metadata object
+   *
+   * @param metadata metadata object
    */
   protected synchronized void setMetadata(final XMLObject metadata) {
     this.metadata = metadata;
@@ -209,7 +209,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
     try {
       this.createMetadataResolver(this.requireValidMetadata, this.failFastInitialization, this.createFilter());
     }
-    catch (ResolverException e) {
+    catch (final ResolverException e) {
       throw new ComponentInitializationException(e);
     }
     this.initializeMetadataResolver();
@@ -217,45 +217,65 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /**
    * Creates the filter(s) that this instance should be configured with.
-   * 
+   *
    * @return a metadata filter
+   * @throws ComponentInitializationException if filters fails to initialize
    */
-  protected MetadataFilter createFilter() {
+  protected MetadataFilter createFilter() throws ComponentInitializationException {
 
     final List<MetadataFilter> filters = new ArrayList<>();
 
     // Verify signature?
     if (this.signatureVerificationCertificates != null && !this.signatureVerificationCertificates.isEmpty()) {
       final CredentialResolver credentialResolver = new StaticCredentialResolver(
-        this.signatureVerificationCertificates.stream().map(c -> new BasicX509Credential(c)).collect(Collectors.toList()));
+          this.signatureVerificationCertificates.stream().map(c -> new BasicX509Credential(c))
+              .collect(Collectors.toList()));
       final ExplicitKeySignatureTrustEngine trustEngine = new ExplicitKeySignatureTrustEngine(credentialResolver,
-        DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
-      filters.add(new SignatureValidationFilter(trustEngine));
+          DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
+      final SignatureValidationFilter signatureValidationFilter = new SignatureValidationFilter(trustEngine);
+      signatureValidationFilter.initialize();
+      filters.add(signatureValidationFilter);
     }
 
     // Schema validation?
     if (this.performSchemaValidation) {
-      filters.add(new SchemaValidationFilter(new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11)));
+      final SchemaValidationFilter schemaValidationFilter =
+          new SchemaValidationFilter(new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11));
+      schemaValidationFilter.initialize();
+      filters.add(schemaValidationFilter);
     }
 
     // Inclusion predicates?
     if (this.inclusionPredicates != null) {
-      for (Predicate<EntityDescriptor> p : this.inclusionPredicates) {
-        filters.add(new PredicateFilter(Direction.INCLUDE, p));
+      for (final Predicate<EntityDescriptor> p : this.inclusionPredicates) {
+        final PredicateFilter predicateFilter = new PredicateFilter(Direction.INCLUDE, p);
+        predicateFilter.initialize();
+        filters.add(predicateFilter);
       }
     }
 
     // Exclusion predicates?
     if (this.exclusionPredicates != null) {
-      for (Predicate<EntityDescriptor> p : this.exclusionPredicates) {
-        filters.add(new PredicateFilter(Direction.EXCLUDE, p));
+      for (final Predicate<EntityDescriptor> p : this.exclusionPredicates) {
+        final PredicateFilter predicateFilter = new PredicateFilter(Direction.EXCLUDE, p);
+        predicateFilter.initialize();
+        filters.add(predicateFilter);
       }
     }
 
     // Install the mandatory filter that saves downloaded metadata.
-    filters.add((metadata, ctx) -> {
-      setMetadata(metadata);
-      return metadata;
+    filters.add(new MetadataFilter() {
+
+      @Override
+      public String getType() {
+        return "MetadataSaveFilter";
+      }
+
+      @Override
+      public XMLObject filter(final XMLObject metadata, final MetadataFilterContext context) throws FilterException {
+        AbstractMetadataProvider.this.setMetadata(metadata);
+        return metadata;
+      }
     });
 
     if (filters.size() == 1) {
@@ -264,6 +284,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
     else {
       final MetadataFilterChain chain = new MetadataFilterChain();
       chain.setFilters(filters);
+      chain.initialize();
       return chain;
     }
   }
@@ -281,24 +302,21 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
    * The {@code filter} parameter is a {@link MetadataFilter} that <b>must</b> be installed for the resolver. Any other
    * filters that should be installed by the specific instance should be placed last in a filter chain.
    * </p>
-   * 
-   * @param requireValidMetadata
-   *          should be passed into {@link MetadataResolver#setRequireValidMetadata(boolean)}
-   * @param failFastInitialization
-   *          should be passed into {@link AbstractMetadataResolver#setFailFastInitialization(boolean)} (if applicable)
-   * @param filter
-   *          filter that must be installed for the resolver
-   * @throws ResolverException
-   *           for errors creating the resolver
+   *
+   * @param requireValidMetadata should be passed into {@link MetadataResolver#setRequireValidMetadata(boolean)}
+   * @param failFastInitialization should be passed into
+   *          {@link AbstractMetadataResolver#setFailFastInitialization(boolean)} (if applicable)
+   * @param filter filter that must be installed for the resolver
+   * @throws ResolverException for errors creating the resolver
    */
-  protected abstract void createMetadataResolver(final boolean requireValidMetadata, final boolean failFastInitialization,
+  protected abstract void createMetadataResolver(final boolean requireValidMetadata,
+      final boolean failFastInitialization,
       final MetadataFilter filter) throws ResolverException;
 
   /**
    * Initializes the metadata resolver.
-   * 
-   * @throws ComponentInitializationException
-   *           for initialization errors
+   *
+   * @throws ComponentInitializationException for initialization errors
    */
   protected abstract void initializeMetadataResolver() throws ComponentInitializationException;
 
@@ -309,36 +327,33 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /**
    * Sets whether the metadata returned by queries must be valid.
-   * 
-   * @param requireValidMetadata
-   *          whether the metadata returned by queries must be valid
+   *
+   * @param requireValidMetadata whether the metadata returned by queries must be valid
    */
   public void setRequireValidMetadata(final boolean requireValidMetadata) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.requireValidMetadata = requireValidMetadata;
   }
 
   /**
    * Sets whether problems during initialization should cause the provider to fail or go on without metadata. The
    * assumption being that in most cases a provider will recover at some point in the future.
-   * 
-   * @param failFast
-   *          whether problems during initialization should cause the provider to fail
+   *
+   * @param failFast whether problems during initialization should cause the provider to fail
    */
   public void setFailFastInitialization(final boolean failFast) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.failFastInitialization = failFast;
   }
 
   /**
    * Assigns the certificate that is to be used when verifying the signature on downloaded metadata. If this attribute
    * is assigned the provider is configured to expect a valid signature on downloaded metadata.
-   * 
-   * @param signatureVerificationCertificate
-   *          the certificate to assign
+   *
+   * @param signatureVerificationCertificate the certificate to assign
    */
   public void setSignatureVerificationCertificate(final X509Certificate signatureVerificationCertificate) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.signatureVerificationCertificates = Collections.singletonList(signatureVerificationCertificate);
   }
 
@@ -349,18 +364,17 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
    * The reason that more than one certificate may be assigned is that we want to be able to handle signing certificate
    * updates in a smooth way.
    * </p>
-   * 
-   * @param signatureVerificationCertificates
-   *          the certificates to assign
+   *
+   * @param signatureVerificationCertificates the certificates to assign
    */
   public void setSignatureVerificationCertificates(final List<X509Certificate> signatureVerificationCertificates) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.signatureVerificationCertificates = signatureVerificationCertificates;
   }
 
   /**
    * Gets the certificate that is to be used when verifying the signature on downloaded metadata.
-   * 
+   *
    * @return the certificates or null
    */
   public List<X509Certificate> getSignatureVerificationCertificates() {
@@ -369,36 +383,33 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /**
    * Assigns whether XML schema validation should be performed on downloaded metadata.
-   * 
-   * @param performSchemaValidation
-   *          whether schema validation should be performed
+   *
+   * @param performSchemaValidation whether schema validation should be performed
    */
   public void setPerformSchemaValidation(final boolean performSchemaValidation) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.performSchemaValidation = performSchemaValidation;
   }
 
   /**
    * Assigns a list of inclusion predicates that will be applied to downloaded metadata.
-   * 
-   * @param inclusionPredicates
-   *          predicates
+   *
+   * @param inclusionPredicates predicates
    * @see MetadataProviderPredicates
    */
   public void setInclusionPredicates(final List<Predicate<EntityDescriptor>> inclusionPredicates) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.inclusionPredicates = inclusionPredicates;
   }
 
   /**
    * Assigns a list of exclusion predicates that will be applied to downloaded metadata.
-   * 
-   * @param exclusionPredicates
-   *          predicates
+   *
+   * @param exclusionPredicates predicates
    * @see MetadataProviderPredicates
    */
   public void setExclusionPredicates(final List<Predicate<EntityDescriptor>> exclusionPredicates) {
-    ComponentSupport.ifInitializedThrowUnmodifiabledComponentException(this);
+    this.checkSetterPreconditions();
     this.exclusionPredicates = exclusionPredicates;
   }
 
@@ -412,9 +423,8 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
     /**
      * Constructor.
-     * 
-     * @param metadata
-     *          the metadata to iterate
+     *
+     * @param metadata the metadata to iterate
      */
     public EntityDescriptorIterator(final XMLObject metadata) {
       this(metadata, null);
@@ -422,11 +432,9 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
     /**
      * Constructor.
-     * 
-     * @param metadata
-     *          the metadata to iterate
-     * @param role
-     *          role requirements
+     *
+     * @param metadata the metadata to iterate
+     * @param role role requirements
      */
     public EntityDescriptorIterator(final XMLObject metadata, final QName role) {
       if (metadata == null) {
@@ -436,7 +444,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
         this.iterator = Collections.singletonList((EntityDescriptor) metadata).iterator();
       }
       else if (metadata instanceof EntitiesDescriptor) {
-        List<EntityDescriptor> edList = setup((EntitiesDescriptor) metadata, role);
+        final List<EntityDescriptor> edList = setup((EntitiesDescriptor) metadata, role);
         this.iterator = edList.iterator();
       }
       else {
@@ -445,9 +453,9 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
     }
 
     private static List<EntityDescriptor> setup(final EntitiesDescriptor entitiesDescriptor, final QName role) {
-      List<EntityDescriptor> edList = new ArrayList<>();
+      final List<EntityDescriptor> edList = new ArrayList<>();
       entitiesDescriptor.getEntityDescriptors().stream().filter(filterRole(role)).forEach(edList::add);
-      for (EntitiesDescriptor ed : entitiesDescriptor.getEntitiesDescriptors()) {
+      for (final EntitiesDescriptor ed : entitiesDescriptor.getEntitiesDescriptors()) {
         edList.addAll(setup(ed, role));
       }
       return edList;

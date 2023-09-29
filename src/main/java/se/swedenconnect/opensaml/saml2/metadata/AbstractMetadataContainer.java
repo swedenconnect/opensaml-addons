@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.apache.commons.codec.binary.Hex;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -31,27 +34,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGenerationStrategy;
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
 
 /**
  * Abstract base class for the {@link MetadataContainer} interface.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
- * @param <T>
- *          the contained type
+ * @param <T> the contained type
  */
-public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & SignableSAMLObject & CacheableSAMLObject> implements
-    MetadataContainer<T> {
+public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & SignableSAMLObject & CacheableSAMLObject>
+    implements MetadataContainer<T> {
 
   /** The default validity for metadata - one week. */
   public static final Duration DEFAULT_VALIDITY = Duration.ofDays(7);
 
   /**
-   * The default update factor for the metadata - 0,75 (75%), i.e.
-   * "update the metadata when less than 75% of its original validity time remains".
-   * 
+   * The default update factor for the metadata - 0,75 (75%), i.e. "update the metadata when less than 75% of its
+   * original validity time remains".
+   *
    * @see #getUpdateFactor()
    */
   public static final float DEFAULT_UPDATE_FACTOR = 0.75f;
@@ -60,7 +63,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   public static final int DEFAULT_DESCRIPTOR_ID_SIZE = 32;
 
   /** Logging instance. */
-  private Logger logger = LoggerFactory.getLogger(AbstractMetadataContainer.class);
+  private final Logger logger = LoggerFactory.getLogger(AbstractMetadataContainer.class);
 
   /** The encapsulated descriptor element. */
   protected T descriptor;
@@ -79,12 +82,10 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
 
   /**
    * Constructor assigning the encapsulated descriptor element.
-   * 
-   * @param descriptor
-   *          the descriptor object
-   * @param signatureCredentials
-   *          the signature credentials for signing the descriptor. May be null, but then no signing will be
-   *          possible
+   *
+   * @param descriptor the descriptor object
+   * @param signatureCredentials the signature credentials for signing the descriptor. May be null, but then no signing
+   *          will be possible
    */
   public AbstractMetadataContainer(final T descriptor, final X509Credential signatureCredentials) {
     this.descriptor = descriptor;
@@ -106,16 +107,14 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   /** {@inheritDoc} */
   @Override
   public boolean updateRequired(final boolean signatureRequired) {
-    if (!this.descriptor.isValid() || (signatureRequired && !this.descriptor.isSigned())) {
+    if (!this.descriptor.isValid() || signatureRequired && !this.descriptor.isSigned()
+        || (this.descriptor.getValidUntil() == null)) {
       return true;
     }
-    if (this.descriptor.getValidUntil() == null) {
-      return true;
-    }
-    long expireInstant = this.descriptor.getValidUntil().toEpochMilli();
-    long now = System.currentTimeMillis(); 
+    final long expireInstant = this.descriptor.getValidUntil().toEpochMilli();
+    final long now = System.currentTimeMillis();
 
-    return (this.updateFactor * this.validity.toMillis()) > (expireInstant - now);
+    return this.updateFactor * this.validity.toMillis() > expireInstant - now;
   }
 
   /** {@inheritDoc} */
@@ -124,17 +123,25 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
 
     // Reset the signature
     this.descriptor.setSignature(null);
-    
+
     // Generate a new ID.
-    final RandomIdentifierGenerationStrategy generator = new RandomIdentifierGenerationStrategy(this.idSize);
+    final RandomIdentifierGenerationStrategy generator;
+    try {
+      generator = new RandomIdentifierGenerationStrategy(
+          new RandomIdentifierParameterSpec(new SecureRandom(), this.idSize, new Hex()));
+    }
+    catch (final InvalidAlgorithmParameterException e) {
+      throw new RuntimeException(e);
+    }
+
     this.assignID(this.descriptor, generator.generateIdentifier(true));
 
     // Assign the validity.
     final Instant validUntil = Instant.now().plusSeconds((int) this.validity.getSeconds());
     this.descriptor.setValidUntil(validUntil);
 
-    logger.debug("Descriptor '{}' was updated with ID '{}' and validUntil '{}'",
-      this.getLogString(this.descriptor), this.getID(this.descriptor), this.descriptor.getValidUntil().toString());
+    this.logger.debug("Descriptor '{}' was updated with ID '{}' and validUntil '{}'",
+        this.getLogString(this.descriptor), this.getID(this.descriptor), this.descriptor.getValidUntil().toString());
 
     return sign ? this.sign() : this.descriptor;
   }
@@ -143,16 +150,16 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   @Override
   public synchronized T sign() throws SignatureException, MarshallingException {
 
-    logger.trace("Signing descriptor '{}' ...", this.getLogString(this.descriptor));
+    this.logger.trace("Signing descriptor '{}' ...", this.getLogString(this.descriptor));
 
     if (this.getID(this.descriptor) == null || this.descriptor.getValidUntil() == null) {
       return this.update(true);
     }
-    
-    SAMLObjectSigner.sign(this.descriptor, this.signatureCredentials, 
-      SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration());
-    
-    logger.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
+
+    SAMLObjectSigner.sign(this.descriptor, this.signatureCredentials,
+        SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration());
+
+    this.logger.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
 
     return this.descriptor;
   }
@@ -160,7 +167,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   /** {@inheritDoc} */
   @Override
   public synchronized Element marshall() throws MarshallingException {
-    return XMLObjectSupport.marshall(this.descriptor); 
+    return XMLObjectSupport.marshall(this.descriptor);
   }
 
   /** {@inheritDoc} */
@@ -174,9 +181,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
    * <p>
    * The default value is {@link #DEFAULT_VALIDITY}.
    * </p>
-   * 
-   * @param validity
-   *          the validity
+   *
+   * @param validity the validity
    */
   public void setValidity(final Duration validity) {
     this.validity = validity;
@@ -193,9 +199,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
    * <p>
    * The default value is {@link #DEFAULT_UPDATE_FACTOR}.
    * </p>
-   * 
-   * @param updateFactor
-   *          the update factor
+   *
+   * @param updateFactor the update factor
    * @see #getUpdateFactor()
    */
   public void setUpdateFactor(final float updateFactor) {
@@ -207,7 +212,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
 
   /**
    * Returns the size of the ID attribute that is generated.
-   * 
+   *
    * @return the size
    */
   public int getIdSize() {
@@ -220,9 +225,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
    * <p>
    * The default value is {@link #DEFAULT_DESCRIPTOR_ID_SIZE}.
    * </p>
-   * 
-   * @param idSize
-   *          the size
+   *
+   * @param idSize the size
    */
   public void setIdSize(final int idSize) {
     this.idSize = idSize;
@@ -230,28 +234,24 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
 
   /**
    * Returns the ID attribute of the supplied descriptor.
-   * 
-   * @param descriptor
-   *          the descriptor
+   *
+   * @param descriptor the descriptor
    * @return the ID attribute
    */
   protected abstract String getID(final T descriptor);
 
   /**
    * Assigns the supplied id to the ID attribute of the descriptor.
-   * 
-   * @param descriptor
-   *          the descriptor
-   * @param id
-   *          the ID attribute value
+   *
+   * @param descriptor the descriptor
+   * @param id the ID attribute value
    */
   protected abstract void assignID(final T descriptor, final String id);
 
   /**
    * Returns a log string of the supplied descriptor.
-   * 
-   * @param descriptor
-   *          the descriptor
+   *
+   * @param descriptor the descriptor
    * @return the log string
    */
   protected abstract String getLogString(final T descriptor);

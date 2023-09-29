@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import se.swedenconnect.opensaml.saml2.core.build.RequestedAuthnContextBuilder;
  * Defines a context which can be used to control how
  * {@link AuthnRequestGenerator#generateAuthnRequest(String, String, AuthnRequestGeneratorContext)} creates an
  * authentication request.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface AuthnRequestGeneratorContext {
@@ -54,7 +54,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * The default implementation returns {@value SAMLConstants#SAML2_REDIRECT_BINDING_URI}.
    * </p>
-   * 
+   *
    * @return the preferred binding
    */
   default String getPreferredBinding() {
@@ -63,7 +63,7 @@ public interface AuthnRequestGeneratorContext {
 
   /**
    * Gets the SP requirement for using the Holder-of-key profile. The default is that the SP does not support HoK.
-   * 
+   *
    * @return a HoK requirement
    */
   default HokRequirement getHokRequirement() {
@@ -78,7 +78,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * If {@code null} is returned, the {@code ForceAuthn} attribute will not be included.
    * </p>
-   * 
+   *
    * @return the ForceAuthn attribute
    */
   default Boolean getForceAuthnAttribute() {
@@ -93,7 +93,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * If {@code null} is returned, the {@code IsPassive} attribute will not be included.
    * </p>
-   * 
+   *
    * @return the IsPassive attribute
    */
   default Boolean getIsPassiveAttribute() {
@@ -107,7 +107,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * The default implementation returns {@code null}.
    * </p>
-   * 
+   *
    * @return the signature configuration, or null
    */
   default SignatureSigningConfiguration getSignatureSigningConfiguration() {
@@ -122,18 +122,18 @@ public interface AuthnRequestGeneratorContext {
    * The default implementation will return a {@code AssertionConsumerServiceURL} based on (1) {@code isDefault}
    * attribute and (2) the lowest {@code Index}.
    * </p>
-   * 
+   *
    * @return a function for resolving AssertionConsumerService elements
    */
   default AssertionConsumerServiceResolver getAssertionConsumerServiceResolver() {
     return (list) -> list.stream()
-      .filter(a -> a.isDefault())
-      .map(AssertionConsumerService::getLocation)
-      .findFirst()
-      .orElse(list.stream()
-        .min(Comparator.comparing(a -> a.getIndex() != null ? a.getIndex() : Integer.MAX_VALUE))
+        .filter(a -> a.isDefault())
         .map(AssertionConsumerService::getLocation)
-        .orElse(list.get(0).getLocation()));
+        .findFirst()
+        .orElse(list.stream()
+            .min(Comparator.comparing(a -> a.getIndex() != null ? a.getIndex() : Integer.MAX_VALUE))
+            .map(AssertionConsumerService::getLocation)
+            .orElse(list.get(0).getLocation()));
   }
 
   /**
@@ -141,7 +141,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * The default implementation returns {@code null}, meaning that no attribute is added.
    * </p>
-   * 
+   *
    * @return a resolver function
    */
   default AttributeConsumingServiceIndexResolver getAttributeConsumingServiceIndexResolver() {
@@ -155,14 +155,14 @@ public interface AuthnRequestGeneratorContext {
    * element with this value as the {@code Format} attribute and the {@code AllowCreate} set to true. If the supplied
    * list is empty, the format will be set to {@code urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified}.
    * </p>
-   * 
+   *
    * @return a builder function
    */
   default NameIDPolicyBuilderFunction getNameIDPolicyBuilderFunction() {
     return list -> NameIDPolicyBuilder.builder()
-      .allowCreate(true)
-      .format(list.isEmpty() ? NameID.UNSPECIFIED : list.get(0).getURI())
-      .build();
+        .allowCreate(true)
+        .format(list.isEmpty() ? NameID.UNSPECIFIED : list.get(0).getURI())
+        .build();
   }
 
   /**
@@ -172,15 +172,15 @@ public interface AuthnRequestGeneratorContext {
    * The default implementation will create a {@code RequestedAuthnContext} object with exact matching and all assurance
    * certification URI:s included in the supplied list.
    * </p>
-   * 
+   *
    * @return a function that returns a RequestedAuthnContext (or null).
    */
   default RequestedAuthnContextBuilderFunction getRequestedAuthnContextBuilderFunction() {
     return (list, hok) -> !list.isEmpty()
         ? RequestedAuthnContextBuilder.builder()
-          .comparison(AuthnContextComparisonTypeEnumeration.EXACT)
-          .authnContextClassRefs(list)
-          .build()
+            .comparison(AuthnContextComparisonTypeEnumeration.EXACT)
+            .authnContextClassRefs(list)
+            .build()
         : null;
   }
 
@@ -189,7 +189,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * The default implementation returns a NO-OP consumer, meaning no customizations are done.
    * </p>
-   * 
+   *
    * @return a consumer working on the AuthnRequest object being built
    */
   default AuthnRequestCustomizer getAuthnRequestCustomizer() {
@@ -204,7 +204,7 @@ public interface AuthnRequestGeneratorContext {
    * <p>
    * The default implementation returns {@code null}.
    * </p>
-   * 
+   *
    * @return the signing credential to use, or null if no override should be done
    */
   default X509Credential getOverrideSignCredential() {
@@ -262,7 +262,8 @@ public interface AuthnRequestGeneratorContext {
    * If the function returns {@code null} no {@code RequestedAuthnContext} is added to the {@code AuthnRequest}.
    * </p>
    */
-  public interface RequestedAuthnContextBuilderFunction extends BiFunction<List<String>, Boolean, RequestedAuthnContext> {
+  public interface RequestedAuthnContextBuilderFunction
+      extends BiFunction<List<String>, Boolean, RequestedAuthnContext> {
   }
 
   /**

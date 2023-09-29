@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,12 @@ import org.opensaml.saml.saml2.metadata.Organization;
 import org.opensaml.saml.saml2.metadata.RoleDescriptor;
 import org.opensaml.saml.saml2.metadata.SSODescriptor;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for creating {@link EntityDescriptor} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDescriptor> {
@@ -54,7 +54,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
    * Constructor setting up the builder with a template {@code EntityDescriptor} that is read from a resource. Users of
    * the bean may now change, add or delete, the elements and attributes of the template object using the assignment
    * methods of the builder.
-   * 
+   *
    * @param resource the template resource
    * @throws IOException if the resource can not be read
    * @throws UnmarshallingException for unmarshalling errors
@@ -70,7 +70,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Maps to {@link #EntityDescriptorBuilder(EntityDescriptor, boolean)} where {@code clone} is {@code true}.
-   * 
+   *
    * @param template the template
    */
   public EntityDescriptorBuilder(final EntityDescriptor template) {
@@ -83,7 +83,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   /**
    * Constructor setting up the builder with a template {@code EntityDescriptor}. Users of the bean may now change, add
    * or delete, the elements and attributes of the template object using the assignment methods of the builder.
-   * 
+   *
    * @param template the template
    * @param clone whether the template object should be cloned
    */
@@ -96,7 +96,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the entityID for the {@code EntityDescriptor}.
-   * 
+   *
    * @param entityID the entityID
    * @return the builder
    */
@@ -107,7 +107,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance.
-   * 
+   *
    * @return an EntityDescriptorBuilder instance
    */
   public static EntityDescriptorBuilder builder() {
@@ -116,7 +116,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied input stream.
-   * 
+   *
    * @param resource the template resource
    * @return an EntityDescriptorBuilder instance
    * @throws IOException if the resource can not be read
@@ -130,28 +130,28 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied template.
-   * 
+   *
    * @param template the template
    * @return an EntityDescriptorBuilder instance
    */
   public static EntityDescriptorBuilder builder(final EntityDescriptor template) {
     return new EntityDescriptorBuilder(template);
   }
-  
+
   /**
    * Utility method that creates an {@code EntityDescriptorBuilder} instance from a supplied template.
-   * 
+   *
    * @param template the template
    * @param clone whether the template object should be cloned
    * @return an EntityDescriptorBuilder instance
    */
   public static EntityDescriptorBuilder builder(final EntityDescriptor template, final boolean clone) {
     return new EntityDescriptorBuilder(template, clone);
-  }  
+  }
 
   /**
    * Assigns the ID attribute for the {@code EntityDescriptor}.
-   * 
+   *
    * @param id the ID
    * @return the builder
    */
@@ -162,7 +162,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the cacheDuration attribute for the {@code EntityDescriptor}.
-   * 
+   *
    * @param cacheDuration the cache duration (in milliseconds)
    * @return the builder
    */
@@ -173,7 +173,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the cacheDuration attribute for the {@code EntityDescriptor}.
-   * 
+   *
    * @param cacheDuration the cache duration
    * @return the builder
    */
@@ -184,7 +184,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the valid until time.
-   * 
+   *
    * @param time valid until
    * @return the builder
    */
@@ -195,7 +195,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns metadata extensions.
-   * 
+   *
    * @param extensions the metadata extensions.
    * @return the builder
    */
@@ -203,11 +203,11 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
     this.object().setExtensions(extensions);
     return this;
   }
-  
+
   /**
    * Based on the contents of this object, an {@link ExtensionsBuilder} is returned. If the object holds an
    * {@link Extensions} object, this is fed to the builder (but not cloned).
-   * 
+   *
    * @return an {@link ExtensionsBuilder}
    */
   public ExtensionsBuilder getExtensionsBuilder() {
@@ -217,11 +217,11 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
     else {
       return new ExtensionsBuilder();
     }
-  }  
+  }
 
   /**
    * Adds the supplied SSO descriptors.
-   * 
+   *
    * @param roleDescriptors the SSO descriptors to add
    * @return the builder
    */
@@ -243,7 +243,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * See {@link #roleDescriptors(List)}.
-   * 
+   *
    * @param roleDescriptors the SSO descriptors to add
    * @return the builder
    */
@@ -253,7 +253,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Adds one SSO descriptor (which is the most common case).
-   * 
+   *
    * @param ssoDescriptor the descriptor to add
    * @return the builder
    */
@@ -263,7 +263,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the {@code Organization} element to the entity descriptor.
-   * 
+   *
    * @param organization the organization (will be cloned before assignment)
    * @return the builder
    */
@@ -279,7 +279,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * Assigns the {@code ContactPerson} elements to the entity descriptor.
-   * 
+   *
    * @param contactPersons the contact person elements (will be cloned before assignment)
    * @return the builder
    */
@@ -300,7 +300,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
 
   /**
    * @see #contactPersons(List)
-   * 
+   *
    * @param contactPersons the contact person elements (will be cloned before assignment)
    * @return the builder
    */

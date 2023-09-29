@@ -27,11 +27,11 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.xml.XMLParserException;
 
 /**
  * Abstract base class for the builder pattern.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
  * @param <T> the type
@@ -52,9 +52,10 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
    * Constructor setting up the builder with a template object. Users of the instance may now change, add or delete, the
    * elements and attributes of the template object using the assignment methods of the builder.
    * <p>
-   * Maps to {@link #AbstractSAMLObjectBuilder(XMLObject, boolean)} with the {@code clone} parameter set to {@code true}.
+   * Maps to {@link #AbstractSAMLObjectBuilder(XMLObject, boolean)} with the {@code clone} parameter set to
+   * {@code true}.
    * </p>
-   * 
+   *
    * @param template the template object
    * @throws SAMLObjectBuilderRuntimeException for marshalling/unmarshalling errors
    */
@@ -69,7 +70,7 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
    * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
    * modifications will have no effect on the passed object.
    * </p>
-   * 
+   *
    * @param template the template object
    * @param clone whether the template object should be cloned
    * @throws SAMLObjectBuilderRuntimeException for marshalling/unmarshalling errors
@@ -87,7 +88,7 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
    * Constructor setting up the builder with a template object that is read from an input stream. Users of the instance
    * may now change, add or delete, the elements and attributes of the template object using the assignment methods of
    * the builder.
-   * 
+   *
    * @param resource the template resource
    * @throws UnmarshallingException for unmarshalling errors
    * @throws XMLParserException for XML parsing errors
@@ -111,14 +112,14 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
 
   /**
    * Returns the object type.
-   * 
+   *
    * @return the object type
    */
   protected abstract Class<T> getObjectType();
 
   /**
    * Returns the object being built.
-   * 
+   *
    * @return the object
    */
   public final T object() {
@@ -127,7 +128,7 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
 
   /**
    * Gets the default element name for the object.
-   * 
+   *
    * @return a QName
    */
   protected QName getDefaultElementName() {

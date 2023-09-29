@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Litsec AB
+ * Copyright 2016-2023 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.xml.SerializeSupport;
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import net.shibboleth.shared.xml.SerializeSupport;
+import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 
 /**
  * Test cases for {@link AbstractSAMLObjectBuilder}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
-  
+
   @Test
   public void testBuild() throws Exception {
     StatusCodeBuilder builder = new StatusCodeBuilder();
@@ -49,13 +49,13 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
             .statusCode(StatusCode.NO_SUPPORTED_IDP)
             .build())
         .build();
-    
-    Assert.assertEquals(StatusCode.REQUESTER, status.getValue());
-    Assert.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
-    Assert.assertEquals(StatusCode.NO_SUPPORTED_IDP, status.getStatusCode().getStatusCode().getValue());
-    Assert.assertNull(status.getStatusCode().getStatusCode().getStatusCode());
+
+    Assertions.assertEquals(StatusCode.REQUESTER, status.getValue());
+    Assertions.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
+    Assertions.assertEquals(StatusCode.NO_SUPPORTED_IDP, status.getStatusCode().getStatusCode().getValue());
+    Assertions.assertNull(status.getStatusCode().getStatusCode().getStatusCode());
   }
-  
+
   @Test
   public void testBuildFromTemplate() throws Exception {
     StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
@@ -63,18 +63,18 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
     StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     subCode.setValue(StatusCode.AUTHN_FAILED);
     template.setStatusCode(subCode);
-    
+
     StatusCodeBuilder builder = new StatusCodeBuilder(template);
     StatusCode status = builder.value(StatusCode.RESPONDER).build();
-    
-    Assert.assertEquals(StatusCode.RESPONDER, status.getValue());
-    Assert.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
-    
+
+    Assertions.assertEquals(StatusCode.RESPONDER, status.getValue());
+    Assertions.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
+
     // Template should be untouched ...
-    Assert.assertEquals(StatusCode.REQUESTER, template.getValue());
-    Assert.assertEquals(StatusCode.AUTHN_FAILED, template.getStatusCode().getValue());
+    Assertions.assertEquals(StatusCode.REQUESTER, template.getValue());
+    Assertions.assertEquals(StatusCode.AUTHN_FAILED, template.getStatusCode().getValue());
   }
-  
+
   @Test
   public void testBuildFromResource() throws Exception {
     StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
@@ -82,23 +82,23 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
     StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     subCode.setValue(StatusCode.AUTHN_FAILED);
     template.setStatusCode(subCode);
-    
+
     // Go to XML
     Element element = XMLObjectSupport.marshall(template);
     String xml = SerializeSupport.prettyPrintXML(element);
-    
+
     StatusCodeBuilder builder = new StatusCodeBuilder(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
     StatusCode status = builder.value(StatusCode.RESPONDER).build();
-    
-    Assert.assertEquals(StatusCode.RESPONDER, status.getValue());
-    Assert.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
+
+    Assertions.assertEquals(StatusCode.RESPONDER, status.getValue());
+    Assertions.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
   }
 
 
   // Dummy class used for testing abstract object builder.
   //
   private static class StatusCodeBuilder extends AbstractSAMLObjectBuilder<StatusCode> {
-    
+
     public StatusCodeBuilder() {
       super();
     }
@@ -110,17 +110,17 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
     public StatusCodeBuilder(StatusCode template) throws MarshallingException, UnmarshallingException {
       super(template);
     }
-    
+
     StatusCodeBuilder value(String value) {
       this.object().setValue(value);
       return this;
     }
-    
+
     StatusCodeBuilder statusCode(StatusCode statusCode) {
       this.object().setStatusCode(statusCode);
       return this;
     }
-    
+
     StatusCodeBuilder statusCode(String statusCode) {
       this.object().setStatusCode((new StatusCodeBuilder()).value(statusCode).build());
       return this;
@@ -130,7 +130,7 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
     protected Class<StatusCode> getObjectType() {
       return StatusCode.class;
     }
-    
+
   }
-  
+
 }

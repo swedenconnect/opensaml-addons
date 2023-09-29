@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,39 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.saml2.metadata.build.ScopeBuilder;
 
 /**
  * Test cases for {@link ScopeUtils}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ScopeUtilsTest extends OpenSAMLTestBase {
 
   @Test
   public void testNoRegexp() throws Exception {
-    Assert.assertTrue(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "kalle@example.com"));
-    Assert.assertFalse(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "example.com"));
-    Assert.assertFalse(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), (String)null));
-    Assert.assertFalse(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), ""));
-    Assert.assertTrue(
-      ScopeUtils.isMatch(ScopeBuilder.builder().value("example@.com").build(), "kalle@example@.com"));
+    Assertions.assertTrue(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "kalle@example.com"));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "example.com"));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), (String) null));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), ""));
+    Assertions.assertTrue(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example@.com").build(), "kalle@example@.com"));
   }
-  
+
   @Test
   public void testRegexp() throws Exception {
-    Assert.assertTrue(
-      ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.com$").build(), "kalle@example.com"));
-    Assert.assertFalse(
-      ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.se$").build(), "kalle@example.com"));
+    Assertions.assertTrue(
+        ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.com$").build(), "kalle@example.com"));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.se$").build(), "kalle@example.com"));
   }
 
 }

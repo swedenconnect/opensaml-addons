@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,14 @@ import se.swedenconnect.opensaml.common.builder.SAMLObjectBuilderRuntimeExceptio
 
 /**
  * Builder class for {@code Scoping} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static ScopingBuilder builder() {
@@ -48,9 +48,8 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * Assigns the {@code ProxyCount} attribute.
-   * 
-   * @param count
-   *          the proxy count
+   *
+   * @param count the proxy count
    * @return the builder
    */
   public ScopingBuilder proxyCount(final Integer count) {
@@ -60,11 +59,9 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * Adds the {@code IDPList} element.
-   * 
-   * @param completeUri
-   *          the GetComplete element of the IDPList element (may be null)
-   * @param idpEntries
-   *          the IDPEntry elements of the IDPList element
+   *
+   * @param completeUri the GetComplete element of the IDPList element (may be null)
+   * @param idpEntries the IDPEntry elements of the IDPList element
    * @return the builder
    */
   public ScopingBuilder idpList(final String completeUri, final List<IDPEntry> idpEntries) {
@@ -96,11 +93,9 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * See {@link #idpList(String, List)}.
-   * 
-   * @param completeUri
-   *          the GetComplete element of the IDPList element (may be null)
-   * @param idpEntries
-   *          the IDPEntry elements of the IDPList element
+   *
+   * @param completeUri the GetComplete element of the IDPList element (may be null)
+   * @param idpEntries the IDPEntry elements of the IDPList element
    * @return the builder
    */
   public ScopingBuilder idpList(final String completeUri, final IDPEntry... idpEntries) {
@@ -109,13 +104,10 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * Creates an {@code IDPEntry} element.
-   * 
-   * @param providerID
-   *          the ProviderID attribute
-   * @param name
-   *          the Name attribute
-   * @param loc
-   *          the Loc attribute
+   *
+   * @param providerID the ProviderID attribute
+   * @param name the Name attribute
+   * @param loc the Loc attribute
    * @return an IDPEntry element
    */
   public static IDPEntry idpEntry(final String providerID, final String name, final String loc) {
@@ -128,9 +120,8 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * Assigns {@code RequesterID} elements.
-   * 
-   * @param ids
-   *          the RequesterID elements to add
+   *
+   * @param ids the RequesterID elements to add
    * @return the builder
    */
   public ScopingBuilder requesterIDs(final List<String> ids) {
@@ -148,9 +139,8 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
 
   /**
    * See {@link #requesterIDs(List)}.
-   * 
-   * @param ids
-   *          the RequesterID elements to add
+   *
+   * @param ids the RequesterID elements to add
    * @return the builder
    */
   public ScopingBuilder requesterIDs(final String... ids) {

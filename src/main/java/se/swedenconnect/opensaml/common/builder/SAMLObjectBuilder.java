@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,15 @@ import org.opensaml.core.xml.XMLObject;
 
 /**
  * Interface for a builder pattern according to:
- * 
+ *
  * <pre>
  * EntityDescriptorBuilder builder = new EntityDescriptorBuilder();
  * EntityDescriptor ed = builder.entityID("http://eid.idsec.se").entityCategories(...)[...].build();
  * </pre>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
- * @param <T>
- *          the type
+ * @param <T> the type
  */
 public interface SAMLObjectBuilder<T extends XMLObject> {
 
@@ -37,7 +36,7 @@ public interface SAMLObjectBuilder<T extends XMLObject> {
    * <p>
    * If invoked several times the method <b>must</b> return the same object.
    * </p>
-   * 
+   *
    * @return the built object
    */
   T build();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import javax.xml.namespace.QName;
 import org.opensaml.core.xml.schema.XSBooleanValue;
 import org.opensaml.core.xml.schema.XSString;
 
-/** 
- * XMLObject for the Shibboleth Scope metadata extension. 
+/**
+ * XMLObject for the Shibboleth Scope metadata extension.
  * */
 
 /**
@@ -30,7 +30,7 @@ import org.opensaml.core.xml.schema.XSString;
  * Note that this class is also defined in Shibboleth's idp-saml-api and idp-saml-impl libraries. Only if Shibboleth is
  * not on the classpath will the marshaller and unmarshaller for Scope be loaded.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface Scope extends XSString {
@@ -46,31 +46,29 @@ public interface Scope extends XSString {
 
   /**
    * Gets the {@code regexp} attribute value.
-   * 
+   *
    * @return the regexp attribute value
    */
   Boolean getRegexp();
 
   /**
    * Gets the {@code regexp} attribute value.
-   * 
+   *
    * @return the regexp attribute value
    */
   XSBooleanValue getRegexpXSBoolean();
 
   /**
    * Sets the {@code regexp} attribute value.
-   * 
-   * @param newRegexp
-   *          the new regexp attribute value
+   *
+   * @param newRegexp the new regexp attribute value
    */
   void setRegexp(final Boolean newRegexp);
 
   /**
    * Set the {@code regexp} attribute value.
-   * 
-   * @param newRegexp
-   *          the new regexp attribute value
+   *
+   * @param newRegexp the new regexp attribute value
    */
   void setRegexp(final XSBooleanValue newRegexp);
 

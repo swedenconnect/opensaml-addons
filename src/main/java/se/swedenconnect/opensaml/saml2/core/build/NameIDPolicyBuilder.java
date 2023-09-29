@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Builder class for {@code NameIDPolicy} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class NameIDPolicyBuilder extends AbstractSAMLObjectBuilder<NameIDPolicy> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static NameIDPolicyBuilder builder() {
@@ -37,9 +37,8 @@ public class NameIDPolicyBuilder extends AbstractSAMLObjectBuilder<NameIDPolicy>
 
   /**
    * Assigns the {@code Format} attribute to the {@code NameIDPolicy} element.
-   * 
-   * @param format
-   *          the format URI
+   *
+   * @param format the format URI
    * @return the builder
    */
   public NameIDPolicyBuilder format(final String format) {
@@ -49,9 +48,8 @@ public class NameIDPolicyBuilder extends AbstractSAMLObjectBuilder<NameIDPolicy>
 
   /**
    * Assigns the {@code SPNameQualifier} attribute to the {@code NameIDPolicy} element.
-   * 
-   * @param spNameQualifier
-   *          the SP name qualifier
+   *
+   * @param spNameQualifier the SP name qualifier
    * @return the builder
    */
   public NameIDPolicyBuilder spNameQualifier(final String spNameQualifier) {
@@ -61,9 +59,8 @@ public class NameIDPolicyBuilder extends AbstractSAMLObjectBuilder<NameIDPolicy>
 
   /**
    * Assigns the {@code AllowCreate} attribute to the {@code NameIDPolicy} element.
-   * 
-   * @param allowCreate
-   *          boolean flag
+   *
+   * @param allowCreate boolean flag
    * @return the builder
    */
   public NameIDPolicyBuilder allowCreate(final Boolean allowCreate) {

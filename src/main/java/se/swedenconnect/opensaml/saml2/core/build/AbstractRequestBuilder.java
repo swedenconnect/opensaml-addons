@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Abstract builder class for building request messages.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  *
- * @param <T>
- *          the type of request message
- * @param <BUILDER>
- *          the builder type
+ * @param <T> the type of request message
+ * @param <BUILDER> the builder type
  */
-public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUILDER extends AbstractSAMLObjectBuilder<T>> extends
-    AbstractSAMLObjectBuilder<T> {
+public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUILDER extends AbstractSAMLObjectBuilder<T>>
+    extends AbstractSAMLObjectBuilder<T> {
 
   /** {@inheritDoc} */
   @Override
@@ -55,11 +53,9 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
    * <p>
    * If not assigned, the {@link SAMLVersion#VERSION_20} will be assigned as a default.
    * </p>
-   * 
-   * @param major
-   *          major version
-   * @param minor
-   *          minor version
+   *
+   * @param major major version
+   * @param minor minor version
    * @return the builder
    */
   public BUILDER version(final int major, final int minor) {
@@ -72,9 +68,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
    * <p>
    * If not assigned, the {@link SAMLVersion#VERSION_20} will be assigned as a default.
    * </p>
-   * 
-   * @param version
-   *          the versions
+   *
+   * @param version the versions
    * @return the builder
    */
   public BUILDER version(final String version) {
@@ -84,9 +79,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns the {@code ID} attribute of the request.
-   * 
-   * @param id
-   *          the ID
+   *
+   * @param id the ID
    * @return the builder
    */
   public BUILDER id(final String id) {
@@ -96,9 +90,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns the issue instant.
-   * 
-   * @param instant
-   *          the issue instant
+   *
+   * @param instant the issue instant
    * @return the builder
    */
   public BUILDER issueInstant(final Instant instant) {
@@ -108,9 +101,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns the {@code Destination} attribute of the request.
-   * 
-   * @param destination
-   *          the destination URI
+   *
+   * @param destination the destination URI
    * @return the builder
    */
   public BUILDER destination(final String destination) {
@@ -120,9 +112,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns the {@code Consent} attribute of the request.
-   * 
-   * @param consent
-   *          the consent string
+   *
+   * @param consent the consent string
    * @return the builder
    */
   public BUILDER consent(final String consent) {
@@ -133,9 +124,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
   /**
    * Assigns the {@code Issuer} element of the request by adding an {@code Issuer} element having the nameID format
    * {@code urn:oasis:names:tc:SAML:2.0:nameid-format:entity}.
-   * 
-   * @param issuer
-   *          the entityID of the issuer
+   *
+   * @param issuer the entityID of the issuer
    * @return the builder
    * @see #issuer(Issuer)
    */
@@ -149,9 +139,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns the {@code Issuer} element of the request.
-   * 
-   * @param issuer
-   *          the issuer (will be cloned before assignment)
+   *
+   * @param issuer the issuer (will be cloned before assignment)
    * @return the builder
    */
   public BUILDER issuer(final Issuer issuer) {
@@ -166,9 +155,8 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * Assigns an {@code Extensions} element to the request.
-   * 
-   * @param extensions
-   *          the extensions element to add
+   *
+   * @param extensions the extensions element to add
    * @return the builder
    */
   public BUILDER extensions(final Extensions extensions) {
@@ -178,7 +166,7 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
 
   /**
    * In order for us to be able to make chaining calls we need to return the concrete type of the builder.
-   * 
+   *
    * @return the concrete type of the builder
    */
   protected abstract BUILDER getThis();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 /**
  * Abstract builder for {@code AuthnRequest} messages.
  */
-public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLObjectBuilder<AuthnRequest>> extends AbstractRequestBuilder<AuthnRequest, BUILDER> {
+public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLObjectBuilder<AuthnRequest>>
+    extends AbstractRequestBuilder<AuthnRequest, BUILDER> {
 
   /** {@inheritDoc} */
   @Override
@@ -44,9 +45,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code ForceAuthn} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param b
-   *          boolean flag
+   *
+   * @param b boolean flag
    * @return the builder
    */
   public BUILDER forceAuthn(final Boolean b) {
@@ -56,9 +56,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code IsPassive} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param b
-   *          boolean flag
+   *
+   * @param b boolean flag
    * @return the builder
    */
   public BUILDER isPassive(final Boolean b) {
@@ -68,9 +67,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code ProtocolBinding} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return the builder
    * @see #postProtocolBinding()
    */
@@ -82,11 +80,11 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
   /**
    * Assigns {@link SAMLConstants#SAML2_POST_BINDING_URI} to the {@code ProtocolBinding} attribute of the
    * {@code AuthnRequest} object.
-   * 
+   *
    * <p>
    * This is the default.
    * </p>
-   * 
+   *
    * @return the builder
    */
   public BUILDER postProtocolBinding() {
@@ -96,9 +94,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code AssertionConsumerServiceIndex} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param index
-   *          the index
+   *
+   * @param index the index
    * @return the builder
    */
   public BUILDER assertionConsumerServiceIndex(final Integer index) {
@@ -108,9 +105,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code AssertionConsumerServiceURL} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param url
-   *          the URL
+   *
+   * @param url the URL
    * @return the builder
    */
   public BUILDER assertionConsumerServiceURL(final String url) {
@@ -120,9 +116,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code AttributeConsumerServiceIndex} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param index
-   *          the index
+   *
+   * @param index the index
    * @return the builder
    */
   public BUILDER attributeConsumerServiceIndex(final Integer index) {
@@ -132,9 +127,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns the {@code ProviderName} attribute to the {@code AuthnRequest} object.
-   * 
-   * @param name
-   *          the provider name
+   *
+   * @param name the provider name
    * @return the builder
    */
   public BUILDER providerName(final String name) {
@@ -144,9 +138,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns a {@code Subject} element to the {@code AuthnRequest} object.
-   * 
-   * @param subject
-   *          the subject (will be cloned before assignment)
+   *
+   * @param subject the subject (will be cloned before assignment)
    * @return the builder
    */
   public BUILDER subject(final Subject subject) {
@@ -161,9 +154,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns a {@code NameIDPolicy} element to the {@code AuthnRequest} object.
-   * 
-   * @param nameIDPolicy
-   *          the nameID policy (will be cloned before assignment)
+   *
+   * @param nameIDPolicy the nameID policy (will be cloned before assignment)
    * @return the builder
    * @see NameIDPolicyBuilder
    */
@@ -179,9 +171,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns a {@code Conditions} element to the {@code AuthnRequest} object.
-   * 
-   * @param conditions
-   *          the request conditions (will be cloned before assignment)
+   *
+   * @param conditions the request conditions (will be cloned before assignment)
    * @return the builder
    */
   public BUILDER conditions(final Conditions conditions) {
@@ -196,9 +187,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns a {@code RequestedAuthnContext} element to the {@code AuthnRequest} object.
-   * 
-   * @param requestedAuthnContext
-   *          the requested authentication context (will be cloned before assignment)
+   *
+   * @param requestedAuthnContext the requested authentication context (will be cloned before assignment)
    * @return the builder
    * @see RequestedAuthnContextBuilder
    */
@@ -214,9 +204,8 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
 
   /**
    * Assigns a {@code Scoping} element to the {@code AuthnRequest} object.
-   * 
-   * @param scoping
-   *          the scoping element to add (will be cloned before assignment)
+   *
+   * @param scoping the scoping element to add (will be cloned before assignment)
    * @return the builder
    */
   public BUILDER scoping(final Scoping scoping) {

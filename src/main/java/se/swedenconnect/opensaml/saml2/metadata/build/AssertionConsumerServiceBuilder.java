@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 
 /**
  * A builder for {@code AssertionConsumerService} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<AssertionConsumerService> {
 
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static AssertionConsumerServiceBuilder builder() {
@@ -45,9 +45,8 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
 
   /**
    * Assigns the location URI.
-   * 
-   * @param location
-   *          the URI
+   *
+   * @param location the URI
    * @return the builder
    */
   public AssertionConsumerServiceBuilder location(final String location) {
@@ -57,9 +56,8 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
 
   /**
    * Assigns the binding of the service
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return the builder
    * @see #postBinding()
    * @see #redirectBinding()
@@ -73,7 +71,7 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
 
   /**
    * Shortcut for assigning the SAML POST binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -83,7 +81,7 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
 
   /**
    * Shortcut for assigning the SAML Redirect binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -96,9 +94,8 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
    * {@value HolderOfKeyMetadataSupport#HOK_WEBSSO_PROFILE_URI} and the actual binding should be assigned to the
    * {@code hoksso:ProtocolBinding} attribute. This method sets the {@code hoksso:ProtocolBinding} attribute to the
    * given binding.
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return this builder
    * @see #hokPostBinding()
    * @see #hokRedirectBinding()
@@ -111,30 +108,29 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
   /**
    * Shortcut to assign the {@code Binding} attribute to Holder-of-key and the {@code hoksso:ProtocolBinding} attribute
    * to the POST binding.
-   * 
+   *
    * @return this builder
    */
   public AssertionConsumerServiceBuilder hokPostBinding() {
     return this.binding(HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI)
-      .protocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+        .protocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
   }
 
   /**
    * Shortcut to assign the {@code Binding} attribute to Holder-of-key and the {@code hoksso:ProtocolBinding} attribute
    * to the Redirect binding.
-   * 
+   *
    * @return this builder
-   */  
+   */
   public AssertionConsumerServiceBuilder hokRedirectBinding() {
     return this.binding(HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI)
-      .protocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+        .protocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
   }
 
   /**
    * Assigns the index for the service.
-   * 
-   * @param index
-   *          the index
+   *
+   * @param index the index
    * @return the builder
    */
   public AssertionConsumerServiceBuilder index(final Integer index) {
@@ -144,9 +140,8 @@ public class AssertionConsumerServiceBuilder extends AbstractSAMLObjectBuilder<A
 
   /**
    * Sets the {@code isDefault} attribute of the service.
-   * 
-   * @param def
-   *          the Boolean
+   *
+   * @param def the Boolean
    * @return the builder
    */
   public AssertionConsumerServiceBuilder isDefault(final Boolean def) {

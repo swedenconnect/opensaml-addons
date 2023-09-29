@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * A builder for {@code SingleLogoutService} elements.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class SingleLogoutServiceBuilder extends AbstractSAMLObjectBuilder<SingleLogoutService> {
-  
+
   /**
    * Utility method that creates a builder.
-   * 
+   *
    * @return a builder
    */
   public static SingleLogoutServiceBuilder builder() {
@@ -38,33 +38,30 @@ public class SingleLogoutServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Assigns the location URI.
-   * 
-   * @param location
-   *          the URI
+   *
+   * @param location the URI
    * @return the builder
    */
   public SingleLogoutServiceBuilder location(final String location) {
     this.object().setLocation(location);
     return this;
   }
-  
+
   /**
    * Assigns the response location URI.
-   * 
-   * @param responseLocation
-   *          the URI
+   *
+   * @param responseLocation the URI
    * @return the builder
    */
   public SingleLogoutServiceBuilder responseLocation(final String responseLocation) {
     this.object().setResponseLocation(responseLocation);
     return this;
-  }  
+  }
 
   /**
    * Assigns the binding of the service
-   * 
-   * @param binding
-   *          the binding URI
+   *
+   * @param binding the binding URI
    * @return the builder
    * @see #postBinding()
    * @see #redirectBinding()
@@ -76,7 +73,7 @@ public class SingleLogoutServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Shortcut for assigning the SAML POST binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -87,7 +84,7 @@ public class SingleLogoutServiceBuilder extends AbstractSAMLObjectBuilder<Single
 
   /**
    * Shortcut for assigning the SAML Redirect binding to the service.
-   * 
+   *
    * @return the builder
    * @see #binding(String)
    */
@@ -95,7 +92,6 @@ public class SingleLogoutServiceBuilder extends AbstractSAMLObjectBuilder<Single
     this.object().setBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
     return this;
   }
-
 
   /** {@inheritDoc} */
   @Override

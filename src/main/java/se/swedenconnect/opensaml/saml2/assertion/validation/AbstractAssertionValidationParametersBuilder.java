@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,15 @@ import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValid
 /**
  * Abstract builder class for building the {@link ValidationContext} object for use as validation input to the
  * {@link AssertionValidator}.
- * 
+ *
  * <p>
  * The reason for all fiddling with generics is that we want to be able to subclass the builder classes.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
-public abstract class AbstractAssertionValidationParametersBuilder<T extends AbstractAssertionValidationParametersBuilder<T>> extends
+public abstract class AbstractAssertionValidationParametersBuilder<T extends AbstractAssertionValidationParametersBuilder<T>>
+    extends
     AbstractResponseValidationParametersBuilder<T> {
 
   /** Logging instance. */
@@ -63,9 +64,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the issue instant from the Response message that contained the assertion being validated.
-   * 
-   * @param instant
-   *          the response issue instant
+   *
+   * @param instant the response issue instant
    * @return the builder
    */
   public T responseIssueInstant(final Instant instant) {
@@ -74,9 +74,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the issue instant from the Response message that contained the assertion being validated.
-   * 
-   * @param instant
-   *          the response issue instant
+   *
+   * @param instant the response issue instant
    * @return the builder
    */
   public T responseIssueInstant(final long instant) {
@@ -85,9 +84,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the valid URLs for the intended recipients.
-   * 
-   * @param recipients
-   *          one or more URLs
+   *
+   * @param recipients one or more URLs
    * @return the builder
    */
   public T validRecipients(final String... recipients) {
@@ -109,9 +107,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
    * <p>
    * See also {@link #subjectConfirmationCheckAddess(boolean)} and {@link #subjectLocalityCheckAddress(boolean)}.
    * </p>
-   * 
-   * @param addresses
-   *          one or more IP addresses
+   *
+   * @param addresses one or more IP addresses
    * @return the builder
    */
   public T validAddresses(final InetAddress... addresses) {
@@ -130,9 +127,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the valid addresses that we allow the user agent to have.
-   * 
-   * @param addresses
-   *          one or more IP addresses (in string format)
+   *
+   * @param addresses one or more IP addresses (in string format)
    * @return the builder
    */
   public T validAddresses(final String... addresses) {
@@ -162,9 +158,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the entityID:s of the valid audiences.
-   * 
-   * @param audiences
-   *          the audiences
+   *
+   * @param audiences the audiences
    * @return the builder
    */
   public T validAudiences(final String... audiences) {
@@ -182,9 +177,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the {@code ForceAuthn} flag from the corresponding {@code AuthnRequest}.
-   * 
-   * @param forceAuthn
-   *          true/false
+   *
+   * @param forceAuthn true/false
    * @return the builder
    */
   public T authnRequestForceAuthn(final Boolean forceAuthn) {
@@ -193,9 +187,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the issuance time for the corresponding {@code AuthnRequest} when validating an assertion.
-   * 
-   * @param issueInstant
-   *          issue time
+   *
+   * @param issueInstant issue time
    * @return the builder
    */
   public T authnRequestIssueInstant(final Instant issueInstant) {
@@ -204,9 +197,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the issuance time for the corresponding {@code AuthnRequest} when validating an assertion.
-   * 
-   * @param issueInstant
-   *          issue time (in milliseconds since epoch)
+   *
+   * @param issueInstant issue time (in milliseconds since epoch)
    * @return the builder
    */
   public T authnRequestIssueInstant(final long issueInstant) {
@@ -216,9 +208,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   /**
    * Assigns the maximum session time that we, as a SP, can accept when receiving assertions based on older
    * authentications (SSO).
-   * 
-   * @param duration
-   *          milliseconds
+   *
+   * @param duration milliseconds
    * @return the builder
    */
   public T maxAcceptedSsoSessionTime(final long duration) {
@@ -228,9 +219,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   /**
    * Assigns the maximum session time that we, as a SP, can accept when receiving assertions based on older
    * authentications (SSO).
-   * 
-   * @param duration
-   *          max session time
+   *
+   * @param duration max session time
    * @return the builder
    */
   public T maxAcceptedSsoSessionTime(final Duration duration) {
@@ -244,9 +234,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the client certificate to be used for HoK validation.
-   * 
-   * @param clientCertificate
-   *          the client certificate
+   *
+   * @param clientCertificate the client certificate
    * @return the builder
    */
   public T clientCertificate(final X509Certificate clientCertificate) {
@@ -255,9 +244,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the SP metadata.
-   * 
-   * @param metadata
-   *          the SP metadata
+   *
+   * @param metadata the SP metadata
    * @return the builder
    */
   public T spMetadata(final EntityDescriptor metadata) {
@@ -266,9 +254,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
 
   /**
    * Assigns the SP metadata.
-   * 
-   * @param metadata
-   *          the SP metadata
+   *
+   * @param metadata the SP metadata
    * @return the builder
    */
   public T idpMetadata(final EntityDescriptor metadata) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.component.DestructableComponent;
-import net.shibboleth.utilities.java.support.component.InitializableComponent;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import net.shibboleth.shared.component.DestructableComponent;
+import net.shibboleth.shared.component.InitializableComponent;
+import net.shibboleth.shared.resolver.ResolverException;
 
 /**
  * An interface that offers methods that operate on one or several metadata sources.
@@ -37,14 +37,14 @@ import net.shibboleth.utilities.java.support.resolver.ResolverException;
  * A {@code MetadataProvider} instance encapsulates OpenSAML:s {@link MetadataResolver} and adds easy to use methods and
  * configuration.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public interface MetadataProvider extends InitializableComponent, DestructableComponent {
 
   /**
    * Returns the identifier for the provider.
-   * 
+   *
    * @return the identifier
    */
   String getID();
@@ -52,25 +52,23 @@ public interface MetadataProvider extends InitializableComponent, DestructableCo
   /**
    * Returns the XML element making up the metadata for the federation. This element is either an
    * {@link EntityDescriptor} or an {@link EntitiesDescriptor}.
-   * 
+   *
    * @return an XML element
-   * @throws ResolverException
-   *           for metadata resolving errors
+   * @throws ResolverException for metadata resolving errors
    */
   XMLObject getMetadata() throws ResolverException;
 
   /**
    * Returns the DOM element making up the metadata for the federation.
-   * 
+   *
    * @return a DOM element
-   * @throws MarshallingException
-   *           for XML marshalling errors
+   * @throws MarshallingException for XML marshalling errors
    */
   Element getMetadataDOM() throws MarshallingException;
 
   /**
    * Returns the time the currently available metadata was last updated.
-   * 
+   *
    * @return time when the currently metadata was last updated, or null if no metadata has been successfully loaded
    */
   Instant getLastUpdate();
@@ -82,15 +80,14 @@ public interface MetadataProvider extends InitializableComponent, DestructableCo
    * support refresh of metadata should typically be either {@code synchronized} or make use other locking mechanisms to
    * protect against concurrent access.
    * </p>
-   * 
-   * @throws ResolverException
-   *           if the refresh operation was unsuccessful
+   *
+   * @throws ResolverException if the refresh operation was unsuccessful
    */
   void refresh() throws ResolverException;
 
   /**
    * Returns an iterator for all entity descriptors held by the provider.
-   * 
+   *
    * @return an iterator for all entity descriptors
    */
   Iterable<EntityDescriptor> iterator();
@@ -100,15 +97,15 @@ public interface MetadataProvider extends InitializableComponent, DestructableCo
    * <p>
    * To list all IdP:s and SP:s do:
    * </p>
-   * 
+   *
    * <pre>
-   * {@code 
+   * {@code
    * idps = provider.iterator(IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
-   * sps = provider.iterator(SPSSODescriptor.DEFAULT_ELEMENT_NAME);}
+   * sps = provider.iterator(SPSSODescriptor.DEFAULT_ELEMENT_NAME);
+   * }
    * </pre>
-   * 
-   * @param role
-   *          role descriptor
+   *
+   * @param role role descriptor
    * @return an iterator for all matching entity descriptors
    * @see #getIdentityProviders()
    * @see #getServiceProviders()
@@ -117,49 +114,42 @@ public interface MetadataProvider extends InitializableComponent, DestructableCo
 
   /**
    * Returns the entity descriptor identified by the given entityID.
-   * 
-   * @param entityID
-   *          the unique entityID for the entry
+   *
+   * @param entityID the unique entityID for the entry
    * @return an entity descriptor or null if no entry is found
-   * @throws ResolverException
-   *           for underlying metadata errors
+   * @throws ResolverException for underlying metadata errors
    */
   EntityDescriptor getEntityDescriptor(final String entityID) throws ResolverException;
 
   /**
    * Returns the entity descriptor identified by the given entityID and given role.
-   * 
-   * @param entityID
-   *          the entity ID
-   * @param role
-   *          the role descriptor
+   *
+   * @param entityID the entity ID
+   * @param role the role descriptor
    * @return an entity descriptor or null if no matching entry is found
-   * @throws ResolverException
-   *           for underlying metadata errors
+   * @throws ResolverException for underlying metadata errors
    */
   EntityDescriptor getEntityDescriptor(final String entityID, final QName role) throws ResolverException;
 
   /**
    * Utility method that returns a list of entity descriptors for Identity Providers found in the metadata.
-   * 
+   *
    * @return a list of entity descriptors
-   * @throws ResolverException
-   *           for metadata errors
+   * @throws ResolverException for metadata errors
    */
   List<EntityDescriptor> getIdentityProviders() throws ResolverException;
 
   /**
    * Utility method that returns a list of entity descriptors for Service Providers found in the metadata.
-   * 
+   *
    * @return a list of entity descriptors
-   * @throws ResolverException
-   *           for metadata errors
+   * @throws ResolverException for metadata errors
    */
   List<EntityDescriptor> getServiceProviders() throws ResolverException;
 
   /**
    * Returns the underlying OpenSAML metadata resolver.
-   * 
+   *
    * @return OpenSAML metadata resolver
    */
   MetadataResolver getMetadataResolver();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 Sweden Connect
+ * Copyright 2016-2023 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,14 @@ import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
  * {@code net.shibboleth.idp.saml.xmlobject.Scope} or {@code se.swedenconnect.opensaml.saml2.metadata.scope.Scope} is
  * created.
  * </p>
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
 
   /**
    * Creates a new {@code ScopeBuilder} instance.
-   * 
+   *
    * @return a ScopeBuilder instance
    */
   public static ScopeBuilder builder() {
@@ -50,9 +50,8 @@ public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
 
   /**
    * Assigns the {@code regexp} attribute.
-   * 
-   * @param regexp
-   *          the regexp attribute
+   *
+   * @param regexp the regexp attribute
    * @return the builder
    */
   public ScopeBuilder regexp(final Boolean regexp) {
@@ -73,9 +72,8 @@ public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
 
   /**
    * Assigns the value.
-   * 
-   * @param value
-   *          the value
+   *
+   * @param value the value
    * @return the builder
    */
   public ScopeBuilder value(final String value) {
@@ -96,11 +94,9 @@ public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
 
   /**
    * Builds and casts to the correct Scope type.
-   * 
-   * @param <T>
-   *          the Scope type to cast to
-   * @param clazz
-   *          the Scope type to cast to
+   *
+   * @param <T> the Scope type to cast to
+   * @param clazz the Scope type to cast to
    * @return a Scope object
    */
   public <T> T build(final Class<T> clazz) {
