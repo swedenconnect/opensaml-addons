@@ -63,7 +63,7 @@ import net.shibboleth.shared.codec.Base64Support;
 import net.shibboleth.shared.codec.DecodingException;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.component.InitializableComponent;
-import net.shibboleth.shared.component.UninitializedComponentException;
+import net.shibboleth.shared.component.UnmodifiableComponentException;
 import net.shibboleth.shared.resolver.CriteriaSet;
 import net.shibboleth.shared.resolver.ResolverException;
 import net.shibboleth.shared.xml.SerializeSupport;
@@ -593,9 +593,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * Helper for a setter method to check the standard preconditions.
    */
   protected final void checkSetterPreconditions() {
-    if (!isInitialized()) {
-      throw new UninitializedComponentException(
-          "Unidentified Component has not yet been initialized and cannot be used.");
+    if (this.isInitialized()) {
+      throw new UnmodifiableComponentException(
+          "Unidentified Component has already been initialized and cannot be changed");
     }
   }
 
