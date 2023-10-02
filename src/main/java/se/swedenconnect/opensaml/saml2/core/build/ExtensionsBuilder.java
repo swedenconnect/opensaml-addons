@@ -82,22 +82,20 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   }
 
   /**
-   * Adds one, or more, extensions to this {@code Extensions} object.
+   * Adds an extension to this {@code Extensions} object.
    *
-   * @param extension the extension(s) to add
+   * @param extension the extension to add
    * @return the builder
    */
-  public ExtensionsBuilder extension(final XMLObject... extension) {
+  public ExtensionsBuilder extension(final XMLObject extension) {
     if (extension == null) {
       return this;
     }
-    for (final XMLObject obj : extension) {
-      try {
-        this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
-      }
-      catch (MarshallingException | UnmarshallingException e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(extension));
+    }
+    catch (MarshallingException | UnmarshallingException e) {
+      throw new RuntimeException(e);
     }
     return this;
   }
