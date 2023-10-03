@@ -1,3 +1,4 @@
+se.swedenconnect.opensaml.common
 se.swedenconnect.opensaml.common.builder
 se.swedenconnect.opensaml.common.utils
 se.swedenconnect.opensaml.common.validation
@@ -14,4 +15,3 @@ se.swedenconnect.opensaml.saml2.request
 se.swedenconnect.opensaml.saml2.response
 se.swedenconnect.opensaml.saml2.response.replay
 se.swedenconnect.opensaml.saml2.response.validation
-se.swedenconnect.opensaml.xmlsec
