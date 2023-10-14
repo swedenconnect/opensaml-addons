@@ -218,7 +218,9 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
     if (algorithms != null && !algorithms.isEmpty()) {
       for (final EncryptionMethod em : algorithms) {
         try {
-          this.object().getEncryptionMethods().add(XMLObjectSupport.cloneXMLObject(em));
+          if (em != null) {
+            this.object().getEncryptionMethods().add(XMLObjectSupport.cloneXMLObject(em));
+          }
         }
         catch (MarshallingException | UnmarshallingException e) {
           throw new RuntimeException(e);

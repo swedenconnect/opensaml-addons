@@ -99,7 +99,9 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
     }
     for (final AssertionConsumerService a : assertionConsumerServices) {
       try {
-        this.object().getAssertionConsumerServices().add(XMLObjectSupport.cloneXMLObject(a));
+        if (a != null) {
+          this.object().getAssertionConsumerServices().add(XMLObjectSupport.cloneXMLObject(a));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -133,7 +135,9 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
     }
     for (final AttributeConsumingService a : attributeConsumingServices) {
       try {
-        this.object().getAttributeConsumingServices().add(XMLObjectSupport.cloneXMLObject(a));
+        if (a != null) {
+          this.object().getAttributeConsumingServices().add(XMLObjectSupport.cloneXMLObject(a));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);

@@ -28,7 +28,7 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Builder for metadata {@link Extensions} objects.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
@@ -47,7 +47,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
    * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
    * modifications will have no effect on the passed object.
    * </p>
-   * 
+   *
    * @param template the template object
    * @param clone whether the template object should be cloned
    */
@@ -57,7 +57,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Creates a builder instance.
-   * 
+   *
    * @return a builder instance
    */
   public static ExtensionsBuilder builder() {
@@ -66,7 +66,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Adds the extensions (overwrites any previous extensions).
-   * 
+   *
    * @param extensions the extension objects
    * @return the builder
    */
@@ -76,7 +76,9 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
     for (final XMLObject obj : extensions) {
       try {
-        this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        if (obj != null) {
+          this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -88,7 +90,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * See {@link #extensions(List)}.
-   * 
+   *
    * @param extensions the extension objects
    * @return the builder
    */
@@ -98,7 +100,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
   /**
    * Adds one, or more, extensions to this {@code Extensions} object.
-   * 
+   *
    * @param extension the extension(s) to add
    * @return the builder
    */
@@ -108,7 +110,9 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
     }
     for (final XMLObject obj : extension) {
       try {
-        this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        if (obj != null) {
+          this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);

@@ -141,7 +141,9 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
     }
     for (final RequestedAttribute attribute : attributes) {
       try {
-        this.object().getRequestedAttributes().add(XMLObjectSupport.cloneXMLObject(attribute));
+        if (attribute != null) {
+          this.object().getRequestedAttributes().add(XMLObjectSupport.cloneXMLObject(attribute));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);

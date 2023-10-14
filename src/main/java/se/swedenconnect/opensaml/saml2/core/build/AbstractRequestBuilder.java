@@ -145,7 +145,9 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
    */
   public BUILDER issuer(final Issuer issuer) {
     try {
-      this.object().setIssuer(XMLObjectSupport.cloneXMLObject(issuer));
+      this.object().setIssuer(issuer != null
+          ? XMLObjectSupport.cloneXMLObject(issuer)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);

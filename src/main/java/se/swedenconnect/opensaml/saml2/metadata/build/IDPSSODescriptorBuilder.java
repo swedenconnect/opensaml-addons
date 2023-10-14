@@ -87,7 +87,9 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
     }
     for (final SingleSignOnService sso : singleSignOnServices) {
       try {
-        this.object().getSingleSignOnServices().add(XMLObjectSupport.cloneXMLObject(sso));
+        if (sso != null) {
+          this.object().getSingleSignOnServices().add(XMLObjectSupport.cloneXMLObject(sso));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -119,7 +121,9 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
     }
     for (final Attribute a : attributes) {
       try {
-        this.object().getAttributes().add(XMLObjectSupport.cloneXMLObject(a));
+        if (a != null) {
+          this.object().getAttributes().add(XMLObjectSupport.cloneXMLObject(a));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
