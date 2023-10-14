@@ -79,7 +79,9 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
       if (idpEntries != null) {
         for (final IDPEntry e : idpEntries) {
           try {
-            idpList.getIDPEntrys().add(XMLObjectSupport.cloneXMLObject(e));
+            if (e != null) {
+              idpList.getIDPEntrys().add(XMLObjectSupport.cloneXMLObject(e));
+            }
           }
           catch (MarshallingException | UnmarshallingException e1) {
             throw new SAMLObjectBuilderRuntimeException(e1);

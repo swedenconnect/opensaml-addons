@@ -61,7 +61,9 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
 
     for (final XMLObject obj : extensions) {
       try {
-        this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        if (obj != null) {
+          this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);

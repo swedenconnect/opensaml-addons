@@ -144,7 +144,9 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
    */
   public BUILDER subject(final Subject subject) {
     try {
-      this.object().setSubject(XMLObjectSupport.cloneXMLObject(subject));
+      this.object().setSubject(subject != null
+          ? XMLObjectSupport.cloneXMLObject(subject)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
@@ -161,7 +163,9 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
    */
   public BUILDER nameIDPolicy(final NameIDPolicy nameIDPolicy) {
     try {
-      this.object().setNameIDPolicy(XMLObjectSupport.cloneXMLObject(nameIDPolicy));
+      this.object().setNameIDPolicy(nameIDPolicy != null
+          ? XMLObjectSupport.cloneXMLObject(nameIDPolicy)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
@@ -177,7 +181,9 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
    */
   public BUILDER conditions(final Conditions conditions) {
     try {
-      this.object().setConditions(XMLObjectSupport.cloneXMLObject(conditions));
+      this.object().setConditions(conditions != null
+          ? XMLObjectSupport.cloneXMLObject(conditions)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
@@ -194,7 +200,9 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
    */
   public BUILDER requestedAuthnContext(final RequestedAuthnContext requestedAuthnContext) {
     try {
-      this.object().setRequestedAuthnContext(XMLObjectSupport.cloneXMLObject(requestedAuthnContext));
+      this.object().setRequestedAuthnContext(requestedAuthnContext != null
+          ? XMLObjectSupport.cloneXMLObject(requestedAuthnContext)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
@@ -210,7 +218,9 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
    */
   public BUILDER scoping(final Scoping scoping) {
     try {
-      this.object().setScoping(XMLObjectSupport.cloneXMLObject(scoping));
+      this.object().setScoping(scoping != null
+          ? XMLObjectSupport.cloneXMLObject(scoping)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);

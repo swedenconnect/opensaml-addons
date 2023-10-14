@@ -32,7 +32,7 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
  * Abstract base class for building a {@link SSODescriptor}.
- * 
+ *
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B extends AbstractSAMLObjectBuilder<T>>
@@ -53,7 +53,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
    * The {@code clone} parameter tells whether the object should be cloned or not. If set to {@code true}, any
    * modifications will have no effect on the passed object.
    * </p>
-   * 
+   *
    * @param template the template object
    * @param clone whether the template object should be cloned
    */
@@ -64,7 +64,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * Adds the key descriptor elements.
-   * 
+   *
    * @param keyDescriptors the key descriptors
    * @return the builder
    */
@@ -75,7 +75,9 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
     }
     for (final KeyDescriptor kd : keyDescriptors) {
       try {
-        this.object().getKeyDescriptors().add(XMLObjectSupport.cloneXMLObject(kd));
+        if (kd != null) {
+          this.object().getKeyDescriptors().add(XMLObjectSupport.cloneXMLObject(kd));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -86,7 +88,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * See {@link #keyDescriptors(List)}.
-   * 
+   *
    * @param keyDescriptors the key descriptors
    * @return the builder
    */
@@ -96,7 +98,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * Assigns metadata extensions.
-   * 
+   *
    * @param extensions the metadata extensions.
    * @return the builder
    */
@@ -108,7 +110,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
   /**
    * Based on the contents of this object, an {@link ExtensionsBuilder} is returned. If the object holds an
    * {@link Extensions} object, this is fed to the builder (but not cloned).
-   * 
+   *
    * @return an {@link ExtensionsBuilder}
    */
   public ExtensionsBuilder getExtensionsBuilder() {
@@ -122,7 +124,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * Assigns the {@code md:NameIDFormat} elements.
-   * 
+   *
    * @param nameIDFormats the nameID format strings
    * @return the builder
    */
@@ -141,7 +143,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * See {@link #nameIDFormats(List)}.
-   * 
+   *
    * @param nameIDFormats the nameID format strings
    * @return the builder
    */
@@ -151,7 +153,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * Adds {@code md:SingleLogoutService} elements to the {@code SSODescriptor}.
-   * 
+   *
    * @param singleLogoutServices single logout service objects (cloned before assignment)
    * @return the builder
    */
@@ -162,7 +164,9 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
     }
     for (final SingleLogoutService slo : singleLogoutServices) {
       try {
-        this.object().getSingleLogoutServices().add(XMLObjectSupport.cloneXMLObject(slo));
+        if (slo != null) {
+          this.object().getSingleLogoutServices().add(XMLObjectSupport.cloneXMLObject(slo));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -173,7 +177,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * See {@link #singleLogoutServices(List)}.
-   * 
+   *
    * @param singleLogoutServices single logout service objects (cloned before assignment)
    * @return the builder
    */
@@ -183,7 +187,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
 
   /**
    * In order for us to be able to make chaining calls we need to return the concrete type of the builder.
-   * 
+   *
    * @return the concrete type of the builder
    */
   protected abstract B getThis();

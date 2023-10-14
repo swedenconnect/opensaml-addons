@@ -232,7 +232,9 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
     }
     for (final RoleDescriptor rd : roleDescriptors) {
       try {
-        this.object().getRoleDescriptors().add(XMLObjectSupport.cloneXMLObject(rd));
+        if (rd != null) {
+          this.object().getRoleDescriptors().add(XMLObjectSupport.cloneXMLObject(rd));
+        }
       }
       catch (MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
@@ -269,7 +271,9 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
    */
   public EntityDescriptorBuilder organization(final Organization organization) {
     try {
-      this.object().setOrganization(XMLObjectSupport.cloneXMLObject(organization));
+      this.object().setOrganization(organization != null
+          ? XMLObjectSupport.cloneXMLObject(organization)
+          : null);
     }
     catch (MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
@@ -288,7 +292,9 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
     if (contactPersons != null) {
       for (ContactPerson cp : contactPersons) {
         try {
-          this.object().getContactPersons().add(XMLObjectSupport.cloneXMLObject(cp));
+          if (cp != null) {
+            this.object().getContactPersons().add(XMLObjectSupport.cloneXMLObject(cp));
+          }
         }
         catch (MarshallingException | UnmarshallingException e) {
           throw new RuntimeException(e);
