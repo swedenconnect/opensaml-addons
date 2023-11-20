@@ -63,7 +63,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   public static final int DEFAULT_DESCRIPTOR_ID_SIZE = 32;
 
   /** Logging instance. */
-  private final Logger logger = LoggerFactory.getLogger(AbstractMetadataContainer.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractMetadataContainer.class);
 
   /** The encapsulated descriptor element. */
   protected T descriptor;
@@ -107,10 +107,13 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   /** {@inheritDoc} */
   @Override
   public boolean updateRequired(final boolean signatureRequired) {
-    if (!this.descriptor.isValid() || signatureRequired && !this.descriptor.isSigned()
-        || (this.descriptor.getValidUntil() == null)) {
+    if (!this.descriptor.isValid() || this.descriptor.getValidUntil() == null) {
       return true;
     }
+    if (signatureRequired && this.signatureCredentials != null && !this.descriptor.isSigned()) {
+      return true;
+    }
+
     final long expireInstant = this.descriptor.getValidUntil().toEpochMilli();
     final long now = System.currentTimeMillis();
 
@@ -140,17 +143,17 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
     final Instant validUntil = Instant.now().plusSeconds((int) this.validity.getSeconds());
     this.descriptor.setValidUntil(validUntil);
 
-    this.logger.debug("Descriptor '{}' was updated with ID '{}' and validUntil '{}'",
+    log.debug("Descriptor '{}' was updated with ID '{}' and validUntil '{}'",
         this.getLogString(this.descriptor), this.getID(this.descriptor), this.descriptor.getValidUntil().toString());
 
-    return sign ? this.sign() : this.descriptor;
+    return sign && this.signatureCredentials != null ? this.sign() : this.descriptor;
   }
 
   /** {@inheritDoc} */
   @Override
   public synchronized T sign() throws SignatureException, MarshallingException {
 
-    this.logger.trace("Signing descriptor '{}' ...", this.getLogString(this.descriptor));
+    log.trace("Signing descriptor '{}' ...", this.getLogString(this.descriptor));
 
     if (this.getID(this.descriptor) == null || this.descriptor.getValidUntil() == null) {
       return this.update(true);
@@ -159,7 +162,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
     SAMLObjectSigner.sign(this.descriptor, this.signatureCredentials,
         SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration());
 
-    this.logger.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
+    log.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
 
     return this.descriptor;
   }
