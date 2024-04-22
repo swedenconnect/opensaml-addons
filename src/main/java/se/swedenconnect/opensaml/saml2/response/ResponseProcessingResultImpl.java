@@ -23,6 +23,10 @@ import java.util.Optional;
 
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.AuthnContext;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Response;
@@ -35,14 +39,8 @@ import org.opensaml.saml.saml2.core.Subject;
  */
 public class ResponseProcessingResultImpl implements ResponseProcessingResult {
 
-  /** The response ID. */
-  private final String responseId;
-
-  /** The InResponseTo attribute of the response. */
-  private final String inResponseTo;
-
-  /** The issue instant. */
-  private final Instant issueInstant;
+  /** The response. */
+  private final Response response;
 
   /** The assertion. */
   private final Assertion assertion;
@@ -54,31 +52,33 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
    * @param assertion the Assertion
    */
   public ResponseProcessingResultImpl(final Response response, final Assertion assertion) {
-    this.responseId = Optional.ofNullable(response).map(Response::getID)
-        .orElseThrow(() -> new NullPointerException("response is required"));
-    this.inResponseTo = Optional.ofNullable(response).map(Response::getInResponseTo)
-        .orElseThrow(() -> new NullPointerException("response is required"));
-    this.issueInstant = Optional.ofNullable(response).map(Response::getIssueInstant)
-        .orElseThrow(() -> new NullPointerException("response is required"));
+    this.response = Objects.requireNonNull(response, "response is required");
     this.assertion = Objects.requireNonNull(assertion, "assertion is required");
   }
 
   /** {@inheritDoc} */
   @Override
+  public Response getResponse() {
+    return this.response;
+  }
+
+
+  /** {@inheritDoc} */
+  @Override
   public String getResponseId() {
-    return this.responseId;
+    return this.response.getID();
   }
 
   /** {@inheritDoc} */
   @Override
   public String getInResponseTo() {
-    return this.inResponseTo;
+    return this.response.getInResponseTo();
   }
 
   /** {@inheritDoc} */
   @Override
   public Instant getIssueInstant() {
-    return this.issueInstant;
+    return this.response.getIssueInstant();
   }
 
   /** {@inheritDoc} */
@@ -90,30 +90,31 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   /** {@inheritDoc} */
   @Override
   public List<Attribute> getAttributes() {
-    try {
-      return Collections.unmodifiableList(this.assertion.getAttributeStatements().get(0).getAttributes());
-    }
-    catch (NullPointerException | IndexOutOfBoundsException e) {
-      return Collections.emptyList();
-    }
+    return Collections.unmodifiableList(this.assertion.getAttributeStatements().stream()
+        .map(AttributeStatement::getAttributes)
+        .findFirst()
+        .orElseGet(() -> Collections.emptyList()));
   }
 
   /** {@inheritDoc} */
   @Override
   public String getAuthnContextClassUri() {
-    try {
-      return this.assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getURI();
-    }
-    catch (NullPointerException e) {
-      return null;
-    }
+    return this.assertion.getAuthnStatements().stream()
+      .map(AuthnStatement::getAuthnContext)
+      .map(AuthnContext::getAuthnContextClassRef)
+      .map(AuthnContextClassRef::getURI)
+      .findFirst()
+      .orElse(null);
   }
 
   /** {@inheritDoc} */
   @Override
   public Instant getAuthnInstant() {
 
-    Instant authnInstant = this.assertion.getAuthnStatements().get(0).getAuthnInstant();
+    final Instant authnInstant =  this.assertion.getAuthnStatements().stream()
+        .map(AuthnStatement::getAuthnInstant)
+        .findFirst()
+        .orElseGet(() -> Instant.now());
 
     // We have already checked the validity of the authentication instant, but if it is
     // after the current time it means that it is within the allowed clock skew. If so,
