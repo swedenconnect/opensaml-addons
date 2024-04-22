@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ import java.util.List;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Response;
 
 /**
- * Interface that describes the result of a response processing operation. It contains the actual {@code Assertion} that
- * really holds all information, but also "easy to access" methods of the elements that are of most interest.
+ * Interface that describes the result of a response processing operation. It contains the actual {@link Response} and
+ * {@link Assertion} objects that really holds all information, but also "easy to access" methods of the elements that
+ * are of most interest.
  * <p>
  * Note that only successful responses are represented. Error responses are represented using the
  * {@link ResponseStatusErrorException}.
@@ -54,6 +56,13 @@ public interface ResponseProcessingResult {
    * @return issue instant
    */
   Instant getIssueInstant();
+
+  /**
+   * Gets the actual {@link Response} object.
+   *
+   * @return the {@link Response}
+   */
+  Response getResponse();
 
   /**
    * Gets the {@code Assertion} from the response.
