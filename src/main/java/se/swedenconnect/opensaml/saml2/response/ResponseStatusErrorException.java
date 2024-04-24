@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,16 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
+import java.util.Optional;
+
+import org.opensaml.core.xml.util.XMLObjectSupport;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
+
+import se.swedenconnect.opensaml.common.LibraryVersion;
+import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
 
 /**
  * Exception that indicates a non-successful status code received in a Response message.
@@ -26,16 +34,24 @@ import org.opensaml.saml.saml2.core.StatusCode;
 public class ResponseStatusErrorException extends Exception {
 
   /** For serializing. */
-  private static final long serialVersionUID = -8050896611037764108L;
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
-  /** The SAML Status. */
-  private final Status status;
+  /** The response. */
+  private final SerializableOpenSamlObject<Response> response;
 
-  /** The Response ID. */
-  private final String responseId;
+  /**
+   * Constructor.
+   *
+   * @param response the response
+   */
+  public ResponseStatusErrorException(final Response response) {
+    super(statusToString(response.getStatus()));
+    this.response = new SerializableOpenSamlObject<Response>(response);
 
-  /** The entityID of the issuer of the response. */
-  private final String issuer;
+    if (StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
+      throw new IllegalArgumentException("Status is success - can not throw ResponseStatusErrorException");
+    }
+  }
 
   /**
    * Constructor taking the error status and the response ID.
@@ -44,11 +60,22 @@ public class ResponseStatusErrorException extends Exception {
    * @param responseId the response ID
    * @param issuer the issuer of the response
    */
+  @Deprecated(forRemoval = true)
   public ResponseStatusErrorException(final Status status, final String responseId, final String issuer) {
     super(statusToString(status));
-    this.status = status;
-    this.responseId = responseId;
-    this.issuer = issuer;
+
+    try {
+      final Response responseObj = (Response) XMLObjectSupport.buildXMLObject(Response.DEFAULT_ELEMENT_NAME);
+      responseObj.setStatus(XMLObjectSupport.cloneXMLObject(status));
+      responseObj.setID(responseId);
+      final Issuer issuerObj = (Issuer) XMLObjectSupport.buildXMLObject(Issuer.DEFAULT_ELEMENT_NAME);
+      issuerObj.setValue(issuer);
+      responseObj.setIssuer(issuerObj);
+      this.response = new SerializableOpenSamlObject<Response>(responseObj);
+    }
+    catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
 
     if (StatusCode.SUCCESS.equals(status.getStatusCode().getValue())) {
       throw new IllegalArgumentException("Status is success - can not throw ResponseStatusErrorException");
@@ -61,7 +88,7 @@ public class ResponseStatusErrorException extends Exception {
    * @return the status object
    */
   public Status getStatus() {
-    return this.status;
+    return this.response.get().getStatus();
   }
 
   /**
@@ -70,7 +97,7 @@ public class ResponseStatusErrorException extends Exception {
    * @return the response ID
    */
   public String getResponseId() {
-    return this.responseId;
+    return this.response.get().getID();
   }
 
   /**
@@ -79,7 +106,9 @@ public class ResponseStatusErrorException extends Exception {
    * @return the issuer entityID
    */
   public String getIssuer() {
-    return this.issuer;
+    return Optional.ofNullable(this.response.get().getIssuer())
+        .map(Issuer::getValue)
+        .orElse(null);
   }
 
   /**
