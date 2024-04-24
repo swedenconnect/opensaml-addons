@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
+
+import org.opensaml.saml.saml2.core.Response;
 
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.saml2.response.ResponseProcessingException;
@@ -32,9 +34,21 @@ public class ResponseValidationException extends ResponseProcessingException {
    * Constructor taking an error message.
    *
    * @param message the error message
+   * @deprecated Also supply the response message
    */
+  @Deprecated(forRemoval = true)
   public ResponseValidationException(final String message) {
     super(message);
+  }
+
+  /**
+   * Constructor taking an error message and the response being processed.
+   *
+   * @param message the error message
+   * @param response the response being processed
+   */
+  public ResponseValidationException(final String message, final Response response) {
+    super(message, response);
   }
 
   /**
@@ -42,9 +56,22 @@ public class ResponseValidationException extends ResponseProcessingException {
    *
    * @param message the error message
    * @param cause the cause of the error
+   * @deprecated Also supply the response message
    */
+  @Deprecated(forRemoval = true)
   public ResponseValidationException(final String message, final Throwable cause) {
     super(message, cause);
+  }
+
+  /**
+   * Constructor taking an error message, the cause of the error and the response being processed.
+   *
+   * @param message the error message
+   * @param cause the cause of the error
+   * @param response the response being processed
+   */
+  public ResponseValidationException(final String message, final Throwable cause, final Response response) {
+    super(message, cause, response);
   }
 
 }
