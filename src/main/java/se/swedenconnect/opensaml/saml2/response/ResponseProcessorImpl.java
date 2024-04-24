@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,10 +136,12 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       final ResponseProcessingInput input, final ValidationContext validationContext)
       throws ResponseStatusErrorException, ResponseProcessingException {
 
+    Response response = null;
+
     try {
       // Step 1: Decode the SAML response message.
       //
-      final Response response = this.decodeResponse(samlResponse);
+      response = this.decodeResponse(samlResponse);
 
       if (log.isTraceEnabled()) {
         log.trace("[{}] Decoded Response: {}", logId(response), toString(response));
@@ -165,7 +167,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       if (!StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
         log.info("Authentication failed with status '{}' [{}]",
             ResponseStatusErrorException.statusToString(response.getStatus()), logId(response));
-        throw new ResponseStatusErrorException(response.getStatus(), response.getID(), issuer);
+        throw new ResponseStatusErrorException(response);
       }
 
       // Step 5. Verify that the relay state matches the request.
@@ -182,7 +184,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         }
       }
       else if (this.requireEncryptedAssertions) {
-        throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required");
+        throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required", response);
       }
       else {
         assertion = response.getAssertions().get(0);
@@ -200,10 +202,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       return new ResponseProcessingResultImpl(response, assertion);
     }
     catch (MessageReplayException e) {
-      throw new ResponseProcessingException("Message replay: " + e.getMessage(), e);
+      throw new ResponseProcessingException("Message replay: " + e.getMessage(), e, response);
     }
     catch (DecryptionException e) {
-      throw new ResponseProcessingException("Failed to decrypt assertion: " + e.getMessage(), e);
+      throw new ResponseProcessingException("Failed to decrypt assertion: " + e.getMessage(), e, response);
     }
   }
 
@@ -318,7 +320,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
               XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes)));
     }
     catch (MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
-      throw new ResponseProcessingException("Failed to decode message", e);
+      throw new ResponseProcessingException("Failed to decode message", e, null);
     }
   }
 
@@ -340,13 +342,13 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     if (authnRequest == null) {
       final String msg = String.format("No AuthnRequest available when processing Response [%s]", logId(response));
       log.info("{}", msg);
-      throw new ResponseValidationException(msg);
+      throw new ResponseValidationException(msg, response);
     }
 
     final IDPSSODescriptor descriptor =
         idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
-      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature");
+      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature", response);
     }
 
     final ResponseValidationParametersBuilder b = ResponseValidationParametersBuilder.builder()
@@ -381,7 +383,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       break;
     case INVALID:
       log.info("Validation of Response failed - {} [{}]", context.getValidationFailureMessages(), logId(response));
-      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()));
+      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()), response);
     }
   }
 
@@ -394,8 +396,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * @throws ResponseValidationException for validation errors
    */
   protected void validateRelayState(final Response response, final String relayState,
-      final ResponseProcessingInput input)
-      throws ResponseValidationException {
+      final ResponseProcessingInput input) throws ResponseValidationException {
 
     final String requestRelayState = Optional.ofNullable(input.getRequestRelayState(response.getInResponseTo()))
         .map(String::trim).filter(r -> !r.isEmpty()).orElse(null);
@@ -407,7 +408,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
           String.format("RelayState variable received with response (%s) does not match the sent one (%s)",
               relayState, requestRelayState);
       log.info("{} [{}]", msg, logId(response));
-      throw new ResponseValidationException(msg);
+      throw new ResponseValidationException(msg, response);
     }
   }
 
@@ -429,7 +430,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     final IDPSSODescriptor descriptor =
         idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
-      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Assertion");
+      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Assertion", response);
     }
 
     final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
@@ -486,7 +487,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       break;
     case INVALID:
       log.info("Validation of Assertion failed - {}", context.getValidationFailureMessages());
-      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()));
+      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()), response);
     }
   }
 
