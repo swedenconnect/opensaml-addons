@@ -83,6 +83,15 @@ public class ResponseStatusErrorException extends Exception {
   }
 
   /**
+   * Gets the {@link Response} object that was processed.
+   *
+   * @return the {@link Response} object
+   */
+  public Response getResponse() {
+    return this.response.get();
+  }
+
+  /**
    * Returns the status object.
    *
    * @return the status object
