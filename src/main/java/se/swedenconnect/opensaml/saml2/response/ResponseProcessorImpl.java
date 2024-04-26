@@ -49,10 +49,13 @@ import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import org.opensaml.security.credential.UsageType;
 import org.opensaml.security.criteria.UsageCriterion;
+import org.opensaml.xmlsec.SignatureValidationConfiguration;
+import org.opensaml.xmlsec.SignatureValidationParameters;
 import org.opensaml.xmlsec.config.impl.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import org.opensaml.xmlsec.signature.support.SignaturePrevalidator;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
+import org.opensaml.xmlsec.signature.support.SignatureValidationParametersCriterion;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +82,7 @@ import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidationExc
 import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidationSettings;
 import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidator;
+import se.swedenconnect.opensaml.xmlsec.config.SecurityConfiguration;
 import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 
 /**
@@ -123,6 +127,9 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
   /** Do we require assertions to be encrypted? The default is {@code true}. */
   protected boolean requireEncryptedAssertions = true;
+
+  /** Custom security configuration. */
+  protected SecurityConfiguration securityConfiguration;
 
   /** Is this component initialized? */
   private boolean isInitialized = false;
@@ -184,7 +191,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         }
       }
       else if (this.requireEncryptedAssertions) {
-        throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required", response);
+        throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required",
+            response);
       }
       else {
         assertion = response.getAssertions().get(0);
@@ -348,7 +356,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     final IDPSSODescriptor descriptor =
         idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
-      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature", response);
+      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature",
+          response);
     }
 
     final ResponseValidationParametersBuilder b = ResponseValidationParametersBuilder.builder()
@@ -356,8 +365,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
         .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
         .signatureRequired(Boolean.TRUE)
-        .signatureValidationCriteriaSet(
-            new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
+        .signatureValidationCriteriaSet(this.buildSignatureValidationCriteriaSet(descriptor))
         .expectedIssuer(idpMetadata.getEntityID())
         .receiveInstant(input.getReceiveInstant())
         .receiveUrl(input.getReceiveURL())
@@ -452,8 +460,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         .allowedClockSkew(this.responseValidationSettings.getAllowedClockSkew())
         .maxAgeReceivedMessage(this.responseValidationSettings.getMaxAgeResponse())
         .signatureRequired(this.responseValidationSettings.isRequireSignedAssertions())
-        .signatureValidationCriteriaSet(
-            new CriteriaSet(new RoleDescriptorCriterion(descriptor), new UsageCriterion(UsageType.SIGNING)))
+        .signatureValidationCriteriaSet(this.buildSignatureValidationCriteriaSet(descriptor))
         .idpMetadata(idpMetadata)
         .receiveInstant(input.getReceiveInstant())
         .receiveUrl(input.getReceiveURL())
@@ -489,6 +496,42 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       log.info("Validation of Assertion failed - {}", context.getValidationFailureMessages());
       throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()), response);
     }
+  }
+
+  /**
+   * Builds a {@link CriteriaSet} for use with signature validation.
+   *
+   * @param descriptor the IDP SSO descriptor
+   * @return a {@link CriteriaSet}
+   */
+  protected CriteriaSet buildSignatureValidationCriteriaSet(final IDPSSODescriptor descriptor) {
+    final RoleDescriptorCriterion role = new RoleDescriptorCriterion(descriptor);
+    final UsageCriterion usage = new UsageCriterion(UsageType.SIGNING);
+    if (this.securityConfiguration != null) {
+      return new CriteriaSet(role, usage, this.buildSignatureValidationParametersCriterion());
+    }
+    else {
+      return new CriteriaSet(role, usage);
+    }
+  }
+
+  /**
+   * Builds a signature validation criterion based on the installed security configuration. This is used during
+   * validation of the signature of a response or assertion.
+   *
+   * @return a {link SignatureValidationParametersCriterion}
+   */
+  protected SignatureValidationParametersCriterion buildSignatureValidationParametersCriterion() {
+    if (this.securityConfiguration == null) {
+      return null;
+    }
+    SignatureValidationParameters parameters = new SignatureValidationParameters();
+    final SignatureValidationConfiguration config = this.securityConfiguration.getSignatureValidationConfiguration();
+    parameters.setSignatureTrustEngine(this.signatureTrustEngine);
+    parameters.setIncludedAlgorithms(config.getIncludedAlgorithms());
+    parameters.setExcludedAlgorithms(config.getExcludedAlgorithms());
+
+    return new SignatureValidationParametersCriterion(parameters);
   }
 
   /**
@@ -588,6 +631,16 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   public void setRequireEncryptedAssertions(boolean requireEncryptedAssertions) {
     this.checkSetterPreconditions();
     this.requireEncryptedAssertions = requireEncryptedAssertions;
+  }
+
+  /**
+   * Assigns a custom {@link SecurityConfiguration} for the processor.
+   *
+   * @param securityConfiguration custom {@link SecurityConfiguration}
+   */
+  public void setSecurityConfiguration(final SecurityConfiguration securityConfiguration) {
+    this.checkSetterPreconditions();
+    this.securityConfiguration = securityConfiguration;
   }
 
   /**
