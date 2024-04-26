@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.apache.commons.codec.binary.Hex;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -29,6 +30,7 @@ import org.opensaml.saml.saml2.common.CacheableSAMLObject;
 import org.opensaml.saml.saml2.common.TimeBoundSAMLObject;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.SecurityConfigurationSupport;
+import org.opensaml.xmlsec.SignatureSigningConfiguration;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,9 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
 
   /** The signature credentials for signing the metadata entry. */
   protected X509Credential signatureCredentials;
+
+  /** Optional signing configuration. */
+  protected SignatureSigningConfiguration signingConfiguration;
 
   /**
    * Constructor assigning the encapsulated descriptor element.
@@ -160,7 +165,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
     }
 
     SAMLObjectSigner.sign(this.descriptor, this.signatureCredentials,
-        SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration());
+        Optional.ofNullable(this.signingConfiguration).orElseGet(() ->
+          SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration()));
 
     log.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
 
@@ -233,6 +239,15 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
    */
   public void setIdSize(final int idSize) {
     this.idSize = idSize;
+  }
+
+  /**
+   * Assigns a custom {@link SignatureSigningConfiguration}.
+   *
+   * @param signingConfiguration a {@link SignatureSigningConfiguration}
+   */
+  public void setSigningConfiguration(final SignatureSigningConfiguration signingConfiguration) {
+    this.signingConfiguration = signingConfiguration;
   }
 
   /**
