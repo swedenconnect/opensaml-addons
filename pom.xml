@@ -46,7 +46,7 @@
 
     <opensaml.version>5.0.0</opensaml.version>
     <shib.support.version>9.0.0</shib.support.version>
-    <slf4j.version>2.0.12</slf4j.version>
+    <slf4j.version>2.0.13</slf4j.version>
     <jackson.version>2.17.0</jackson.version>
     <bc.version>1.78</bc.version>
   </properties>
@@ -283,7 +283,7 @@
             <id>enforce</id>
             <configuration>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
               </rules>
             </configuration>
             <goals>
