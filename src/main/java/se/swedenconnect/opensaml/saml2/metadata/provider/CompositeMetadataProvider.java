@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.ResolverException;
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Validate;
 import org.opensaml.core.xml.XMLObject;
@@ -45,10 +35,17 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.resolver.ResolverException;
-import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
-import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
+import javax.annotation.Nonnull;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A metadata provider that collects its metadata from multiple sources (providers).
@@ -63,16 +60,16 @@ import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 public class CompositeMetadataProvider extends AbstractMetadataProvider {
 
   /** Logging instance. */
-  private Logger log = LoggerFactory.getLogger(CompositeMetadataProvider.class);
+  private static final Logger log = LoggerFactory.getLogger(CompositeMetadataProvider.class);
 
   /** The metadata resolver. */
   private CompositeMetadataResolverEx metadataResolver;
 
   /** The list of underlying metadata providers. */
-  private List<MetadataProvider> metadataProviders;
+  private final List<MetadataProvider> metadataProviders;
 
   /** The identifier for the provider. */
-  private String id;
+  private final String id;
 
   /** The time that this provider was initialized. */
   private Instant initTime;
@@ -84,7 +81,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
   private Instant compositeMetadataCreationTime;
 
   /** Generates ID. */
-  private RandomIdentifierGenerationStrategy idGenerator;
+  private final RandomIdentifierGenerationStrategy idGenerator;
 
   /** Duration telling for how long the metadata returned by {@link #getMetadata()} should be valid. */
   private Duration validity;
@@ -186,7 +183,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
           final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();
           if (calculatedValidUntil == null
               || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil)
-                  && providerValidUntil.isAfter(Instant.now()))) {
+              && providerValidUntil.isAfter(Instant.now()))) {
             calculatedValidUntil = providerValidUntil;
           }
           final Duration providerCacheDuration = ((CacheableSAMLObject) providerMetadata).getCacheDuration();
@@ -201,9 +198,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
         }
       }
 
-      final Iterator<EntityDescriptor> it = provider.iterator().iterator();
-      while (it.hasNext()) {
-        final EntityDescriptor ed = it.next();
+      for (final EntityDescriptor ed : provider.iterator()) {
         if (entityIds.contains(ed.getEntityID())) {
           log.warn(
               "EntityDescriptor for '{}' already exists in metadata. Entry read from provider '{}' will be ignored.",
@@ -224,8 +219,8 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
           entityIds.add(edCopy.getEntityID());
           log.trace("EntityDescriptor '{}' added to composite metadata", edCopy.getEntityID());
         }
-        catch (MarshallingException | UnmarshallingException e) {
-          log.error("Error copying EntityDescriptor '{}' ({}), entry will not be included in metadata");
+        catch (final MarshallingException | UnmarshallingException e) {
+          log.error("Error copying EntityDescriptor '{}', entry will not be included in metadata", ed.getEntityID(), e);
         }
       }
     }
@@ -279,13 +274,13 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
    * A list of provider ID:s for underlying providers that should be destroyed (by {@link #destroyMetadataResolver()}).
    * Only the providers that are initialized by this instance will be destroyed.
    */
-  private List<String> destroyList = new ArrayList<>();
+  private final List<String> destroyList = new ArrayList<>();
 
   /** {@inheritDoc} */
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
     log.debug("Initializing CompositeMetadataProvider ...");
-    for (MetadataProvider p : this.metadataProviders) {
+    for (final MetadataProvider p : this.metadataProviders) {
       final String id = p.getID();
       if (p.isInitialized()) {
         log.debug("Underlying provider ({}) has already been initialized", id);
@@ -298,11 +293,11 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
       }
     }
 
-    // OK, now we save the init time since we may used that to answer the getLastUpdate queries.
+    // OK, now we save the init time since we may use that to answer the getLastUpdate queries.
     //
     this.initTime = Instant.now();
 
-    // At this point we know that all the underlying providers/resolvers have been initialized
+    // At this point we know that all the underlying providers/resolvers have been initialized,
     // and we can install them.
     //
     final List<MetadataResolver> resolvers = this.metadataProviders
@@ -316,7 +311,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
     try {
       this.metadataResolver.setResolvers(resolvers);
     }
-    catch (ResolverException e) {
+    catch (final ResolverException e) {
       throw new ComponentInitializationException("Failed to install resolvers", e);
     }
 
@@ -327,14 +322,14 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
   /** {@inheritDoc} */
   @Override
   protected void destroyMetadataResolver() {
-    for (MetadataProvider p : this.metadataProviders) {
+    for (final MetadataProvider p : this.metadataProviders) {
       final String id = p.getID();
       try {
         if (this.destroyList.contains(id) && p.isInitialized() && !p.isDestroyed()) {
           p.destroy();
         }
       }
-      catch (Exception e) {
+      catch (final Exception e) {
         log.error("Error while destroying underlying provider ({})", id, e);
       }
     }
@@ -426,7 +421,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
 
   /**
    * OpenSAML:s CompositeMetadataResolver is buggy since the ID property can not be set (it's hidden), and when the
-   * resolver is initialized an exception is thrown saying the the ID must be set.
+   * resolver is initialized an exception is thrown saying the ID must be set.
    */
   private static class CompositeMetadataResolverEx extends CompositeMetadataResolver {
 

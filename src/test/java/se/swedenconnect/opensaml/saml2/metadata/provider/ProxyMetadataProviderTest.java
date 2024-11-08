@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ public class ProxyMetadataProviderTest extends BaseMetadataProviderTest {
 
   /** {@inheritDoc} */
   @Override
-  protected AbstractMetadataProvider createMetadataProvider(Resource resource) throws Exception {
-    FilesystemMetadataResolver resolver = new FilesystemMetadataResolver(resource.getFile());
+  protected AbstractMetadataProvider createMetadataProvider(final Resource resource) throws Exception {
+    final FilesystemMetadataResolver resolver = new FilesystemMetadataResolver(resource.getFile());
     resolver.setId(resource.getFilename());
     resolver.setParserPool(XMLObjectProviderRegistrySupport.getParserPool());
     return new ProxyMetadataProvider(resolver);

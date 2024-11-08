@@ -15,12 +15,12 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
-import java.util.Optional;
-
 import org.opensaml.saml.saml2.core.Response;
-
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
+
+import java.io.Serial;
+import java.util.Optional;
 
 /**
  * Exception class for the SAML response processor.
@@ -30,6 +30,7 @@ import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
 public class ResponseProcessingException extends Exception {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /** The response. */
@@ -73,7 +74,7 @@ public class ResponseProcessingException extends Exception {
    */
   public ResponseProcessingException(final String message, final Throwable cause, final Response response) {
     super(message, cause);
-    this.response = response != null ? new SerializableOpenSamlObject<Response>(response) : null;
+    this.response = response != null ? new SerializableOpenSamlObject<>(response) : null;
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package se.swedenconnect.opensaml.saml2.metadata.build;
 
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.metadata.AssertionConsumerService;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 

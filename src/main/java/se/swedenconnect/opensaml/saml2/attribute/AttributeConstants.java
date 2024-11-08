@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,25 @@ public class AttributeConstants {
    * The attribute name for the assurance certification attribute stored as an attribute in the entity attributes
    * extension.
    */
-  public static final String ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME = "urn:oasis:names:tc:SAML:attribute:assurance-certification";
+  public static final String ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME =
+      "urn:oasis:names:tc:SAML:attribute:assurance-certification";
 
   /**
    * The attribute template for the assurance certification attribute stored as an attribute in the entity attributes
    * extension.
    */
   public static final AttributeTemplate ASSURANCE_CERTIFICATION_ATTRIBUTE_TEMPLATE = new AttributeTemplate(
-    ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, null);
+      ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, null);
 
   /** The attribute name for the entity category attribute stored as an attribute in the entity attributes extension. */
   public static final String ENTITY_CATEGORY_ATTRIBUTE_NAME = "http://macedir.org/entity-category";
 
   /**
-   * The attribute template for the entity category attribute stored as an attribute in the entity attributes extension.
+   * The attribute template for the entity category attribute stored as an attribute in the entity attributes
+   * extension.
    */
-  public static final AttributeTemplate ENTITY_CATEGORY_TEMPLATE = new AttributeTemplate(ENTITY_CATEGORY_ATTRIBUTE_NAME, null);
+  public static final AttributeTemplate ENTITY_CATEGORY_TEMPLATE =
+      new AttributeTemplate(ENTITY_CATEGORY_ATTRIBUTE_NAME, null);
 
   // Hidden constructor.
   private AttributeConstants() {

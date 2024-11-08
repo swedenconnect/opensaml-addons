@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package se.swedenconnect.opensaml.core.build;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +51,7 @@ public class AuthnRequestBuilderTest extends OpenSAMLTestBase {
     final Instant now = Instant.now();
     final String requesterID = "http://www.example.com/sp";
 
-    AuthnRequest request = AuthnRequestBuilder.builder()
+    final AuthnRequest request = AuthnRequestBuilder.builder()
       .assertionConsumerServiceURL(assertionConsumerServiceURL)
       .destination(destination)
       .forceAuthn(true)
@@ -82,7 +83,7 @@ public class AuthnRequestBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals(requesterID, request.getScoping().getRequesterIDs().get(0).getURI());
     Assertions.assertEquals(Boolean.TRUE, request.getNameIDPolicy().getAllowCreate());
     Assertions.assertEquals(AuthnContextComparisonTypeEnumeration.EXACT, request.getRequestedAuthnContext().getComparison());
-    Assertions.assertEquals(Arrays.asList(authnContext),
+    Assertions.assertEquals(List.of(authnContext),
       request.getRequestedAuthnContext().getAuthnContextClassRefs().stream()
         .map(AuthnContextClassRef::getURI)
         .collect(Collectors.toList()));

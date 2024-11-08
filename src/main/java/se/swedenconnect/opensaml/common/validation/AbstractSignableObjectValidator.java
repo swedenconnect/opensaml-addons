@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.common.validation;
 
+import net.shibboleth.shared.resolver.CriteriaSet;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
@@ -30,8 +31,6 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
-
-import net.shibboleth.shared.resolver.CriteriaSet;
 
 /**
  * Abstract object validator that supports validating signatures.
@@ -50,14 +49,13 @@ import net.shibboleth.shared.resolver.CriteriaSet;
  * from the criteria set, they will be added with the above values.</li>
  * </ul>
  *
- * @author Martin Lindström (martin@idsec.se)
- *
  * @param <T> the type of the object that is to be validated
+ * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractSignableObjectValidator<T extends SignableXMLObject> extends AbstractObjectValidator<T> {
 
   /** Class logger. */
-  private final Logger log = LoggerFactory.getLogger(AbstractSignableObjectValidator.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractSignableObjectValidator.class);
 
   /** Trust engine for signature evaluation. */
   protected SignatureTrustEngine trustEngine;
@@ -107,7 +105,7 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
       }
     }
 
-    if (trustEngine == null) {
+    if (this.trustEngine == null) {
       log.warn("Signature validation was necessary, but no signature trust engine was available");
       context.getValidationFailureMessages().add(String.format(
           "%s signature could not be evaluated due to internal error", this.getObjectName()));
@@ -122,7 +120,6 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
    *
    * @param token object whose signature will be validated
    * @param context current validation context
-   *
    * @return the validation result
    */
   protected ValidationResult performSignatureValidation(final T token, final ValidationContext context) {
@@ -142,9 +139,9 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
         this.getObjectName(), this.getID(token), tokenIssuer);
 
     try {
-      signaturePrevalidator.validate(signature);
+      this.signaturePrevalidator.validate(signature);
     }
-    catch (SignatureException e) {
+    catch (final SignatureException e) {
       final String msg = String.format("%s Signature failed pre-validation: %s", this.getObjectName(), e.getMessage());
       log.warn(msg);
       context.getValidationFailureMessages().add(msg);
@@ -154,7 +151,7 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
     final CriteriaSet criteriaSet = this.getSignatureValidationCriteriaSet(token, context);
 
     try {
-      if (trustEngine.validate(signature, criteriaSet)) {
+      if (this.trustEngine.validate(signature, criteriaSet)) {
         log.debug("Validation of signature of {} '{}' from Issuer '{}' was successful",
             this.getObjectName(), this.getID(token), tokenIssuer);
         return ValidationResult.VALID;
@@ -168,7 +165,7 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
         return ValidationResult.INVALID;
       }
     }
-    catch (SecurityException e) {
+    catch (final SecurityException e) {
       final String msg = String.format("A problem was encountered evaluating the signature over %s with ID '%s': %s",
           this.getObjectName(), this.getID(token), e.getMessage());
       log.warn(msg);

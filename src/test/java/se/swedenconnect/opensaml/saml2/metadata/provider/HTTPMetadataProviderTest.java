@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.security.KeyStore;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.core.io.Resource;
-
 import se.swedenconnect.opensaml.TestWebServer;
+
+import java.security.KeyStore;
 
 /**
  * Test cases for the {@code HTTPMetadataProvider} class.
@@ -31,7 +30,7 @@ import se.swedenconnect.opensaml.TestWebServer;
 public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
 
   /** Holds the metadata that is serviced by the web server. */
-  private static MetadataResourceProvider resourceProvider = new MetadataResourceProvider();
+  private static final MetadataResourceProvider resourceProvider = new MetadataResourceProvider();
 
   /** The TLS trust. */
   private static KeyStore trustStore;
@@ -44,7 +43,7 @@ public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
       trustStore = loadKeyStore("src/test/resources/trust.jks", "secret", null);
       server = new TestWebServer(resourceProvider, "src/test/resources/localhost.jks", "secret");
     }
-    catch (Exception e) {
+    catch (final Exception e) {
     }
   }
 
@@ -90,7 +89,7 @@ public class HTTPMetadataProviderTest extends BaseMetadataProviderTest {
 
     private Resource resource;
 
-    public void setResource(Resource resource) {
+    public void setResource(final Resource resource) {
       this.resource = resource;
     }
 

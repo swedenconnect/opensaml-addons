@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
       try {
         this.object().getAttributes().add(XMLObjectSupport.cloneXMLObject(attribute));
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -120,9 +120,9 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
       if (uris != null && !uris.isEmpty()) {
         assuranceCertification.getAttributeValues().clear();
         for (final String u : uris) {
-          final XSString sv = XSString.class.cast(
-              XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
-                  XSString.TYPE_NAME));
+          final XSString sv = (XSString) XMLObjectSupport.getBuilder(XSString.TYPE_NAME)
+              .buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
+                  XSString.TYPE_NAME);
           sv.setValue(u);
           assuranceCertification.getAttributeValues().add(sv);
         }
@@ -174,9 +174,9 @@ public class EntityAttributesBuilder extends AbstractSAMLObjectBuilder<EntityAtt
       if (uris != null && !uris.isEmpty()) {
         entityCategories.getAttributeValues().clear();
         for (final String u : uris) {
-          final XSString sv = XSString.class.cast(
-              XMLObjectSupport.getBuilder(XSString.TYPE_NAME).buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
-                  XSString.TYPE_NAME));
+          final XSString sv = (XSString) XMLObjectSupport.getBuilder(XSString.TYPE_NAME)
+              .buildObject(AttributeValue.DEFAULT_ELEMENT_NAME,
+                  XSString.TYPE_NAME);
           sv.setValue(u);
           entityCategories.getAttributeValues().add(sv);
         }

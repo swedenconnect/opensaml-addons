@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.assertion.validation;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import jakarta.annotation.Nonnull;
 import org.opensaml.saml.common.assertion.AssertionValidationException;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
@@ -28,6 +24,10 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.Statement;
+
+import javax.xml.namespace.QName;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Abstract validator for {@link AttributeStatement}s.
@@ -38,6 +38,7 @@ public abstract class AbstractAttributeStatementValidator implements StatementVa
 
   /** {@inheritDoc} */
   @Override
+  @Nonnull
   public QName getServicedStatement() {
     return AttributeStatement.DEFAULT_ELEMENT_NAME;
   }
@@ -46,12 +47,12 @@ public abstract class AbstractAttributeStatementValidator implements StatementVa
    * Validates that all required attributes were received in the {@code AttributeStatement}.
    */
   @Override
-  public ValidationResult validate(final Statement statement, final Assertion assertion,
-      final ValidationContext context)
+  @Nonnull
+  public ValidationResult validate(@Nonnull final Statement statement, @Nonnull final Assertion assertion,
+      @Nonnull final ValidationContext context)
       throws AssertionValidationException {
 
-    if (statement instanceof AttributeStatement) {
-      final AttributeStatement attributeStatement = (AttributeStatement) statement;
+    if (statement instanceof final AttributeStatement attributeStatement) {
       final List<Attribute> list =
           attributeStatement.getAttributes() != null ? attributeStatement.getAttributes() : Collections.emptyList();
       return this.validateRequiredAttributes(list, attributeStatement, assertion, context);

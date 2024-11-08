@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package se.swedenconnect.opensaml.common;
 
-import java.util.Properties;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
 
 /**
  * Test cases for LibraryVersion.
  *
  * @author Martin Lindström
  */
-public class LibraryVersionTest {
+class LibraryVersionTest {
 
   private String version;
 
@@ -35,19 +35,21 @@ public class LibraryVersionTest {
 
     this.version = properties.getProperty("library.version");
     if (this.version.endsWith("-SNAPSHOT")) {
-      this.version = this.version.substring(0, version.length() - 9);
+      this.version = this.version.substring(0, this.version.length() - 9);
     }
   }
 
   @Test
-  public void testUid() {
-    Assertions.assertEquals(this.version.hashCode(), LibraryVersion.SERIAL_VERSION_UID);
+  void testUid() {
+    final String[] parts = this.version.split("\\.");
+    final String majorAndMinor = parts[0] + "." + parts[1];
+    Assertions.assertEquals(majorAndMinor.hashCode(), LibraryVersion.SERIAL_VERSION_UID);
   }
 
   @Test
-  public void testVersion() throws Exception {
+  void testVersion() {
     Assertions.assertEquals(this.version, LibraryVersion.getVersion(),
-        "Expected LibraryVersion.getVersion() to return " + version);
+        "Expected LibraryVersion.getVersion() to return " + this.version);
   }
 
 }

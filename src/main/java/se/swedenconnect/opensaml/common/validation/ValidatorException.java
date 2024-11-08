@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 package se.swedenconnect.opensaml.common.validation;
 
 import org.opensaml.saml.common.assertion.ValidationContext;
-
 import se.swedenconnect.opensaml.common.LibraryVersion;
+
+import java.io.Serial;
 
 /**
  * Generic exception class for validator errors.
@@ -27,6 +28,7 @@ import se.swedenconnect.opensaml.common.LibraryVersion;
 public class ValidatorException extends Exception {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**

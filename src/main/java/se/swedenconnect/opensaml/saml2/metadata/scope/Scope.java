@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope;
 
-import javax.xml.namespace.QName;
-
 import org.opensaml.core.xml.schema.XSBooleanValue;
 import org.opensaml.core.xml.schema.XSString;
 
-/**
- * XMLObject for the Shibboleth Scope metadata extension.
- * */
+import javax.xml.namespace.QName;
 
 /**
  * The Shibboleth Scope metadata extension.

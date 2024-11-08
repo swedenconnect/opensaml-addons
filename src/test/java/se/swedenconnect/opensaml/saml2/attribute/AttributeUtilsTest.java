@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,14 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
   @Test
   public void testGetAttributeStringValues() {
 
-    Attribute attribute = AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL)
+    final Attribute attribute = AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL)
       .friendlyName(AttributeBuilderTest.ATTRIBUTE_FRIENDLY_NAME_MAIL)
       .nameFormat(Attribute.URI_REFERENCE)
       .value("martin@litsec.se")
       .value("martin.lindstrom@litsec.se")
       .build();
 
-    List<String> values = AttributeUtils.getAttributeStringValues(attribute);
+    final List<String> values = AttributeUtils.getAttributeStringValues(attribute);
     Assertions.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"), values);
 
     // Using the AttributeUtils.getAttributeStringValue method only gives the first value.
@@ -59,59 +59,59 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
   @Test
   public void testGetAttributeStringValue() {
 
-    Attribute attribute = AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_SN)
+    final Attribute attribute = AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_SN)
       .friendlyName(AttributeBuilderTest.ATTRIBUTE_FRIENDLY_NAME_SN)
       .nameFormat(Attribute.URI_REFERENCE)
       .value("Eriksson")
       .build();
 
-    String value = AttributeUtils.getAttributeStringValue(attribute);
+    final String value = AttributeUtils.getAttributeStringValue(attribute);
     Assertions.assertEquals("Eriksson", value);
 
     // Using the AttributeUtils.getAttributeStringValues method gives a list with one element.
-    Assertions.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
+    Assertions.assertEquals(List.of("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
   }
 
   @Test
   public void testGetAttributeStringValueNoType() throws Exception {
-    String xml = "<saml2:Attribute FriendlyName=\"sn\" Name=\"urn:oid:2.5.4.4\" " +
+    final String xml = "<saml2:Attribute FriendlyName=\"sn\" Name=\"urn:oid:2.5.4.4\" " +
         "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\">" +
         "<saml2:AttributeValue>Eriksson</saml2:AttributeValue>" +
         "</saml2:Attribute>";
 
-    Attribute attribute = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
+    final Attribute attribute = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
 
-    String value = AttributeUtils.getAttributeStringValue(attribute);
+    final String value = AttributeUtils.getAttributeStringValue(attribute);
     Assertions.assertEquals("Eriksson", value);
 
     // Using the AttributeUtils.getAttributeStringValues method gives a list with one element.
-    Assertions.assertEquals(Arrays.asList("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
+    Assertions.assertEquals(List.of("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
   }
 
   @Test
   public void testGetAttributeValueBoolean() throws Exception {
-    XSBoolean bool = AttributeBuilder.createValueObject(XSBoolean.class);
+    final XSBoolean bool = AttributeBuilder.createValueObject(XSBoolean.class);
     bool.setValue(XSBooleanValue.valueOf("true"));
 
-    Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/bool")
+    final Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/bool")
       .friendlyName("LitsecBool")
       .nameFormat(Attribute.URI_REFERENCE)
       .value(bool)
       .build();
 
-    XSBoolean value = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
+    final XSBoolean value = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
     Assertions.assertNotNull(value);
     Assertions.assertTrue(value.getValue().getValue());
 
     // Try the same, but with no xsi:type declaration
     //
-    String xml = "<saml2:Attribute FriendlyName=\"LitsecBool\" Name=\"http://id.litsec.se/attr/bool\" " +
+    final String xml = "<saml2:Attribute FriendlyName=\"LitsecBool\" Name=\"http://id.litsec.se/attr/bool\" " +
         "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\"> " +
         "<saml2:AttributeValue>true</saml2:AttributeValue> " +
         "</saml2:Attribute>";
 
-    Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
-    XSBoolean value2 = AttributeUtils.getAttributeValue(attribute2, XSBoolean.class);
+    final Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
+    final XSBoolean value2 = AttributeUtils.getAttributeValue(attribute2, XSBoolean.class);
     Assertions.assertNotNull(value2);
     Assertions.assertTrue(value2.getValue().getValue());
 
@@ -121,27 +121,27 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
 
   @Test
   public void testGetAttributeValueInteger() throws Exception {
-    XSInteger integer = AttributeBuilder.createValueObject(XSInteger.class);
+    final XSInteger integer = AttributeBuilder.createValueObject(XSInteger.class);
     integer.setValue(42);
 
-    Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/int")
+    final Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/int")
       .friendlyName("Litsecint")
       .nameFormat(Attribute.URI_REFERENCE)
       .value(integer)
       .build();
 
-    XSInteger value = AttributeUtils.getAttributeValue(attribute, XSInteger.class);
+    final XSInteger value = AttributeUtils.getAttributeValue(attribute, XSInteger.class);
     Assertions.assertNotNull(value);
     Assertions.assertEquals(42, value.getValue().intValue());
 
     // Try the same, but with no xsi:type declaration
     //
-    String xml = "<saml2:Attribute FriendlyName=\"Litsecint\"  Name=\"http://id.litsec.se/attr/int\" " +
+    final String xml = "<saml2:Attribute FriendlyName=\"Litsecint\"  Name=\"http://id.litsec.se/attr/int\" " +
         "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\"> " +
         "<saml2:AttributeValue>42</saml2:AttributeValue> </saml2:Attribute>";
 
-    Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
-    XSInteger value2 = AttributeUtils.getAttributeValue(attribute2, XSInteger.class);
+    final Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
+    final XSInteger value2 = AttributeUtils.getAttributeValue(attribute2, XSInteger.class);
     Assertions.assertNotNull(value2);
     Assertions.assertEquals(42, value2.getValue().intValue());
 
@@ -152,28 +152,28 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
   @Test
   public void testGetAttributeValueDateTime() throws Exception {
 
-    Instant date = Instant.parse("2018-12-10T15:10:21Z");
-    XSDateTime xmlDate = AttributeBuilder.createValueObject(XSDateTime.class);
+    final Instant date = Instant.parse("2018-12-10T15:10:21Z");
+    final XSDateTime xmlDate = AttributeBuilder.createValueObject(XSDateTime.class);
     xmlDate.setValue(date);
 
-    Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/date")
+    final Attribute attribute = AttributeBuilder.builder("http://id.litsec.se/attr/date")
       .friendlyName("LitsecDate")
       .nameFormat(Attribute.URI_REFERENCE)
       .value(xmlDate)
       .build();
 
-    XSDateTime value = AttributeUtils.getAttributeValue(attribute, XSDateTime.class);
+    final XSDateTime value = AttributeUtils.getAttributeValue(attribute, XSDateTime.class);
     Assertions.assertNotNull(value);
     Assertions.assertEquals(date, value.getValue());
 
     // Try the same, but with no xsi:type declaration
     //
-    String xml = "<saml2:Attribute FriendlyName=\"LitsecDate\" Name=\"http://id.litsec.se/attr/date\" " +
+    final String xml = "<saml2:Attribute FriendlyName=\"LitsecDate\" Name=\"http://id.litsec.se/attr/date\" " +
         "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\"> " +
         "<saml2:AttributeValue>2018-12-10T15:10:21.000Z</saml2:AttributeValue> </saml2:Attribute>";
 
-    Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
-    XSDateTime value2 = AttributeUtils.getAttributeValue(attribute2, XSDateTime.class);
+    final Attribute attribute2 = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
+    final XSDateTime value2 = AttributeUtils.getAttributeValue(attribute2, XSDateTime.class);
     Assertions.assertNotNull(value2);
     Assertions.assertEquals(date, value2.getValue());
 
@@ -192,18 +192,18 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .value("martin.lindstrom@litsec.se")
       .build();
 
-    List<XSString> values = AttributeUtils.getAttributeValues(attribute, XSString.class);
+    final List<XSString> values = AttributeUtils.getAttributeValues(attribute, XSString.class);
     Assertions.assertTrue(values.size() == 2);
     Assertions.assertEquals(Arrays.asList("martin@litsec.se", "martin.lindstrom@litsec.se"),
       values.stream()
-        .filter(a -> XSString.class.isInstance(a))
+        .filter(a -> a instanceof XSString)
         .map(XSString.class::cast)
         .map(s -> s.getValue())
         .collect(Collectors.toList()));
 
-    XSBoolean value1 = AttributeBuilder.createValueObject(XSBoolean.class);
+    final XSBoolean value1 = AttributeBuilder.createValueObject(XSBoolean.class);
     value1.setValue(XSBooleanValue.valueOf("true"));
-    XSBoolean value2 = AttributeBuilder.createValueObject(XSBoolean.class);
+    final XSBoolean value2 = AttributeBuilder.createValueObject(XSBoolean.class);
     value2.setValue(XSBooleanValue.valueOf("false"));
 
     attribute = AttributeBuilder.builder("http://eid.litsec.se/types/boolean")
@@ -213,11 +213,11 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .value(value2)
       .build();
 
-    List<XSBoolean> bvalues = AttributeUtils.getAttributeValues(attribute, XSBoolean.class);
+    final List<XSBoolean> bvalues = AttributeUtils.getAttributeValues(attribute, XSBoolean.class);
     Assertions.assertTrue(values.size() == 2);
     Assertions.assertEquals(Arrays.asList(Boolean.TRUE, Boolean.FALSE),
       bvalues.stream()
-        .filter(a -> XSBoolean.class.isInstance(a))
+        .filter(a -> a instanceof XSBoolean)
         .map(XSBoolean.class::cast)
         .map(b -> b.getValue().getValue())
         .collect(Collectors.toList()));
@@ -232,10 +232,10 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .value("Eriksson")
       .build();
 
-    XSString value = AttributeUtils.getAttributeValue(attribute, XSString.class);
+    final XSString value = AttributeUtils.getAttributeValue(attribute, XSString.class);
     Assertions.assertEquals("Eriksson", value.getValue());
 
-    XSBoolean bvalue = AttributeBuilder.createValueObject(XSBoolean.class);
+    final XSBoolean bvalue = AttributeBuilder.createValueObject(XSBoolean.class);
     bvalue.setValue(XSBooleanValue.valueOf("true"));
 
     attribute = AttributeBuilder.builder("http://eid.litsec.se/types/boolean")
@@ -244,14 +244,14 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
       .value(bvalue)
       .build();
 
-    XSBoolean b = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
+    final XSBoolean b = AttributeUtils.getAttributeValue(attribute, XSBoolean.class);
     Assertions.assertEquals(Boolean.TRUE, b.getValue().getValue());
   }
 
   @Test
   public void testGetAttribute() {
 
-    List<Attribute> attributes = Arrays.asList(
+    final List<Attribute> attributes = Arrays.asList(
       AttributeBuilder.builder(AttributeBuilderTest.ATTRIBUTE_NAME_MAIL)
         .value("martin@litsec.se")
         .value("martin.lindstrom@litsec.se")

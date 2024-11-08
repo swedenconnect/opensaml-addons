@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package se.swedenconnect.opensaml.saml2.attribute;
 
+import org.opensaml.saml.saml2.core.Attribute;
+import se.swedenconnect.opensaml.common.LibraryVersion;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Optional;
-
-import org.opensaml.saml.saml2.core.Attribute;
 
 /**
  * An attribute template is a template of a SAML attribute, i.e., it represents the name, friendly name and name format
@@ -31,23 +33,24 @@ import org.opensaml.saml.saml2.core.Attribute;
  */
 public class AttributeTemplate implements Serializable {
 
-  private static final long serialVersionUID = 1903081114009014914L;
+  @Serial
+  private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /** The attribute name. */
-  private String name;
+  private final String name;
 
   /** The attribute friendly name. */
-  private String friendlyName;
+  private final String friendlyName;
 
   /**
    * The name format of this attribute. The default is {@code urn:oasis:names:tc:SAML:2.0:attrname-format:uri}
    * ({@link Attribute#URI_REFERENCE}).
    */
-  private String nameFormat = Attribute.URI_REFERENCE;
+  private final String nameFormat;
 
   /**
    * Creates an attribute template with the given name and friendly name, the default name format
-   * {@code urn:oasis:names:tc:SAML:2.0:attrname-format:uri} ({@link Attribute#URI_REFERENCE}) and not multi-valued.
+   * {@code urn:oasis:names:tc:SAML:2.0:attrname-format:uri} ({@link Attribute#URI_REFERENCE}) and not multivalued.
    *
    * @param name the attribute name
    * @param friendlyName the attribute friendly name (optional)
@@ -102,7 +105,7 @@ public class AttributeTemplate implements Serializable {
    * @return a builder
    */
   public AttributeBuilder createBuilder() {
-    AttributeBuilder builder = new AttributeBuilder(this.name);
+    final AttributeBuilder builder = new AttributeBuilder(this.name);
     return builder.friendlyName(this.friendlyName).nameFormat(this.nameFormat);
   }
 

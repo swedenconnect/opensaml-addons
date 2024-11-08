@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
    * @return the builder
    */
   public EncryptionMethodBuilder keySize(final Integer keySize) {
-    KeySize size = (KeySize) XMLObjectSupport.buildXMLObject(KeySize.DEFAULT_ELEMENT_NAME);
+    final KeySize size = (KeySize) XMLObjectSupport.buildXMLObject(KeySize.DEFAULT_ELEMENT_NAME);
     this.object().setKeySize(size);
     return this;
   }
@@ -99,7 +99,7 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
    * @return the builder
    */
   public EncryptionMethodBuilder oAEPparams(final String base64Encoding) {
-    OAEPparams p = (OAEPparams) XMLObjectSupport.buildXMLObject(OAEPparams.DEFAULT_ELEMENT_NAME);
+    final OAEPparams p = (OAEPparams) XMLObjectSupport.buildXMLObject(OAEPparams.DEFAULT_ELEMENT_NAME);
     this.object().setOAEPparams(p);
     return this;
   }

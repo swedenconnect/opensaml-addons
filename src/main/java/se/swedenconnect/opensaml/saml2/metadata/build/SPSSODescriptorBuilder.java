@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
           this.object().getAssertionConsumerServices().add(XMLObjectSupport.cloneXMLObject(a));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -139,7 +139,7 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
           this.object().getAttributeConsumingServices().add(XMLObjectSupport.cloneXMLObject(a));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }

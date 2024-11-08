@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope.impl;
 
+import jakarta.annotation.Nonnull;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.AbstractXMLObjectUnmarshaller;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.w3c.dom.Attr;
-
 import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
 
 /**
@@ -31,7 +31,8 @@ public class ScopeUnmarshaller extends AbstractXMLObjectUnmarshaller {
 
   /** {@inheritDoc} */
   @Override
-  protected void processAttribute(final XMLObject xmlObject, final Attr attribute) throws UnmarshallingException {
+  protected void processAttribute(@Nonnull final XMLObject xmlObject, @Nonnull final Attr attribute)
+      throws UnmarshallingException {
     final Scope scope = (Scope) xmlObject;
     if (attribute.getLocalName().equals(Scope.REGEXP_ATTRIB_NAME)) {
       scope.setRegexp(Boolean.valueOf(attribute.getValue()));
@@ -40,7 +41,7 @@ public class ScopeUnmarshaller extends AbstractXMLObjectUnmarshaller {
 
   /** {@inheritDoc} */
   @Override
-  protected void processElementContent(final XMLObject xmlObject, final String elementContent) {
+  protected void processElementContent(@Nonnull final XMLObject xmlObject, @Nonnull final String elementContent) {
     final Scope scope = (Scope) xmlObject;
     scope.setValue(elementContent);
   }

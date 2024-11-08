@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.util.Optional;
-
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
@@ -26,8 +26,7 @@ import org.opensaml.security.x509.X509Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.shared.resolver.CriteriaSet;
-import net.shibboleth.shared.resolver.ResolverException;
+import java.util.Optional;
 
 /**
  * A default implementation of the {@link AuthnRequestGenerator} where a metadata resolver is used to locate metadata.
@@ -37,7 +36,7 @@ import net.shibboleth.shared.resolver.ResolverException;
 public class DefaultAuthnRequestGenerator extends AbstractAuthnRequestGenerator {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(DefaultAuthnRequestGenerator.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultAuthnRequestGenerator.class);
 
   /** The metadata resolver. */
   private final MetadataResolver metadataResolver;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,17 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
-
+import net.shibboleth.shared.component.ComponentInitializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.springframework.core.io.ClassPathResource;
-
-import net.shibboleth.shared.component.ComponentInitializationException;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.TestWebServer;
 import se.swedenconnect.security.credential.factory.X509CertificateFactoryBean;
+
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Additional test cases for HTTPMetadataProvider.
@@ -37,7 +36,8 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testHttp() throws Exception {
-    TestWebServer server = new TestWebServer(() -> new ClassPathResource("/metadata/sveleg-fedtest.xml"), null, null);
+    final TestWebServer server =
+        new TestWebServer(() -> new ClassPathResource("/metadata/sveleg-fedtest.xml"), null, null);
     server.start();
 
     HTTPMetadataProvider provider = null;
@@ -47,7 +47,7 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
       provider.setRequireValidMetadata(true);
       provider.initialize();
 
-      EntityDescriptor ed = provider.getEntityDescriptor(BaseMetadataProviderTest.TEST_IDP);
+      final EntityDescriptor ed = provider.getEntityDescriptor(BaseMetadataProviderTest.TEST_IDP);
       Assertions.assertNotNull(ed,
           String.format("EntityDescriptor for '%s' was not found", BaseMetadataProviderTest.TEST_IDP));
     }
@@ -59,10 +59,10 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnect() throws Exception {
-    X509CertificateFactoryBean certFactory =
+    final X509CertificateFactoryBean certFactory =
         new X509CertificateFactoryBean(new ClassPathResource("sweden-connect-prod.crt"));
     certFactory.afterPropertiesSet();
-    X509Certificate signingCert = certFactory.getObject();
+    final X509Certificate signingCert = certFactory.getObject();
     HTTPMetadataProvider provider = null;
 
     try {
@@ -73,7 +73,7 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
       provider.setSignatureVerificationCertificate(signingCert);
       provider.initialize();
 
-      List<EntityDescriptor> idps = provider.getIdentityProviders();
+      final List<EntityDescriptor> idps = provider.getIdentityProviders();
       Assertions.assertTrue(idps.size() > 1);
     }
     finally {
@@ -83,10 +83,10 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnectNotTrusted() throws Exception {
-    X509CertificateFactoryBean certFactory =
+    final X509CertificateFactoryBean certFactory =
         new X509CertificateFactoryBean(new ClassPathResource("sweden-connect-prod.crt"));
     certFactory.afterPropertiesSet();
-    X509Certificate signingCert = certFactory.getObject();
+    final X509Certificate signingCert = certFactory.getObject();
 
     Assertions.assertThrows(ComponentInitializationException.class, () -> {
       HTTPMetadataProvider provider = null;
@@ -107,10 +107,9 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnectFailedSignatureValidation() throws Exception {
-    X509CertificateFactoryBean certFactory = new X509CertificateFactoryBean(new ClassPathResource("testca.crt"));
+    final X509CertificateFactoryBean certFactory = new X509CertificateFactoryBean(new ClassPathResource("testca.crt"));
     certFactory.afterPropertiesSet();
-    X509Certificate signingCert = certFactory.getObject();
-
+    final X509Certificate signingCert = certFactory.getObject();
 
     Assertions.assertThrows(ComponentInitializationException.class, () -> {
       HTTPMetadataProvider provider = null;

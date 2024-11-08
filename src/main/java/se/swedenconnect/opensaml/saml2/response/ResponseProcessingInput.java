@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
+import org.opensaml.saml.saml2.core.AuthnRequest;
+
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-
-import org.opensaml.saml.saml2.core.AuthnRequest;
 
 /**
  * Represents the input passed along with a SAML Response to the {@link ResponseProcessor}.
@@ -46,14 +46,14 @@ public interface ResponseProcessingInput {
   /**
    * Returns the URL on which the response message was received.
    *
-   * @return the receive URL
+   * @return the reception URL
    */
   String getReceiveURL();
 
   /**
    * Returns the timestamp when the response was received.
    *
-   * @return the receive timestamp
+   * @return the reception timestamp
    */
   Instant getReceiveInstant();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.config;
 
+import jakarta.annotation.Nonnull;
 import org.opensaml.core.xml.config.AbstractXMLObjectProviderInitializer;
 
 /**
@@ -25,16 +26,17 @@ import org.opensaml.core.xml.config.AbstractXMLObjectProviderInitializer;
 public class XMLObjectProviderInitializer extends AbstractXMLObjectProviderInitializer {
 
   /** Config resources. */
-  private static String[] configs = {
+  private static final String[] configs = {
       "/shib-scope-config.xml"
   };
 
   /** {@inheritDoc} */
   @Override
+  @Nonnull
   protected String[] getConfigResources() {
     try {
       // If the Shibboleth implementation of the Scope element can be found
-      // in the classpath it means that the Shibboleth version will be loaded
+      // in the classpath it means that the Shibboleth version will be loaded,
       // and we don't have to register ours.
       //
       Class.forName("net.shibboleth.idp.saml.xmlobject.impl.ScopeImpl", false, this.getClass().getClassLoader());

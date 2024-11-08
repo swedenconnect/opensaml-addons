@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testCreateStringValueAttribute() {
-    Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
+    final Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
         .friendlyName(ATTRIBUTE_FRIENDLY_NAME_SN)
         .nameFormat(Attribute.URI_REFERENCE)
         .value("Eriksson")
@@ -59,7 +59,7 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testCreateMultipleStringValuesAttribute() {
-    Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_MAIL)
+    final Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_MAIL)
         .friendlyName(ATTRIBUTE_FRIENDLY_NAME_MAIL)
         .nameFormat(Attribute.URI_REFERENCE)
         .value("martin@litsec.se")
@@ -76,10 +76,10 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
   public void testCreateNonStringAttribute() {
 
     // We pretend that there is a attribute that holds a boolean ...
-    XSBoolean value = AttributeBuilder.createValueObject(XSBoolean.class);
+    final XSBoolean value = AttributeBuilder.createValueObject(XSBoolean.class);
     value.setValue(XSBooleanValue.valueOf("true"));
 
-    Attribute attribute = AttributeBuilder.builder("http://eid.litsec.se/types/boolean")
+    final Attribute attribute = AttributeBuilder.builder("http://eid.litsec.se/types/boolean")
         .friendlyName("booleanAttribute")
         .nameFormat(Attribute.URI_REFERENCE)
         .value(value)
@@ -94,7 +94,7 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testDefaultNameFormat() {
-    Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
+    final Attribute attribute = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
         .value("Eriksson")
         .build();
 
@@ -105,7 +105,7 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testCreateValueObject() {
-    XSBase64Binary value = AttributeBuilder.createValueObject(XSBase64Binary.class);
+    final XSBase64Binary value = AttributeBuilder.createValueObject(XSBase64Binary.class);
     Assertions.assertEquals(XSBase64Binary.TYPE_NAME, value.getSchemaType());
     Assertions.assertEquals(AttributeValue.DEFAULT_ELEMENT_NAME, value.getElementQName());
   }
@@ -117,10 +117,10 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
       new AttributeBuilder((String)null);
       Assertions.fail("Expected IllegalArgumentException");
     }
-    catch (IllegalArgumentException e) {
+    catch (final IllegalArgumentException e) {
     }
 
-    AttributeBuilder builder = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
+    final AttributeBuilder builder = AttributeBuilder.builder(ATTRIBUTE_NAME_SN)
         .friendlyName(ATTRIBUTE_FRIENDLY_NAME_SN)
         .nameFormat(Attribute.URI_REFERENCE)
         .value("Eriksson");
@@ -131,7 +131,7 @@ public class AttributeBuilderTest extends OpenSAMLTestBase {
       builder.build();
       Assertions.fail("Expected RuntimeException");
     }
-    catch (RuntimeException e) {
+    catch (final RuntimeException e) {
     }
   }
 

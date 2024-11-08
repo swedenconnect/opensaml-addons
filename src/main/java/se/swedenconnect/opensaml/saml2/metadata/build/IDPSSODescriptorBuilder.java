@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.build;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.SingleSignOnService;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Builder for {@link IDPSSODescriptor} objects.
@@ -91,7 +91,7 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
           this.object().getSingleSignOnServices().add(XMLObjectSupport.cloneXMLObject(sso));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -125,7 +125,7 @@ public class IDPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<IDPSSO
           this.object().getAttributes().add(XMLObjectSupport.cloneXMLObject(a));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }

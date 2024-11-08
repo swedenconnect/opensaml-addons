@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import net.shibboleth.shared.component.ComponentInitializationException;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
@@ -23,8 +24,6 @@ import org.opensaml.saml.metadata.resolver.impl.DOMMetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
-
-import net.shibboleth.shared.component.ComponentInitializationException;
 
 /**
  * A {@code MetadataProvider} that is given an object representing SAML metadata (EntityDescriptor or
@@ -46,8 +45,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
   /**
    * Constructor that takes a DOM element representing the metadata.
    *
-   * @param element
-   *          DOM element
+   * @param element DOM element
    */
   public StaticMetadataProvider(final Element element) {
     this.element = element;
@@ -56,10 +54,8 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
   /**
    * Constructor that takes an {link EntityDescriptor} object.
    *
-   * @param entityDescriptor
-   *          the metadata EntityDescriptor
-   * @throws MarshallingException
-   *           if the supplied object cannot be marshalled
+   * @param entityDescriptor the metadata EntityDescriptor
+   * @throws MarshallingException if the supplied object cannot be marshalled
    */
   public StaticMetadataProvider(final EntityDescriptor entityDescriptor) throws MarshallingException {
     this.element = entityDescriptor.getDOM();
@@ -71,10 +67,8 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
   /**
    * Constructor that takes an {@link EntitiesDescriptor} object.
    *
-   * @param entitiesDescriptor
-   *          the metadata EntitiesDescriptor
-   * @throws MarshallingException
-   *           if the supplied object cannot be marshalled
+   * @param entitiesDescriptor the metadata EntitiesDescriptor
+   * @throws MarshallingException if the supplied object cannot be marshalled
    */
   public StaticMetadataProvider(final EntitiesDescriptor entitiesDescriptor) throws MarshallingException {
     this.element = entitiesDescriptor.getDOM();
@@ -88,7 +82,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
   public String getID() {
     if (this.id == null) {
       this.id = this.element.getAttribute("ID");
-      if (this.id == null || this.id.trim().length() == 0) {
+      if (this.id == null || this.id.trim().isEmpty()) {
         this.id = this.toString();
       }
     }
@@ -98,8 +92,7 @@ public class StaticMetadataProvider extends AbstractMetadataProvider {
   /**
    * Assigns the ID for the provider.
    *
-   * @param id
-   *          the ID
+   * @param id the ID
    */
   public void setID(final String id) {
     this.id = id;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.build;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -25,9 +22,11 @@ import org.opensaml.saml.saml2.metadata.AttributeConsumingService;
 import org.opensaml.saml.saml2.metadata.RequestedAttribute;
 import org.opensaml.saml.saml2.metadata.ServiceDescription;
 import org.opensaml.saml.saml2.metadata.ServiceName;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 import se.swedenconnect.opensaml.common.utils.LocalizedString;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Builder for {@code md:AttributeConsumingService} elements.
@@ -88,10 +87,9 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
   }
 
   /**
-   * @see #serviceNames(List)
-   *
    * @param names the service names
    * @return the builder.
+   * @see #serviceNames(List)
    */
   public AttributeConsumingServiceBuilder serviceNames(final LocalizedString... names) {
     return this.serviceNames(names != null ? Arrays.asList(names) : null);
@@ -119,10 +117,9 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
   }
 
   /**
-   * @see #descriptions(List)
-   *
    * @param descriptions the descriptions
    * @return the builder
+   * @see #descriptions(List)
    */
   public AttributeConsumingServiceBuilder descriptions(final LocalizedString... descriptions) {
     return this.descriptions(descriptions != null ? Arrays.asList(descriptions) : null);
@@ -145,7 +142,7 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
           this.object().getRequestedAttributes().add(XMLObjectSupport.cloneXMLObject(attribute));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -153,10 +150,9 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
   }
 
   /**
-   * @see #requestedAttributes(List)
-   *
    * @param attributes the requested attributes
    * @return the builder
+   * @see #requestedAttributes(List)
    */
   public AttributeConsumingServiceBuilder requestedAttributes(final RequestedAttribute... attributes) {
     return this.requestedAttributes(attributes != null ? Arrays.asList(attributes) : null);

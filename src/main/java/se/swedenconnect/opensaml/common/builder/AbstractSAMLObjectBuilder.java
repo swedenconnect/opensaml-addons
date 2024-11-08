@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,7 @@
  */
 package se.swedenconnect.opensaml.common.builder;
 
-import java.io.InputStream;
-
-import javax.xml.namespace.QName;
-
+import net.shibboleth.shared.xml.XMLParserException;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLRuntimeException;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -27,19 +24,19 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.w3c.dom.Element;
 
-import net.shibboleth.shared.xml.XMLParserException;
+import javax.xml.namespace.QName;
+import java.io.InputStream;
 
 /**
  * Abstract base class for the builder pattern.
  *
- * @author Martin Lindström (martin@idsec.se)
- *
  * @param <T> the type
+ * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements SAMLObjectBuilder<T> {
 
   /** The object that is being built. */
-  private T object;
+  private final T object;
 
   /**
    * Constructor setting up the object to build.
@@ -100,7 +97,7 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
 
   /**
    * The default implementation of this method assumes that the object has been built during assignment of its
-   * attributes and elements so it simply returns the object.
+   * attributes and elements, so it simply returns the object.
    * <p>
    * Implementations that need to perform additional processing during the build step should override this method.
    * </p>
@@ -135,7 +132,7 @@ public abstract class AbstractSAMLObjectBuilder<T extends XMLObject> implements 
     try {
       return (QName) this.getObjectType().getDeclaredField("DEFAULT_ELEMENT_NAME").get(null);
     }
-    catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
+    catch (final NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
       throw new XMLRuntimeException(e);
     }
   }

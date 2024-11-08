@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Litsec AB
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testBuild() throws Exception {
-    StatusCodeBuilder builder = new StatusCodeBuilder();
-    StatusCode status = builder
+    final StatusCodeBuilder builder = new StatusCodeBuilder();
+    final StatusCode status = builder
         .value(StatusCode.REQUESTER)
         .statusCode(
           (new StatusCodeBuilder())
@@ -58,14 +58,14 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testBuildFromTemplate() throws Exception {
-    StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
+    final StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     template.setValue(StatusCode.REQUESTER);
-    StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
+    final StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     subCode.setValue(StatusCode.AUTHN_FAILED);
     template.setStatusCode(subCode);
 
-    StatusCodeBuilder builder = new StatusCodeBuilder(template);
-    StatusCode status = builder.value(StatusCode.RESPONDER).build();
+    final StatusCodeBuilder builder = new StatusCodeBuilder(template);
+    final StatusCode status = builder.value(StatusCode.RESPONDER).build();
 
     Assertions.assertEquals(StatusCode.RESPONDER, status.getValue());
     Assertions.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
@@ -77,18 +77,18 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
 
   @Test
   public void testBuildFromResource() throws Exception {
-    StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
+    final StatusCode template = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     template.setValue(StatusCode.REQUESTER);
-    StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
+    final StatusCode subCode = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
     subCode.setValue(StatusCode.AUTHN_FAILED);
     template.setStatusCode(subCode);
 
     // Go to XML
-    Element element = XMLObjectSupport.marshall(template);
-    String xml = SerializeSupport.prettyPrintXML(element);
+    final Element element = XMLObjectSupport.marshall(template);
+    final String xml = SerializeSupport.prettyPrintXML(element);
 
-    StatusCodeBuilder builder = new StatusCodeBuilder(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-    StatusCode status = builder.value(StatusCode.RESPONDER).build();
+    final StatusCodeBuilder builder = new StatusCodeBuilder(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+    final StatusCode status = builder.value(StatusCode.RESPONDER).build();
 
     Assertions.assertEquals(StatusCode.RESPONDER, status.getValue());
     Assertions.assertEquals(StatusCode.AUTHN_FAILED, status.getStatusCode().getValue());
@@ -103,25 +103,25 @@ public class AbstractSAMLObjectBuilderTest extends OpenSAMLTestBase {
       super();
     }
 
-    public StatusCodeBuilder(InputStream resource) throws XMLParserException, UnmarshallingException {
+    public StatusCodeBuilder(final InputStream resource) throws XMLParserException, UnmarshallingException {
       super(resource);
     }
 
-    public StatusCodeBuilder(StatusCode template) throws MarshallingException, UnmarshallingException {
+    public StatusCodeBuilder(final StatusCode template) throws MarshallingException, UnmarshallingException {
       super(template);
     }
 
-    StatusCodeBuilder value(String value) {
+    StatusCodeBuilder value(final String value) {
       this.object().setValue(value);
       return this;
     }
 
-    StatusCodeBuilder statusCode(StatusCode statusCode) {
+    StatusCodeBuilder statusCode(final StatusCode statusCode) {
       this.object().setStatusCode(statusCode);
       return this;
     }
 
-    StatusCodeBuilder statusCode(String statusCode) {
+    StatusCodeBuilder statusCode(final String statusCode) {
       this.object().setStatusCode((new StatusCodeBuilder()).value(statusCode).build());
       return this;
     }

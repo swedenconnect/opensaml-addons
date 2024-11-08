@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,7 +236,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
           this.object().getRoleDescriptors().add(XMLObjectSupport.cloneXMLObject(rd));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -275,7 +275,7 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
           ? XMLObjectSupport.cloneXMLObject(organization)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this;
@@ -290,13 +290,13 @@ public class EntityDescriptorBuilder extends AbstractSAMLObjectBuilder<EntityDes
   public EntityDescriptorBuilder contactPersons(final List<ContactPerson> contactPersons) {
     this.object().getContactPersons().clear();
     if (contactPersons != null) {
-      for (ContactPerson cp : contactPersons) {
+      for (final ContactPerson cp : contactPersons) {
         try {
           if (cp != null) {
             this.object().getContactPersons().add(XMLObjectSupport.cloneXMLObject(cp));
           }
         }
-        catch (MarshallingException | UnmarshallingException e) {
+        catch (final MarshallingException | UnmarshallingException e) {
           throw new RuntimeException(e);
         }
       }

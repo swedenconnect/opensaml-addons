@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class CoreValidatorParameters {
   public static final String STRICT_VALIDATION = STD_PREFIX + ".StrictValidation";
 
   /**
-   * Carries a String that holds the entityID of the expected issuer of a element.
+   * Carries a String that holds the entityID of the expected issuer of an element.
    */
   public static final String EXPECTED_ISSUER = STD_PREFIX + ".ExpectedIssuer";
 

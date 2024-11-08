@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Litsec AB
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package se.swedenconnect.opensaml.saml2.request;
 
 import se.swedenconnect.opensaml.common.LibraryVersion;
 
+import java.io.Serial;
+
 /**
  * Exception class for indicating errors during a request generation.
  *
@@ -25,6 +27,7 @@ import se.swedenconnect.opensaml.common.LibraryVersion;
 public class RequestGenerationException extends Exception {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
@@ -32,7 +35,7 @@ public class RequestGenerationException extends Exception {
    *
    * @param message the error message
    */
-  public RequestGenerationException(String message) {
+  public RequestGenerationException(final String message) {
     super(message);
   }
 
@@ -42,7 +45,7 @@ public class RequestGenerationException extends Exception {
    * @param message the error message
    * @param cause the cause of the error
    */
-  public RequestGenerationException(String message, Throwable cause) {
+  public RequestGenerationException(final String message, final Throwable cause) {
     super(message, cause);
   }
 

@@ -15,12 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import org.apache.commons.codec.binary.Hex;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
@@ -35,17 +31,19 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-
-import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
-import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Abstract base class for the {@link MetadataContainer} interface.
  *
- * @author Martin Lindström (martin@idsec.se)
- *
  * @param <T> the contained type
+ * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & SignableSAMLObject & CacheableSAMLObject>
     implements MetadataContainer<T> {
@@ -89,8 +87,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
    * Constructor assigning the encapsulated descriptor element.
    *
    * @param descriptor the descriptor object
-   * @param signatureCredentials the signature credentials for signing the descriptor. May be null, but then no signing
-   *          will be possible
+   * @param signatureCredentials the signature credentials for signing the descriptor. May be null, but then no
+   *     signing will be possible
    */
   public AbstractMetadataContainer(final T descriptor, final X509Credential signatureCredentials) {
     this.descriptor = descriptor;
@@ -165,8 +163,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
     }
 
     SAMLObjectSigner.sign(this.descriptor, this.signatureCredentials,
-        Optional.ofNullable(this.signingConfiguration).orElseGet(() ->
-          SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration()));
+        Optional.ofNullable(this.signingConfiguration).orElseGet(
+            SecurityConfigurationSupport::getGlobalSignatureSigningConfiguration));
 
     log.debug("Descriptor '{}' successfully signed.", this.getLogString(this.descriptor));
 
@@ -204,7 +202,8 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
   }
 
   /**
-   * Assigns the factor (between 0 and 1) that is used to compute whether it is time to update the contained descriptor.
+   * Assigns the factor (between 0 and 1) that is used to compute whether it is time to update the contained
+   * descriptor.
    * <p>
    * The default value is {@link #DEFAULT_UPDATE_FACTOR}.
    * </p>

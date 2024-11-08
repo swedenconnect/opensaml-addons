@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
@@ -31,6 +25,12 @@ import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Subject;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Implementation of the {@code ResponseProcessingResult} interface.
@@ -62,7 +62,6 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
     return this.response;
   }
 
-
   /** {@inheritDoc} */
   @Override
   public String getResponseId() {
@@ -93,28 +92,28 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
     return Collections.unmodifiableList(this.assertion.getAttributeStatements().stream()
         .map(AttributeStatement::getAttributes)
         .findFirst()
-        .orElseGet(() -> Collections.emptyList()));
+        .orElseGet(Collections::emptyList));
   }
 
   /** {@inheritDoc} */
   @Override
   public String getAuthnContextClassUri() {
     return this.assertion.getAuthnStatements().stream()
-      .map(AuthnStatement::getAuthnContext)
-      .map(AuthnContext::getAuthnContextClassRef)
-      .map(AuthnContextClassRef::getURI)
-      .findFirst()
-      .orElse(null);
+        .map(AuthnStatement::getAuthnContext)
+        .map(AuthnContext::getAuthnContextClassRef)
+        .map(AuthnContextClassRef::getURI)
+        .findFirst()
+        .orElse(null);
   }
 
   /** {@inheritDoc} */
   @Override
   public Instant getAuthnInstant() {
 
-    final Instant authnInstant =  this.assertion.getAuthnStatements().stream()
+    final Instant authnInstant = this.assertion.getAuthnStatements().stream()
         .map(AuthnStatement::getAuthnInstant)
         .findFirst()
-        .orElseGet(() -> Instant.now());
+        .orElseGet(Instant::now);
 
     // We have already checked the validity of the authentication instant, but if it is
     // after the current time it means that it is within the allowed clock skew. If so,

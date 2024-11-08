@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package se.swedenconnect.opensaml.common.validation;
 
+import net.shibboleth.shared.resolver.CriteriaSet;
+import org.opensaml.saml.common.assertion.ValidationContext;
+import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.opensaml.saml.common.assertion.ValidationContext;
-import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
-
-import net.shibboleth.shared.resolver.CriteriaSet;
 
 /**
  * Abstract base class for building the {@link ValidationContext} object using a builder pattern. These settings are
@@ -35,10 +34,10 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
     ValidationParametersBuilder {
 
   /** The static parameters. */
-  private Map<String, Object> staticParameters = new HashMap<>();
+  private final Map<String, Object> staticParameters = new HashMap<>();
 
   /** The dynamic parameters. */
-  private Map<String, Object> dynamicParameters = new HashMap<>();
+  private final Map<String, Object> dynamicParameters = new HashMap<>();
 
   /** {@inheritDoc} */
   @Override
@@ -128,9 +127,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
   }
 
   /**
-   * Sets the receive instant (i.e., when a message being validated was received).
+   * Sets the reception instant (i.e., when a message being validated was received).
    *
-   * @param instant the receive instant
+   * @param instant the reception instant
    * @return the builder
    */
   public T receiveInstant(final Instant instant) {
@@ -139,9 +138,9 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
   }
 
   /**
-   * Sets the receive instant (i.e., when a message being validated was received).
+   * Sets the reception instant (i.e., when a message being validated was received).
    *
-   * @param instant the receive instant
+   * @param instant the reception instant
    * @return the builder
    */
   public T receiveInstant(final long instant) {
@@ -175,7 +174,7 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
   /**
    * Returns 'this' object.
    *
-   * @return this object (the concrete builder}
+   * @return this object (the concrete builder)
    */
   protected abstract T getThis();
 

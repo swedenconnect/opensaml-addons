@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.io.IOException;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import net.shibboleth.shared.collection.Pair;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.ResolverException;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -32,9 +30,9 @@ import org.opensaml.saml.metadata.resolver.impl.FunctionDrivenDynamicHTTPMetadat
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
-import net.shibboleth.shared.collection.Pair;
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.resolver.ResolverException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
 
 /**
  * A {@link MetadataProvider} that supports the <a href="https://www.ietf.org/id/draft-young-md-query-17.html">MDQ
@@ -60,8 +58,8 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
    * entities.
    *
    * @param metadataBaseUrl the base metadata URL (must not end with a /)
-   * @param httpClient the HTTP client instance to use, if null, {@link HTTPMetadataProvider#createDefaultHttpClient()}
-   *          is used to create a default client
+   * @param httpClient the HTTP client instance to use, if null,
+   *     {@link HTTPMetadataProvider#createDefaultHttpClient()} is used to create a default client
    * @param cacheBaseDir the base directory where caches will be stored, if null, the caches are kept in memory
    * @throws ResolverException for failures setting up the underlying {@link MetadataResolver}
    */

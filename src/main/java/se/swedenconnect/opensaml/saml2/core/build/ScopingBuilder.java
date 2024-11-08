@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.core.build;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -26,9 +23,11 @@ import org.opensaml.saml.saml2.core.IDPEntry;
 import org.opensaml.saml.saml2.core.IDPList;
 import org.opensaml.saml.saml2.core.RequesterID;
 import org.opensaml.saml.saml2.core.Scoping;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 import se.swedenconnect.opensaml.common.builder.SAMLObjectBuilderRuntimeException;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Builder class for {@code Scoping} elements.
@@ -83,7 +82,7 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
               idpList.getIDPEntrys().add(XMLObjectSupport.cloneXMLObject(e));
             }
           }
-          catch (MarshallingException | UnmarshallingException e1) {
+          catch (final MarshallingException | UnmarshallingException e1) {
             throw new SAMLObjectBuilderRuntimeException(e1);
           }
         }
@@ -113,7 +112,7 @@ public class ScopingBuilder extends AbstractSAMLObjectBuilder<Scoping> {
    * @return an IDPEntry element
    */
   public static IDPEntry idpEntry(final String providerID, final String name, final String loc) {
-    IDPEntry entry = (IDPEntry) XMLObjectSupport.buildXMLObject(IDPEntry.DEFAULT_ELEMENT_NAME);
+    final IDPEntry entry = (IDPEntry) XMLObjectSupport.buildXMLObject(IDPEntry.DEFAULT_ELEMENT_NAME);
     entry.setProviderID(providerID);
     entry.setName(name);
     entry.setLoc(loc);

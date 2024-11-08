@@ -15,16 +15,16 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
-import java.util.Optional;
-
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
-
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
+
+import java.io.Serial;
+import java.util.Optional;
 
 /**
  * Exception that indicates a non-successful status code received in a Response message.
@@ -34,6 +34,7 @@ import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
 public class ResponseStatusErrorException extends Exception {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /** The response. */
@@ -46,7 +47,7 @@ public class ResponseStatusErrorException extends Exception {
    */
   public ResponseStatusErrorException(final Response response) {
     super(statusToString(response.getStatus()));
-    this.response = new SerializableOpenSamlObject<Response>(response);
+    this.response = new SerializableOpenSamlObject<>(response);
 
     if (StatusCode.SUCCESS.equals(response.getStatus().getStatusCode().getValue())) {
       throw new IllegalArgumentException("Status is success - can not throw ResponseStatusErrorException");
@@ -71,7 +72,7 @@ public class ResponseStatusErrorException extends Exception {
       final Issuer issuerObj = (Issuer) XMLObjectSupport.buildXMLObject(Issuer.DEFAULT_ELEMENT_NAME);
       issuerObj.setValue(issuer);
       responseObj.setIssuer(issuerObj);
-      this.response = new SerializableOpenSamlObject<Response>(responseObj);
+      this.response = new SerializableOpenSamlObject<>(responseObj);
     }
     catch (final Exception e) {
       throw new RuntimeException(e);
@@ -127,7 +128,7 @@ public class ResponseStatusErrorException extends Exception {
    * @return a status string
    */
   public static String statusToString(final Status status) {
-    StringBuffer sb = new StringBuffer("Status: ");
+    final StringBuilder sb = new StringBuilder("Status: ");
     sb.append(status.getStatusCode().getValue());
     if (status.getStatusCode().getStatusCode() != null) {
       sb.append(", ").append(status.getStatusCode().getStatusCode().getValue());

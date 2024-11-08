@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.response.replay;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.RequestAbstractType;
@@ -25,8 +22,12 @@ import org.opensaml.saml.saml2.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * An in-memory based message replay checker implementation. This is mainly for testing and simple mock implementations.
+ * An in-memory based message replay checker implementation. This is mainly for testing and simple mock
+ * implementations.
  *
  * @author Martin Lindström (martin@idsec.se)
  */
@@ -36,7 +37,7 @@ public class InMemoryReplayChecker implements MessageReplayChecker {
   private static final int MAX_SIZE = 1000;
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(InMemoryReplayChecker.class);
+  private static final Logger log = LoggerFactory.getLogger(InMemoryReplayChecker.class);
 
   /** Number of milliseconds to keep elements in the replay cache - default is 5 minutes. */
   private long replayCacheExpiration = 300 * 1000L;
@@ -54,14 +55,14 @@ public class InMemoryReplayChecker implements MessageReplayChecker {
     else {
       if (System.currentTimeMillis() < e) {
         final String msg = String.format("Replay check of ID '%s' failed", id);
-        this.log.warn(msg);
+        log.warn(msg);
         throw new MessageReplayException(msg);
       }
       else {
         this.cache.remove(id);
       }
     }
-    this.log.debug("Message replay check of ID '{}' succeeded", id);
+    log.debug("Message replay check of ID '{}' succeeded", id);
     if (this.cache.size() > MAX_SIZE) {
       final long now = System.currentTimeMillis();
       this.cache.entrySet().removeIf(entry -> now > entry.getValue());
