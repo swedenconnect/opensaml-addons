@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,9 +74,9 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
   public void testBuildSpMetadata() throws Exception {
 
     final String metadataId = "MLoeU7ALIHTZ61ibqZdJ";
-    Instant validUntil = Instant.now();
+    final Instant validUntil = Instant.now();
     validUntil.plus(7, ChronoUnit.DAYS);
-    long cacheDuration = 3600000L;
+    final long cacheDuration = 3600000L;
 
     final DigestMethod[] digestMethods = {
         DigestMethodBuilder.builder().algorithm(SignatureConstants.ALGO_ID_DIGEST_SHA256).build(),
@@ -167,7 +167,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
       .telephoneNumbers("+46 (0)70 361 98 80")
       .build();
 
-    EntityDescriptor ed = EntityDescriptorBuilder.builder()
+    final EntityDescriptor ed = EntityDescriptorBuilder.builder()
       .entityID(SP_ENTITY_ID)
       .id(metadataId)
       .cacheDuration(cacheDuration)
@@ -231,9 +231,9 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
     Assertions.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
 
-    EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
+    final EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
     Assertions.assertNotNull(entityAttributes);
-    Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
+    final Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assertions.assertNotNull(entityCategoryAttribute);
     Assertions.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
@@ -244,17 +244,17 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals(2, EntityDescriptorUtils.getSigningMethods(ed).size());
     Assertions.assertTrue(ed.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).isEmpty());
 
-    List<DigestMethod> digestList = EntityDescriptorUtils.getDigestMethods(ed);
+    final List<DigestMethod> digestList = EntityDescriptorUtils.getDigestMethods(ed);
     Assertions.assertEquals(digestMethods[0].getAlgorithm(), digestList.get(0).getAlgorithm());
     Assertions.assertEquals(digestMethods[1].getAlgorithm(), digestList.get(1).getAlgorithm());
     Assertions.assertEquals(digestMethods[2].getAlgorithm(), digestList.get(2).getAlgorithm());
 
-    SPSSODescriptor ssoDescriptor = ed.getSPSSODescriptor(SAMLConstants.SAML20P_NS);
+    final SPSSODescriptor ssoDescriptor = ed.getSPSSODescriptor(SAMLConstants.SAML20P_NS);
 
     Assertions.assertEquals(2, ssoDescriptor.getExtensions().getUnknownXMLObjects(SigningMethod.DEFAULT_ELEMENT_NAME).size());
     Assertions.assertTrue(ssoDescriptor.getExtensions().getUnknownXMLObjects(DigestMethod.DEFAULT_ELEMENT_NAME).isEmpty());
 
-    List<SigningMethod> signingList = EntityDescriptorUtils.getSigningMethods(ed);
+    final List<SigningMethod> signingList = EntityDescriptorUtils.getSigningMethods(ed);
     Assertions.assertEquals(signingMethods[0].getAlgorithm(), signingList.get(0).getAlgorithm());
     Assertions.assertEquals(signingMethods[0].getMinKeySize(), signingList.get(0).getMinKeySize());
     Assertions.assertEquals(signingMethods[1].getAlgorithm(), signingList.get(1).getAlgorithm());
@@ -262,7 +262,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertTrue(ssoDescriptor.isAuthnRequestsSigned());
     Assertions.assertTrue(ssoDescriptor.getWantAssertionsSigned());
 
-    UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
+    final UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
     Assertions.assertNotNull(uiInfo);
     Assertions.assertEquals(Arrays.asList(uiDisplayNames),
       uiInfo.getDisplayNames().stream().map(dn -> new LocalizedString(dn.getValue(), dn.getXMLLang())).collect(Collectors.toList()));
@@ -277,7 +277,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals(Arrays.asList(uiLogos).stream().map(l -> l.getWidth()).collect(Collectors.toList()),
       uiInfo.getLogos().stream().map(l -> l.getWidth()).collect(Collectors.toList()));
 
-    List<DiscoveryResponse> discoResponses =
+    final List<DiscoveryResponse> discoResponses =
         EntityDescriptorUtils.getMetadataExtensions(ssoDescriptor.getExtensions(), DiscoveryResponse.class);
     Assertions.assertTrue(discoResponses.size() == 2);
     Assertions.assertEquals(1, (int) discoResponses.get(0).getIndex());
@@ -329,7 +329,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals(Arrays.asList(organizationDisplayNames),
       ed.getOrganization().getDisplayNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assertions.assertEquals(Arrays.asList(organizationURL),
+    Assertions.assertEquals(List.of(organizationURL),
       ed.getOrganization().getURLs().stream().map(n -> new LocalizedString(n.getURI(), n.getXMLLang())).collect(Collectors.toList()));
 
     Assertions.assertEquals(2, ed.getContactPersons().size());
@@ -339,9 +339,9 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
       Assertions.assertEquals("Litsec AB", ed.getContactPersons().get(i).getCompany().getValue());
       Assertions.assertEquals("Martin", ed.getContactPersons().get(i).getGivenName().getValue());
       Assertions.assertEquals("Lindström", ed.getContactPersons().get(i).getSurName().getValue());
-      Assertions.assertEquals(Arrays.asList("martin.lindstrom@litsec.se"),
+      Assertions.assertEquals(List.of("martin.lindstrom@litsec.se"),
         ed.getContactPersons().get(i).getEmailAddresses().stream().map(m -> m.getURI()).collect(Collectors.toList()));
-      Assertions.assertEquals(Arrays.asList("+46 (0)70 361 98 80"),
+      Assertions.assertEquals(List.of("+46 (0)70 361 98 80"),
         ed.getContactPersons().get(i).getTelephoneNumbers().stream().map(t -> t.getValue()).collect(Collectors.toList()));
     }
   }
@@ -353,9 +353,9 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
   public void testBuildIdpMetadata() throws Exception {
 
     final String metadataId = "MLoeU7ALIHTZ61ibqZdJ";
-    Instant validUntil = Instant.now();
+    final Instant validUntil = Instant.now();
     validUntil.plus(7, ChronoUnit.DAYS);
-    long cacheDuration = 3600000L;
+    final long cacheDuration = 3600000L;
 
     final String[] assuranceCertificationUris = {
         "http://id.elegnamnden.se/loa/1.0/loa2",
@@ -411,7 +411,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
       .emailAddresses("stefan@aaa-sec.com")
       .build();
 
-    EntityDescriptor ed = EntityDescriptorBuilder.builder()
+    final EntityDescriptor ed = EntityDescriptorBuilder.builder()
       .entityID(SP_ENTITY_ID)
       .id(metadataId)
       .cacheDuration(cacheDuration)
@@ -454,31 +454,31 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
         ContactPersonBuilder.builder(contactPersonTemplate).type(ContactPersonTypeEnumeration.SUPPORT).build())
       .build();
 
-    Element elm = XMLObjectSupport.marshall(ed);
+    final Element elm = XMLObjectSupport.marshall(ed);
     System.out.println(SerializeSupport.prettyPrintXML(elm));
 
     Assertions.assertEquals(metadataId, ed.getID());
     Assertions.assertEquals((Long) cacheDuration, (Long) ed.getCacheDuration().toMillis());
     Assertions.assertEquals(validUntil.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), ed.getValidUntil().toEpochMilli());
 
-    EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
+    final EntityAttributes entityAttributes = EntityDescriptorUtils.getMetadataExtension(ed.getExtensions(), EntityAttributes.class);
     Assertions.assertNotNull(entityAttributes);
 
-    Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
+    final Attribute entityCategoryAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ENTITY_CATEGORY_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assertions.assertNotNull(entityCategoryAttribute);
     Assertions.assertEquals(Arrays.asList(entityCategories), AttributeUtils.getAttributeStringValues(entityCategoryAttribute));
 
-    Attribute assuranceCertificationAttribute = AttributeUtils.getAttribute(
+    final Attribute assuranceCertificationAttribute = AttributeUtils.getAttribute(
       AttributeConstants.ASSURANCE_CERTIFICATION_ATTRIBUTE_NAME, entityAttributes.getAttributes());
     Assertions.assertNotNull(assuranceCertificationAttribute);
     Assertions.assertEquals(Arrays.asList(assuranceCertificationUris), AttributeUtils.getAttributeStringValues(assuranceCertificationAttribute));
 
-    IDPSSODescriptor ssoDescriptor = ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
+    final IDPSSODescriptor ssoDescriptor = ed.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
 
     Assertions.assertEquals(Boolean.TRUE, ssoDescriptor.getWantAuthnRequestsSigned());
 
-    UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
+    final UIInfo uiInfo = EntityDescriptorUtils.getMetadataExtension(ssoDescriptor.getExtensions(), UIInfo.class);
     Assertions.assertNotNull(uiInfo);
     Assertions.assertEquals(Arrays.asList(uiDisplayNames),
       uiInfo.getDisplayNames().stream().map(dn -> new LocalizedString(dn.getValue(), dn.getXMLLang())).collect(Collectors.toList()));
@@ -515,7 +515,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     Assertions.assertEquals(Arrays.asList(organizationDisplayNames),
       ed.getOrganization().getDisplayNames().stream().map(n -> new LocalizedString(n.getValue(), n.getXMLLang())).collect(Collectors
         .toList()));
-    Assertions.assertEquals(Arrays.asList(organizationURL),
+    Assertions.assertEquals(List.of(organizationURL),
       ed.getOrganization().getURLs().stream().map(n -> new LocalizedString(n.getURI(), n.getXMLLang())).collect(Collectors.toList()));
 
     Assertions.assertEquals(2, ed.getContactPersons().size());
@@ -524,7 +524,7 @@ public class EntityDescriptorBuilderTest extends OpenSAMLTestBase {
     for (int i = 0; i < 2; i++) {
       Assertions.assertEquals("E-legitimationsnämnden", ed.getContactPersons().get(i).getCompany().getValue());
       Assertions
-          .assertEquals(Arrays.asList("stefan@aaa-sec.com"),
+          .assertEquals(List.of("stefan@aaa-sec.com"),
         ed.getContactPersons().get(i).getEmailAddresses().stream().map(m -> m.getURI()).collect(Collectors.toList()));
     }
   }

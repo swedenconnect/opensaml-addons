@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package se.swedenconnect.opensaml.common.validation;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,16 +51,16 @@ public class AbstractSignableObjectValidatorTest extends OpenSAMLTestBase {
 
   public static final String ISSUER_ENTITYID = "https://idp.svelegtest.se/idp";
 
-  private SignatureTrustEngine signatureTrustEngine;
+  private final SignatureTrustEngine signatureTrustEngine;
 
-  private SignaturePrevalidator signatureProfileValidator = new SAMLSignatureProfileValidator();
+  private final SignaturePrevalidator signatureProfileValidator = new SAMLSignatureProfileValidator();
 
   public AbstractSignableObjectValidatorTest() throws Exception {
-    X509Certificate cert = decodeCertificate(new ClassPathResource("/signed/signer.crt").getInputStream());
-    BasicX509Credential cred = new BasicX509Credential(cert);
+    final X509Certificate cert = decodeCertificate(new ClassPathResource("/signed/signer.crt").getInputStream());
+    final BasicX509Credential cred = new BasicX509Credential(cert);
     cred.setEntityId(ISSUER_ENTITYID);
 
-    CollectionCredentialResolver credentialResolver = new CollectionCredentialResolver(Arrays.asList(cred));
+    final CollectionCredentialResolver credentialResolver = new CollectionCredentialResolver(List.of(cred));
 
     this.signatureTrustEngine = new ExplicitKeySignatureTrustEngine(credentialResolver,
       DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
@@ -67,56 +68,56 @@ public class AbstractSignableObjectValidatorTest extends OpenSAMLTestBase {
 
   @Test
   public void testResponseSignatureValidation() throws Exception {
-    TestResponseValidator validator = new TestResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
+    final TestResponseValidator validator = new TestResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
 
-    Map<String, Object> staticPars = new HashMap<String, Object>();
+    final Map<String, Object> staticPars = new HashMap<String, Object>();
     staticPars.put(SAML2AssertionValidationParameters.SIGNATURE_REQUIRED, Boolean.TRUE);
     staticPars.put(SAML2AssertionValidationParameters.SIGNATURE_VALIDATION_CRITERIA_SET,
       new CriteriaSet(new EntityIdCriterion(ISSUER_ENTITYID), new UsageCriterion(UsageType.SIGNING)));
 
-    ValidationContext context = new ValidationContext(staticPars);
+    final ValidationContext context = new ValidationContext(staticPars);
 
-    Response response = unmarshall(new ClassPathResource("signed/signed-response.xml").getInputStream(), Response.class);
+    final Response response = unmarshall(new ClassPathResource("signed/signed-response.xml").getInputStream(), Response.class);
 
-    ValidationResult result = validator.validate(response, context);
+    final ValidationResult result = validator.validate(response, context);
     Assertions.assertEquals(ValidationResult.VALID, result);
   }
 
   @Test
   public void testResponseSignatureValidationFailureBadDigest() throws Exception {
-    TestResponseValidator validator = new TestResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
+    final TestResponseValidator validator = new TestResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
 
-    Map<String, Object> staticPars = new HashMap<String, Object>();
+    final Map<String, Object> staticPars = new HashMap<String, Object>();
     staticPars.put(SAML2AssertionValidationParameters.SIGNATURE_REQUIRED, Boolean.TRUE);
     staticPars.put(SAML2AssertionValidationParameters.SIGNATURE_VALIDATION_CRITERIA_SET,
       new CriteriaSet(new EntityIdCriterion(ISSUER_ENTITYID), new UsageCriterion(UsageType.SIGNING)));
 
-    ValidationContext context = new ValidationContext(staticPars);
+    final ValidationContext context = new ValidationContext(staticPars);
 
-    Response response = unmarshall(new ClassPathResource("signed/signed-baddigest-response.xml").getInputStream(), Response.class);
+    final Response response = unmarshall(new ClassPathResource("signed/signed-baddigest-response.xml").getInputStream(), Response.class);
 
-    ValidationResult result = validator.validate(response, context);
+    final ValidationResult result = validator.validate(response, context);
     Assertions.assertEquals(ValidationResult.INVALID, result);
   }
 
   private static class TestResponseValidator extends AbstractSignableObjectValidator<Response> {
 
-    public TestResponseValidator(SignatureTrustEngine trustEngine, SignaturePrevalidator signaturePrevalidator) {
+    public TestResponseValidator(final SignatureTrustEngine trustEngine, final SignaturePrevalidator signaturePrevalidator) {
       super(trustEngine, signaturePrevalidator);
     }
 
     @Override
-    public ValidationResult validate(Response object, ValidationContext context) {
+    public ValidationResult validate(final Response object, final ValidationContext context) {
       return this.validateSignature(object, context);
     }
 
     @Override
-    protected String getIssuer(Response signableObject) {
+    protected String getIssuer(final Response signableObject) {
       return signableObject.getIssuer().getValue();
     }
 
     @Override
-    protected String getID(Response signableObject) {
+    protected String getID(final Response signableObject) {
       return signableObject.getID();
     }
 

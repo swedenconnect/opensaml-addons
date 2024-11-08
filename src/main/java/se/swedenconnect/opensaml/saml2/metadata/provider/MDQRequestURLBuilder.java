@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,17 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
-
+import net.shibboleth.shared.logic.Constraint;
+import net.shibboleth.shared.resolver.CriteriaSet;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.shared.logic.Constraint;
-import net.shibboleth.shared.resolver.CriteriaSet;
+import javax.annotation.Nullable;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Function which examines an entity ID from supplied criteria and returns a metadata request URL for MDQ.
@@ -37,7 +35,7 @@ import net.shibboleth.shared.resolver.CriteriaSet;
 public class MDQRequestURLBuilder implements Function<CriteriaSet, String> {
 
   /** Logger. */
-  private final Logger log = LoggerFactory.getLogger(MDQRequestURLBuilder.class);
+  private static final Logger log = LoggerFactory.getLogger(MDQRequestURLBuilder.class);
 
   /** The metadata base URL. */
   private String baseUrl;
@@ -66,7 +64,8 @@ public class MDQRequestURLBuilder implements Function<CriteriaSet, String> {
     final String entityID = criteria.get(EntityIdCriterion.class).getEntityId();
     Constraint.isNotNull(entityID, "Entity ID was null");
 
-    final String url = String.format("%s/entities/%s", this.baseUrl, URLEncoder.encode(entityID, StandardCharsets.UTF_8));
+    final String url =
+        String.format("%s/entities/%s", this.baseUrl, URLEncoder.encode(entityID, StandardCharsets.UTF_8));
     log.debug("Returning request URL: {}", url);
     return url;
   }

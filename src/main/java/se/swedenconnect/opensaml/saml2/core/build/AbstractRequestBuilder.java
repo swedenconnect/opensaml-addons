@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.core.build;
 
-import java.time.Instant;
-
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -25,16 +23,16 @@ import org.opensaml.saml.saml2.core.Extensions;
 import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.RequestAbstractType;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
+
+import java.time.Instant;
 
 /**
  * Abstract builder class for building request messages.
  *
- * @author Martin Lindström (martin@idsec.se)
- *
  * @param <T> the type of request message
  * @param <BUILDER> the builder type
+ * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUILDER extends AbstractSAMLObjectBuilder<T>>
     extends AbstractSAMLObjectBuilder<T> {
@@ -149,7 +147,7 @@ public abstract class AbstractRequestBuilder<T extends RequestAbstractType, BUIL
           ? XMLObjectSupport.cloneXMLObject(issuer)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.security.cert.X509Certificate;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.xml.namespace.QName;
-
+import net.shibboleth.shared.component.AbstractInitializableComponent;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -35,10 +26,10 @@ import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.RefreshableMetadataResolver;
-import org.opensaml.saml.metadata.resolver.filter.FilterException;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterContext;
+import org.opensaml.saml.metadata.resolver.filter.impl.EntityRoleFilter;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter.Direction;
 import org.opensaml.saml.metadata.resolver.filter.impl.SchemaValidationFilter;
@@ -57,10 +48,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import net.shibboleth.shared.component.AbstractInitializableComponent;
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.resolver.CriteriaSet;
-import net.shibboleth.shared.resolver.ResolverException;
+import javax.annotation.Nonnull;
+import javax.xml.namespace.QName;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for the {@link MetadataProvider} interface.
@@ -70,7 +68,7 @@ import net.shibboleth.shared.resolver.ResolverException;
 public abstract class AbstractMetadataProvider extends AbstractInitializableComponent implements MetadataProvider {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(AbstractMetadataProvider.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractMetadataProvider.class);
 
   /** Whether the metadata returned by queries must be valid. Default: true. */
   private boolean requireValidMetadata = true;
@@ -89,6 +87,9 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /** Tells whether XML schema validation should be performed on downloaded metadata. Default: false. */
   private boolean performSchemaValidation = false;
+
+  /** Tells whether we should keep only SP and IdP role descriptors. The default is true. */
+  private boolean keepOnlySpAndIdps = true;
 
   /** A list of inclusion predicates that will be applied to downloaded metadata. */
   private List<Predicate<EntityDescriptor>> inclusionPredicates = null;
@@ -124,7 +125,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
   /** {@inheritDoc} */
   @Override
   public Instant getLastUpdate() {
-    if (RefreshableMetadataResolver.class.isInstance(this.getMetadataResolver())) {
+    if (this.getMetadataResolver() instanceof RefreshableMetadataResolver) {
       return ((RefreshableMetadataResolver) this.getMetadataResolver()).getLastUpdate();
     }
     return this.downloadTime;
@@ -133,11 +134,11 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
   /** {@inheritDoc} */
   @Override
   public void refresh() throws ResolverException {
-    if (RefreshableMetadataResolver.class.isInstance(this.getMetadataResolver())) {
+    if (this.getMetadataResolver() instanceof RefreshableMetadataResolver) {
       ((RefreshableMetadataResolver) this.getMetadataResolver()).refresh();
     }
     else {
-      this.log.debug("Refresh of metadata is not supported by {}", this.getClass().getName());
+      log.debug("Refresh of metadata is not supported by {}", this.getClass().getName());
     }
   }
 
@@ -228,7 +229,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
     // Verify signature?
     if (this.signatureVerificationCertificates != null && !this.signatureVerificationCertificates.isEmpty()) {
       final CredentialResolver credentialResolver = new StaticCredentialResolver(
-          this.signatureVerificationCertificates.stream().map(c -> new BasicX509Credential(c))
+          this.signatureVerificationCertificates.stream().map(BasicX509Credential::new)
               .collect(Collectors.toList()));
       final ExplicitKeySignatureTrustEngine trustEngine = new ExplicitKeySignatureTrustEngine(credentialResolver,
           DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
@@ -243,6 +244,14 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
           new SchemaValidationFilter(new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11));
       schemaValidationFilter.initialize();
       filters.add(schemaValidationFilter);
+    }
+
+    // Keep only SP:s and IdP:s?
+    if (this.keepOnlySpAndIdps) {
+      final EntityRoleFilter entityRoleFilter = new EntityRoleFilter(
+          List.of(SPSSODescriptor.DEFAULT_ELEMENT_NAME, IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
+      entityRoleFilter.initialize();
+      filters.add(entityRoleFilter);
     }
 
     // Inclusion predicates?
@@ -272,7 +281,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
       }
 
       @Override
-      public XMLObject filter(final XMLObject metadata, final MetadataFilterContext context) throws FilterException {
+      public XMLObject filter(final XMLObject metadata, @Nonnull final MetadataFilterContext context) {
         AbstractMetadataProvider.this.setMetadata(metadata);
         return metadata;
       }
@@ -305,7 +314,7 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
    *
    * @param requireValidMetadata should be passed into {@link MetadataResolver#setRequireValidMetadata(boolean)}
    * @param failFastInitialization should be passed into
-   *          {@link AbstractMetadataResolver#setFailFastInitialization(boolean)} (if applicable)
+   *     {@link AbstractMetadataResolver#setFailFastInitialization(boolean)} (if applicable)
    * @param filter filter that must be installed for the resolver
    * @throws ResolverException for errors creating the resolver
    */
@@ -389,6 +398,16 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
   public void setPerformSchemaValidation(final boolean performSchemaValidation) {
     this.checkSetterPreconditions();
     this.performSchemaValidation = performSchemaValidation;
+  }
+
+  /**
+   * Tells whether we should keep only SP and IdP role descriptors. The default is true.
+   *
+   * @param keepOnlySpAndIdps whether to keep only SPs and IdPs.
+   */
+  public void setKeepOnlySpAndIdps(final boolean keepOnlySpAndIdps) {
+    this.checkSetterPreconditions();
+    this.keepOnlySpAndIdps = keepOnlySpAndIdps;
   }
 
   /**

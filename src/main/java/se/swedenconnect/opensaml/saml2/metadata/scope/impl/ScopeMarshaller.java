@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope.impl;
 
+import jakarta.annotation.Nonnull;
+import net.shibboleth.shared.xml.ElementSupport;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.AbstractXMLObjectMarshaller;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.w3c.dom.Element;
-
-import net.shibboleth.shared.xml.ElementSupport;
 import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
 
 /**
@@ -32,7 +32,8 @@ public class ScopeMarshaller extends AbstractXMLObjectMarshaller {
 
   /** {@inheritDoc} */
   @Override
-  protected void marshallAttributes(final XMLObject xmlObject, final Element domElement) throws MarshallingException {
+  protected void marshallAttributes(@Nonnull final XMLObject xmlObject, @Nonnull final Element domElement)
+      throws MarshallingException {
     final Scope scope = (Scope) xmlObject;
     if (scope.getRegexpXSBoolean() != null) {
       domElement.setAttributeNS(null, Scope.REGEXP_ATTRIB_NAME, scope.getRegexpXSBoolean().toString());
@@ -41,7 +42,7 @@ public class ScopeMarshaller extends AbstractXMLObjectMarshaller {
 
   /** {@inheritDoc} */
   @Override
-  protected void marshallElementContent(final XMLObject xmlObject, final Element domElement)
+  protected void marshallElementContent(@Nonnull final XMLObject xmlObject, @Nonnull final Element domElement)
       throws MarshallingException {
     final Scope shibMDScope = (Scope) xmlObject;
     ElementSupport.appendTextContent(domElement, shibMDScope.getValue());

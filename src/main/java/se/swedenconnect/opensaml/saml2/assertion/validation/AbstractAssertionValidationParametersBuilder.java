@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,24 @@
  */
 package se.swedenconnect.opensaml.saml2.assertion.validation;
 
+import org.opensaml.saml.common.assertion.ValidationContext;
+import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
+import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValidationParametersBuilder;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.opensaml.saml.common.assertion.ValidationContext;
-import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
-import org.opensaml.saml.saml2.metadata.EntityDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
-import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValidationParametersBuilder;
 
 /**
  * Abstract builder class for building the {@link ValidationContext} object for use as validation input to the
@@ -45,11 +45,10 @@ import se.swedenconnect.opensaml.saml2.response.validation.AbstractResponseValid
  * @author Martin Lindström (martin@idsec.se)
  */
 public abstract class AbstractAssertionValidationParametersBuilder<T extends AbstractAssertionValidationParametersBuilder<T>>
-    extends
-    AbstractResponseValidationParametersBuilder<T> {
+    extends AbstractResponseValidationParametersBuilder<T> {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(AbstractAssertionValidationParametersBuilder.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractAssertionValidationParametersBuilder.class);
 
   /**
    * Adds default settings before invoking the super implementation.
@@ -90,10 +89,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
    */
   public T validRecipients(final String... recipients) {
     if (recipients != null) {
-      Set<String> set = new HashSet<>();
-      for (String r : recipients) {
-        set.add(r);
-      }
+      final Set<String> set = new HashSet<>();
+      Collections.addAll(set, recipients);
       this.staticParameter(SAML2AssertionValidationParameters.SC_RECIPIENT_REQUIRED, Boolean.TRUE);
       return this.staticParameter(SAML2AssertionValidationParameters.SC_VALID_RECIPIENTS, set);
     }
@@ -113,10 +110,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
    */
   public T validAddresses(final InetAddress... addresses) {
     if (addresses != null) {
-      Set<InetAddress> set = new HashSet<>();
-      for (InetAddress a : addresses) {
-        set.add(a);
-      }
+      final Set<InetAddress> set = new HashSet<>();
+      Collections.addAll(set, addresses);
       if (!set.isEmpty()) {
         this.staticParameter(SAML2AssertionValidationParameters.SC_VALID_ADDRESSES, set);
         this.staticParameter(SAML2AssertionValidationParameters.STMT_AUTHN_VALID_ADDRESSES, set);
@@ -135,13 +130,13 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
     if (addresses == null) {
       return this.getThis();
     }
-    List<InetAddress> _addresses = new ArrayList<>();
-    for (String a : addresses) {
+    final List<InetAddress> _addresses = new ArrayList<>();
+    for (final String a : addresses) {
       try {
         _addresses.add(InetAddress.getByName(a));
       }
-      catch (UnknownHostException e) {
-        log.error("Invalid IP address - " + a, e);
+      catch (final UnknownHostException e) {
+        log.error("Invalid IP address - {}", a, e);
         return this.getThis();
       }
     }
@@ -149,11 +144,11 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   }
 
   public T subjectConfirmationCheckAddess(final boolean flag) {
-    return this.staticParameter(SAML2AssertionValidationParameters.SC_CHECK_ADDRESS, Boolean.valueOf(flag));
+    return this.staticParameter(SAML2AssertionValidationParameters.SC_CHECK_ADDRESS, flag);
   }
 
   public T subjectLocalityCheckAddress(final boolean flag) {
-    return this.staticParameter(SAML2AssertionValidationParameters.STMT_AUTHN_CHECK_ADDRESS, Boolean.valueOf(flag));
+    return this.staticParameter(SAML2AssertionValidationParameters.STMT_AUTHN_CHECK_ADDRESS, flag);
   }
 
   /**
@@ -164,10 +159,8 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
    */
   public T validAudiences(final String... audiences) {
     if (audiences != null) {
-      Set<String> set = new HashSet<>();
-      for (String a : audiences) {
-        set.add(a);
-      }
+      final Set<String> set = new HashSet<>();
+      Collections.addAll(set, audiences);
       return this.staticParameter(SAML2AssertionValidationParameters.COND_VALID_AUDIENCES, set);
     }
     else {
@@ -206,7 +199,7 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   }
 
   /**
-   * Assigns the maximum session time that we, as a SP, can accept when receiving assertions based on older
+   * Assigns the maximum session time that we, as an SP, can accept when receiving assertions based on older
    * authentications (SSO).
    *
    * @param duration milliseconds
@@ -217,7 +210,7 @@ public abstract class AbstractAssertionValidationParametersBuilder<T extends Abs
   }
 
   /**
-   * Assigns the maximum session time that we, as a SP, can accept when receiving assertions based on older
+   * Assigns the maximum session time that we, as an SP, can accept when receiving assertions based on older
    * authentications (SSO).
    *
    * @param duration max session time

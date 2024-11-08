@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.response.replay;
 
-import java.time.Instant;
-import java.util.Optional;
-
 import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.RequestAbstractType;
@@ -25,6 +22,9 @@ import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.storage.ReplayCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Message replay checker implementation using OpenSAML's {@link ReplayCache} as an underlying cache.
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class MessageReplayCheckerImpl implements MessageReplayChecker {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(MessageReplayCheckerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(MessageReplayCheckerImpl.class);
 
   /** The replay cache. */
   private ReplayCache replayCache;
@@ -63,7 +63,7 @@ public class MessageReplayCheckerImpl implements MessageReplayChecker {
   public void checkReplay(final String id) throws MessageReplayException {
     if (!this.replayCache.check(this.replayCacheName, id,
         Instant.ofEpochMilli(this.replayCacheExpiration + System.currentTimeMillis()))) {
-      String msg = String.format("Replay check of ID '%s' failed", id);
+      final String msg = String.format("Replay check of ID '%s' failed", id);
       log.warn(msg);
       throw new MessageReplayException(msg);
     }

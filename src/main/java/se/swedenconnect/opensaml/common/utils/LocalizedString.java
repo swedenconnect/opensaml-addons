@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ public class LocalizedString {
    * @param source the string to parse
    */
   public LocalizedString(final String source) {
-    String _source = source.trim();
-    int i = _source.indexOf('-');
+    final String _source = source.trim();
+    final int i = _source.indexOf('-');
     if (i <= 0 || i > 3) {
       throw new IllegalArgumentException("Bad format on localized string, expected <language code>-String");
     }
@@ -144,8 +144,7 @@ public class LocalizedString {
     if (obj == this) {
       return true;
     }
-    if (obj instanceof LocalizedString) {
-      LocalizedString otherLString = (LocalizedString) obj;
+    if (obj instanceof final LocalizedString otherLString) {
       return Objects.equal(this.localizedString, otherLString.getLocalString())
           && Objects.equal(this.getLanguage(), otherLString.getLanguage());
     }

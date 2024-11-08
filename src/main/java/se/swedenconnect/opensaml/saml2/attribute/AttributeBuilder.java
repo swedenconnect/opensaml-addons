@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.attribute;
 
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import net.shibboleth.shared.xml.XMLParserException;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLRuntimeException;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -29,9 +24,12 @@ import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeValue;
-
-import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
+
+import javax.xml.namespace.QName;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Implements the build pattern to create {@link Attribute} objects.
@@ -105,7 +103,8 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
   }
 
   /**
-   * Static utility method that creates a {@code AttributeBuilder} given a template attribute read from an input stream.
+   * Static utility method that creates a {@code AttributeBuilder} given a template attribute read from an input
+   * stream.
    *
    * @param resource the attribute template
    * @return an attribute builder
@@ -179,18 +178,17 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
   }
 
   /**
-   * @see #value(String...)
-   *
    * @param values the string value(s) to add
    * @return the builder
+   * @see #value(String...)
    */
   public AttributeBuilder value(final List<String> values) {
     if (values == null) {
       this.object().getAttributeValues().clear();
       return this;
     }
-    for (String s : values) {
-      XSString sv = createValueObject(XSString.TYPE_NAME, XSString.class);
+    for (final String s : values) {
+      final XSString sv = createValueObject(XSString.TYPE_NAME, XSString.class);
       sv.setValue(s);
       this.object().getAttributeValues().add(sv);
     }
@@ -228,10 +226,10 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
    */
   public static <T extends XMLObject> T createValueObject(final Class<T> clazz) {
     try {
-      QName schemaType = (QName) clazz.getDeclaredField("TYPE_NAME").get(null);
+      final QName schemaType = (QName) clazz.getDeclaredField("TYPE_NAME").get(null);
       return createValueObject(schemaType, clazz);
     }
-    catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
+    catch (final NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
       throw new XMLRuntimeException(e);
     }
   }
@@ -249,7 +247,7 @@ public class AttributeBuilder extends AbstractSAMLObjectBuilder<Attribute> {
    *
    * @param <T> the type
    * @param schemaType the schema type that should be assigned to the attribute value, i.e.,
-   *          {@code xsi:type="ns:ValueType"}
+   *     {@code xsi:type="ns:ValueType"}
    * @param clazz the type of the attribute value
    * @return the attribute value
    * @see #createValueObject(Class)

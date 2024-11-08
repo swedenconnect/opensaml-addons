@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
-
+import net.shibboleth.shared.codec.Base64Support;
+import net.shibboleth.shared.codec.EncodingException;
+import net.shibboleth.shared.xml.SerializeSupport;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -35,11 +34,11 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-
-import net.shibboleth.shared.codec.Base64Support;
-import net.shibboleth.shared.codec.EncodingException;
-import net.shibboleth.shared.xml.SerializeSupport;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A RequestHttpObject for sending using HTTP POST.
@@ -47,71 +46,56 @@ import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
  * If signature credentials are supplied when creating the object the request will be signed.
  * </p>
  *
+ * @param <T> the type of the request
  * @author Martin Lindström (martin@idsec.se)
- *
- * @param <T>
- *          the type of the request
  */
 public class PostRequestHttpObject<T extends RequestAbstractType> implements RequestHttpObject<T> {
 
   /** Logging instance. */
-  private static final Logger logger = LoggerFactory.getLogger(PostRequestHttpObject.class);
+  private static final Logger log = LoggerFactory.getLogger(PostRequestHttpObject.class);
 
   /** The request. */
-  private T request;
+  private final T request;
 
   /** The URL to redirect to. */
-  private String sendUrl;
+  private final String sendUrl;
 
   /** HTTP headers. */
-  private Map<String, String> httpHeaders = new HashMap<>();
+  private final Map<String, String> httpHeaders = new HashMap<>();
 
   /** The POST parameters. */
-  private Map<String, String> postParameters = new HashMap<>();
+  private final Map<String, String> postParameters = new HashMap<>();
 
   /**
    * Constructor that puts together the resulting object.
    *
-   * @param request
-   *          the request object
-   * @param relayState
-   *          the relay state
-   * @param signatureCredentials
-   *          optional signature credentials
-   * @param endpoint
-   *          the endpoint where we send this request to
-   * @param recipientMetadata
-   *          the recipient metadata (may be {@code null})
-   * @throws MessageEncodingException
-   *           for encoding errors
-   * @throws SignatureException
-   *           for signature errors
+   * @param request the request object
+   * @param relayState the relay state
+   * @param signatureCredentials optional signature credentials
+   * @param endpoint the endpoint where we send this request to
+   * @param recipientMetadata the recipient metadata (may be {@code null})
+   * @throws MessageEncodingException for encoding errors
+   * @throws SignatureException for signature errors
    */
   public PostRequestHttpObject(final T request, final String relayState, final X509Credential signatureCredentials,
-      final String endpoint, final EntityDescriptor recipientMetadata) throws MessageEncodingException, SignatureException {
+      final String endpoint, final EntityDescriptor recipientMetadata)
+      throws MessageEncodingException, SignatureException {
     this(request, relayState, signatureCredentials, endpoint, recipientMetadata, null);
   }
 
   /**
    * Constructor that puts together the resulting object.
    *
-   * @param request
-   *          the request object
-   * @param relayState
-   *          the relay state
-   * @param signatureCredentials
-   *          optional signature credentials
-   * @param endpoint
-   *          the endpoint where we send this request to
-   * @param recipientMetadata
-   *          the recipient metadata (may be null)
-   * @param defaultSignatureSigningConfiguration
-   *          the default signature configuration for the application. If null, the value returned from
-   *          {@link SecurityConfigurationSupport#getGlobalSignatureSigningConfiguration()} will be used
-   * @throws MessageEncodingException
-   *           for encoding errors
-   * @throws SignatureException
-   *           for signature errors
+   * @param request the request object
+   * @param relayState the relay state
+   * @param signatureCredentials optional signature credentials
+   * @param endpoint the endpoint where we send this request to
+   * @param recipientMetadata the recipient metadata (may be null)
+   * @param defaultSignatureSigningConfiguration the default signature configuration for the application. If null,
+   *     the value returned from {@link SecurityConfigurationSupport#getGlobalSignatureSigningConfiguration()} will be
+   *     used
+   * @throws MessageEncodingException for encoding errors
+   * @throws SignatureException for signature errors
    */
   public PostRequestHttpObject(final T request, final String relayState, final X509Credential signatureCredentials,
       final String endpoint, final EntityDescriptor recipientMetadata,
@@ -130,31 +114,28 @@ public class PostRequestHttpObject<T extends RequestAbstractType> implements Req
     // Assign SAMLRequest
     //
     if (signatureCredentials != null) {
-      logger.trace("Signing SAML Request message ...");
+      log.trace("Signing SAML Request message ...");
       SAMLObjectSigner.sign(this.request, signatureCredentials,
-        defaultSignatureSigningConfiguration != null
-            ? defaultSignatureSigningConfiguration
-            : SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration(),
-        recipientMetadata);
+          defaultSignatureSigningConfiguration != null
+              ? defaultSignatureSigningConfiguration
+              : SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration(),
+          recipientMetadata);
     }
 
-    logger.trace("Marshalling and Base64 encoding SAML message");
+    log.trace("Marshalling and Base64 encoding SAML message");
     final Element domMessage;
     try {
       domMessage = XMLObjectSupport.marshall((XMLObject) context.getMessage());
     }
-    catch (MarshallingException e) {
+    catch (final MarshallingException e) {
       throw new MessageEncodingException("Error marshalling SAML message", e);
     }
 
     try {
       final String messageXML = SerializeSupport.nodeToString(domMessage);
-      final String encodedMessage = Base64Support.encode(messageXML.getBytes("UTF-8"), Base64Support.UNCHUNKED);
+      final String encodedMessage =
+          Base64Support.encode(messageXML.getBytes(StandardCharsets.UTF_8), Base64Support.UNCHUNKED);
       this.postParameters.put("SAMLRequest", encodedMessage);
-    }
-    catch (final UnsupportedEncodingException e) {
-      logger.error("UTF-8 encoding is not supported, this VM is not Java compliant.");
-      throw new MessageEncodingException("Unable to encode message, UTF-8 encoding is not supported");
     }
     catch (final EncodingException e) {
       throw new MessageEncodingException("Unable to encode message", e);
@@ -163,7 +144,7 @@ public class PostRequestHttpObject<T extends RequestAbstractType> implements Req
     // Assign RelayState
     //
     if (SAMLBindingSupport.checkRelayState(relayState)) {
-      logger.debug("Setting RelayState parameter to: '{}'", relayState);
+      log.debug("Setting RelayState parameter to: '{}'", relayState);
       this.postParameters.put("RelayState", relayState);
     }
 
@@ -212,8 +193,9 @@ public class PostRequestHttpObject<T extends RequestAbstractType> implements Req
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return String.format("request-type='%s', sendUrl='%s', httpHeaders='%s, postParameters=%s", this.request.getClass().getSimpleName(),
-      this.sendUrl, this.httpHeaders, this.postParameters);
+    return String.format("request-type='%s', sendUrl='%s', httpHeaders='%s, postParameters=%s",
+        this.request.getClass().getSimpleName(),
+        this.sendUrl, this.httpHeaders, this.postParameters);
   }
 
 }

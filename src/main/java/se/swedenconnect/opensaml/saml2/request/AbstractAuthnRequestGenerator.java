@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import net.shibboleth.shared.component.AbstractInitializableComponent;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
+import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.messaging.encoder.MessageEncodingException;
@@ -37,16 +34,18 @@ import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.shibboleth.shared.component.AbstractInitializableComponent;
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
-import net.shibboleth.shared.security.impl.RandomIdentifierGenerationStrategy;
 import se.swedenconnect.opensaml.common.utils.SamlLog;
 import se.swedenconnect.opensaml.saml2.core.build.AuthnRequestBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
 import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 import se.swedenconnect.opensaml.saml2.request.AuthnRequestGeneratorContext.HokRequirement;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for generating AuthnRequest messages.
@@ -57,7 +56,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     implements AuthnRequestGenerator {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(AbstractAuthnRequestGenerator.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractAuthnRequestGenerator.class);
 
   /** The SP entityID. */
   private final String spEntityID;
@@ -133,7 +132,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     // If the hok-requirement states that HoK must be used, we ensure that the SP
     // has an AssertionConsumerService endpoint dedicated for this.
     //
-    if (HokRequirement.REQUIRED.equals(generatorContext.getHokRequirement())) {
+    if (HokRequirement.REQUIRED == generatorContext.getHokRequirement()) {
       if (HolderOfKeyMetadataSupport.getHokAssertionConsumerServices(spDescriptor).isEmpty()) {
         throw new RequestGenerationException(
             "Context Holder-of-key requirement states that HoK must be used, but SP does not "
@@ -146,11 +145,11 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     final SingleSignOnService ssoService = this.getSingleSignOnService(idp, generatorContext);
 
     // Is this a HoK endpoint?
-    boolean hokActive = HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI.equals(ssoService.getBinding());
+    final boolean hokActive = HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI.equals(ssoService.getBinding());
 
     // OK, let's start building the AuthnRequest ...
     //
-    AuthnRequestBuilder builder = AuthnRequestBuilder.builder();
+    final AuthnRequestBuilder builder = AuthnRequestBuilder.builder();
     builder
         .id(this.idGenerator.generateIdentifier())
         .issuer(this.getSpEntityID())
@@ -189,7 +188,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     //
     final List<NameIDFormat> idpFormats = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS).getNameIDFormats();
     final List<NameIDFormat> formats = spDescriptor.getNameIDFormats().stream()
-        .filter(f -> idpFormats.stream().filter(idpf -> idpf.getURI().equals(f.getURI())).findFirst().isPresent())
+        .filter(f -> idpFormats.stream().anyMatch(idpf -> idpf.getURI().equals(f.getURI())))
         .collect(Collectors.toList());
     builder.nameIDPolicy(generatorContext.getNameIDPolicyBuilderFunction().apply(formats));
 
@@ -331,8 +330,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
         throw new RequestGenerationException("Unsupported binding: " + binding);
       }
     }
-    catch (MessageEncodingException | SignatureException e) {
-      String msg = "Failed to encode/sign request for transport";
+    catch (final MessageEncodingException | SignatureException e) {
+      final String msg = "Failed to encode/sign request for transport";
       log.error(msg, e);
       throw new RequestGenerationException(msg);
     }
@@ -387,8 +386,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     final IDPSSODescriptor descriptor = Optional.ofNullable(idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS))
         .orElseThrow(() -> new RequestGenerationException("Invalid IdP metadata - missing IDPSSODescriptor"));
 
-    if (HokRequirement.REQUIRED.equals(context.getHokRequirement())
-        || HokRequirement.IF_AVAILABLE.equals(context.getHokRequirement())) {
+    if (HokRequirement.REQUIRED == context.getHokRequirement()
+        || HokRequirement.IF_AVAILABLE == context.getHokRequirement()) {
       SingleSignOnService ssoService = null;
       for (final SingleSignOnService sso : HolderOfKeyMetadataSupport.getHokSingleSignOnServices(descriptor)) {
         final String protocolBinding =
@@ -403,15 +402,15 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
       if (ssoService != null) {
         return ssoService;
       }
-      else if (HokRequirement.REQUIRED.equals(context.getHokRequirement())) {
-        String msg = String.format("IdP '%s' does not specify endpoints for Holder-of-key - cannot send request",
+      else if (HokRequirement.REQUIRED == context.getHokRequirement()) {
+        final String msg = String.format("IdP '%s' does not specify endpoints for Holder-of-key - cannot send request",
             idp.getEntityID());
         log.error(msg);
         throw new RequestGenerationException(msg);
       }
       else {
         // HokRequirement.IF_AVAILABLE
-        log.info("IdP '%s' does not specify endpoints for Holder-of-key - using normal WebSSO Profile",
+        log.info("IdP '{}' does not specify endpoints for Holder-of-key - using normal WebSSO Profile",
             idp.getEntityID());
       }
     }
@@ -430,7 +429,7 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
           .orElse(null);
     }
     if (ssoService == null) {
-      String msg = String.format(
+      final String msg = String.format(
           "IdP '%s' does not specify endpoints for POST or Redirect - cannot send request", idp.getEntityID());
       log.error(msg);
       throw new RequestGenerationException(msg);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-
+import net.shibboleth.shared.net.URIComparator;
+import net.shibboleth.shared.net.URIException;
+import net.shibboleth.shared.net.impl.BasicURLComparator;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.assertion.ValidationContext;
@@ -33,14 +32,14 @@ import org.opensaml.xmlsec.signature.support.SignaturePrevalidator;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.shibboleth.shared.net.URIComparator;
-import net.shibboleth.shared.net.URIException;
-import net.shibboleth.shared.net.impl.BasicURLComparator;
 import se.swedenconnect.opensaml.common.validation.AbstractSignableObjectValidator;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationResultException;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Response validator that ensures that a {@code Response} element is valid according to the 2.0 SAML Core specification
@@ -75,7 +74,7 @@ import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationR
 public class ResponseValidator extends AbstractSignableObjectValidator<Response> {
 
   /** Class logger. */
-  private final Logger log = LoggerFactory.getLogger(ResponseValidator.class);
+  private static final Logger log = LoggerFactory.getLogger(ResponseValidator.class);
 
   /** The URI comparator used when checking URL:s against each other. */
   private URIComparator uriComparator = new BasicURLComparator();
@@ -119,7 +118,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       ValidationSupport.check(this.validateAssertions(response, context));
       ValidationSupport.check(this.validateExtensions(response, context));
     }
-    catch (ValidationResultException e) {
+    catch (final ValidationResultException e) {
       return e.getResult();
     }
 
@@ -234,7 +233,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     }
     String expectedInResponseTo = (String) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST_ID);
     if (expectedInResponseTo == null) {
-      AuthnRequest authnRequest =
+      final AuthnRequest authnRequest =
           (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
       if (authnRequest != null) {
         expectedInResponseTo = authnRequest.getID();
@@ -286,7 +285,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       catch (final URIException e) {
         final String msg = String.format(
             "Error when comparing Destination attribute (%s) with URL on which the response was received (%s) - %s",
-            response.getDestination(), receiveUrl, e.getMessage(), e);
+            response.getDestination(), receiveUrl, e.getMessage());
         context.getValidationFailureMessages().add(msg);
         return ValidationResult.INVALID;
       }
@@ -362,7 +361,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
       }
     }
     else {
-      if (response.getAssertions().size() > 0 || response.getEncryptedAssertions().size() > 0) {
+      if (!response.getAssertions().isEmpty() || !response.getEncryptedAssertions().isEmpty()) {
         context.getValidationFailureMessages()
             .add("Response message has failure status but contains assertions - invalid");
         return ValidationResult.INVALID;

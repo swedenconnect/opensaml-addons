@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.attribute;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSBoolean;
@@ -30,6 +24,12 @@ import org.opensaml.core.xml.schema.XSInteger;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Attribute;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Helper methods for accessing attribute values. See also {@link AttributeBuilder}.
@@ -131,7 +131,7 @@ public class AttributeUtils {
     if (type.isInstance(obj)) {
       return Stream.of(type.cast(obj));
     }
-    else if (XSAny.class.isInstance(obj)) {
+    else if (obj instanceof XSAny) {
       if (type.isAssignableFrom(XSString.class)) {
         final XSString newObject = (XSString) XMLObjectSupport.buildXMLObject(XSString.TYPE_NAME);
         newObject.setValue(((XSAny) obj).getTextContent());
@@ -176,7 +176,7 @@ public class AttributeUtils {
             return Stream.of(type.cast(newObject));
           }
         }
-        catch (final Exception e) {
+        catch (final Exception ignored) {
         }
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
    */
   @BeforeAll
   public static void setup() throws Exception {
-    Resource entireMetadata = new ClassPathResource("/metadata/sveleg-fedtest.xml");
-    Element entireMetadataDOM = XMLObjectProviderRegistrySupport.getParserPool()
+    final Resource entireMetadata = new ClassPathResource("/metadata/sveleg-fedtest.xml");
+    final Element entireMetadataDOM = XMLObjectProviderRegistrySupport.getParserPool()
       .parse(entireMetadata.getInputStream())
       .getDocumentElement();
     entireMetadataProvider = new StaticMetadataProvider(entireMetadataDOM);
@@ -95,7 +95,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
 
     // Setup the composite provider with three providers (for the three parts)
     //
-    CompositeMetadataProvider provider =
+    final CompositeMetadataProvider provider =
         new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
           new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
 
@@ -114,23 +114,23 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
       ed = provider.getEntityDescriptor(TEST_SP, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
       Assertions.assertNotNull(ed, String.format("SPSSODescriptor for '%s' was not found", TEST_SP));
 
-      List<EntityDescriptor> idps = provider.getIdentityProviders();
+      final List<EntityDescriptor> idps = provider.getIdentityProviders();
       Assertions.assertEquals(2, idps.size(), "Expected 2 IdPs");
 
-      List<EntityDescriptor> sps = provider.getServiceProviders();
+      final List<EntityDescriptor> sps = provider.getServiceProviders();
       Assertions.assertEquals(43, sps.size(), "Expected 43 SPs");
 
-      XMLObject xmlObject = provider.getMetadata();
+      final XMLObject xmlObject = provider.getMetadata();
       Assertions.assertNotNull(xmlObject, "Could not get metadata XMLObject from provider");
       Assertions.assertTrue(xmlObject instanceof EntitiesDescriptor, "Expected EntitiesDescriptor");
 
       // Make sure that no signature is there, and so on
-      EntitiesDescriptor metadata = (EntitiesDescriptor) xmlObject;
+      final EntitiesDescriptor metadata = (EntitiesDescriptor) xmlObject;
       Assertions.assertNull(metadata.getSignature(), "Expected no signature");
       Assertions.assertEquals(provider.getID(), metadata.getName());
       Assertions.assertNotNull("Expected ID to be assigned", metadata.getID());
 
-      Element xml = provider.getMetadataDOM();
+      final Element xml = provider.getMetadataDOM();
       Assertions.assertNotNull(xml, "Could not get metadata DOM from provider");
     }
     finally {
@@ -148,16 +148,16 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
    */
   @Test
   public void testDOM() throws Exception {
-    CompositeMetadataProvider provider =
+    final CompositeMetadataProvider provider =
         new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
           new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
 
     try {
       provider.initialize();
-      Element dom = provider.getMetadataDOM();
-      EntitiesDescriptor ed = EntitiesDescriptor.class.cast(XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom));
-      for (EntityDescriptor e : ed.getEntityDescriptors()) {
-        EntityDescriptor e2 = provider.getEntityDescriptor(e.getEntityID());
+      final Element dom = provider.getMetadataDOM();
+      final EntitiesDescriptor ed = (EntitiesDescriptor) XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom);
+      for (final EntityDescriptor e : ed.getEntityDescriptors()) {
+        final EntityDescriptor e2 = provider.getEntityDescriptor(e.getEntityID());
         Assertions.assertNotNull(e2, String.format("EntityDescriptor for '%s' was not found", e.getEntityID()));
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.build;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -27,8 +24,10 @@ import org.opensaml.saml.saml2.metadata.KeyDescriptor;
 import org.opensaml.saml.saml2.metadata.NameIDFormat;
 import org.opensaml.saml.saml2.metadata.SSODescriptor;
 import org.opensaml.saml.saml2.metadata.SingleLogoutService;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Abstract base class for building a {@link SSODescriptor}.
@@ -79,7 +78,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
           this.object().getKeyDescriptors().add(XMLObjectSupport.cloneXMLObject(kd));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -168,7 +167,7 @@ public abstract class AbstractSSODescriptorBuilder<T extends SSODescriptor, B ex
           this.object().getSingleLogoutServices().add(XMLObjectSupport.cloneXMLObject(slo));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }

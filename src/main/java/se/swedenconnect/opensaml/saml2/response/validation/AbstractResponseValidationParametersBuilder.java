@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
 
-import java.util.Collections;
-
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 import org.opensaml.saml.saml2.core.AuthnRequest;
-
 import se.swedenconnect.opensaml.common.validation.AbstractValidationParametersBuilder;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
+
+import java.util.Collections;
 
 /**
  * Abstract builder class for building the {@link ValidationContext} object for use as validation input to the

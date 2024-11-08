@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,19 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.PatternSyntaxException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLRuntimeException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
-
 import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
 import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Utility methods for validating a scoped attribute against a {@code shibmd:Scope} element.
@@ -40,14 +39,13 @@ public class ScopeUtils {
   /**
    * Given an (IdP) {@link EntityDescriptor}, the method finds all {@code shibmd:Scope} elements.
    *
-   * @param entityDescriptor
-   *          the metadata object
+   * @param entityDescriptor the metadata object
    * @return a (possible empty) list of {@code shibmd:Scope} elements
    */
   public static List<XMLObject> getScopeExtensions(final EntityDescriptor entityDescriptor) {
     return Optional.ofNullable(entityDescriptor.getIDPSSODescriptor(SAMLConstants.SAML20P_NS))
-      .map(d -> EntityDescriptorUtils.getMetadataExtensions(d.getExtensions(), Scope.DEFAULT_ELEMENT_NAME))
-      .orElse(Collections.emptyList());
+        .map(d -> EntityDescriptorUtils.getMetadataExtensions(d.getExtensions(), Scope.DEFAULT_ELEMENT_NAME))
+        .orElse(Collections.emptyList());
   }
 
   /**
@@ -57,17 +55,13 @@ public class ScopeUtils {
    * If an attribute that is not "scoped" (value@scope) the method returns {@code false}.
    * </p>
    *
-   * @param scopedAttribute
-   *          the attribute to test
-   * @param scopes
-   *          the shibmd:Scope elements
+   * @param scopedAttribute the attribute to test
+   * @param scopes the shibmd:Scope elements
    * @return true if the attribute scope is listed among the Scope extensions and false otherwise
    */
   public static boolean isAuthorized(final Attribute scopedAttribute, final List<XMLObject> scopes) {
     return scopes.stream()
-      .filter(s -> isMatch(s, scopedAttribute))
-      .findFirst()
-      .isPresent();
+        .anyMatch(s -> isMatch(s, scopedAttribute));
   }
 
   /**
@@ -77,17 +71,15 @@ public class ScopeUtils {
    * If the attribute contains multiple values, all must match the scope.
    * </p>
    *
-   * @param scope
-   *          the Scope element
-   * @param attribute
-   *          the attribute
+   * @param scope the Scope element
+   * @param attribute the attribute
    * @return true if there is a match and false otherwise
    */
   public static boolean isMatch(final XMLObject scope, final Attribute attribute) {
     if (attribute == null) {
       return false;
     }
-    List<String> attributeValues = AttributeUtils.getAttributeStringValues(attribute);
+    final List<String> attributeValues = AttributeUtils.getAttributeStringValues(attribute);
     for (final String a : attributeValues) {
       if (!isMatch(scope, a)) {
         return false;
@@ -100,10 +92,8 @@ public class ScopeUtils {
    * Given a {@code shibmd:Scope} element, the method tests whether the value of the (scoped) attribute matches the
    * scope.
    *
-   * @param scope
-   *          the Scope element
-   * @param attributeValue
-   *          the full attribute value
+   * @param scope the Scope element
+   * @param attributeValue the full attribute value
    * @return true if there is a match and false otherwise
    */
   public static boolean isMatch(final XMLObject scope, final String attributeValue) {
@@ -116,8 +106,8 @@ public class ScopeUtils {
       return false;
     }
 
-    boolean isRegexp = false;
-    String scopeValue = null;
+    final boolean isRegexp;
+    final String scopeValue;
 
     if (scope instanceof Scope) {
       isRegexp = ((Scope) scope).getRegexp();
@@ -149,8 +139,7 @@ public class ScopeUtils {
   /**
    * Gets the domain part (value@domain) from a scoped attribute value.
    *
-   * @param attributeValue
-   *          the attribute value
+   * @param attributeValue the attribute value
    * @return the domain part, or null
    */
   public static String getScopedDomain(final String attributeValue) {

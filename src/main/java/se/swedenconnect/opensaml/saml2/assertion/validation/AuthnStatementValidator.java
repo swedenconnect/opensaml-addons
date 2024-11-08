@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.assertion.validation;
 
-import java.time.Duration;
-import java.time.Instant;
-
+import jakarta.annotation.Nonnull;
+import net.shibboleth.shared.primitive.DeprecationSupport;
+import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
 import org.opensaml.saml.common.assertion.AssertionValidationException;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
@@ -28,13 +28,13 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.core.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.shibboleth.shared.primitive.DeprecationSupport;
-import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
 import se.swedenconnect.opensaml.common.validation.AbstractObjectValidator;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport;
 import se.swedenconnect.opensaml.common.validation.ValidationSupport.ValidationResultException;
+
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Core statement validator for {@link AuthnStatement}s.
@@ -80,12 +80,13 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
       CoreValidatorParameters.STD_PREFIX + ".MaxAcceptedSsoSessionTime";
 
   /** Class logger. */
-  private final Logger log = LoggerFactory.getLogger(AuthnStatementValidator.class);
+  private static final Logger log = LoggerFactory.getLogger(AuthnStatementValidator.class);
 
   /** {@inheritDoc} */
   @Override
-  public final ValidationResult validate(final Statement statement, final Assertion assertion,
-      final ValidationContext context)
+  @Nonnull
+  public final ValidationResult validate(@Nonnull final Statement statement, @Nonnull final Assertion assertion,
+      @Nonnull final ValidationContext context)
       throws AssertionValidationException {
 
     if (statement instanceof AuthnStatement) {
@@ -117,12 +118,12 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
       ValidationSupport.check(this.validateSubjectLocality(statement, assertion, context));
       ValidationSupport.check(this.validateAuthnContext(statement, assertion, context));
     }
-    catch (AssertionValidationException e) {
+    catch (final AssertionValidationException e) {
       log.warn("Error during determining AuthnStatement validity", e);
       context.getValidationFailureMessages().add("AuthnStatement validation failure - " + e.getMessage());
       return ValidationResult.INDETERMINATE;
     }
-    catch (ValidationResultException e) {
+    catch (final ValidationResultException e) {
       return e.getResult();
     }
     return ValidationResult.VALID;
@@ -137,15 +138,16 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
    * @return validation result
    */
   @Override
-  protected ValidationResult validateAuthnInstant(final AuthnStatement statement, final Assertion assertion,
-      final ValidationContext context) {
+  @Nonnull
+  protected ValidationResult validateAuthnInstant(@Nonnull final AuthnStatement statement,
+      @Nonnull final Assertion assertion, @Nonnull final ValidationContext context) {
 
     if (statement.getAuthnInstant() == null) {
       context.getValidationFailureMessages().add("AuthnInstant of Assertion/@AuthnStatement is missing");
       return ValidationResult.INVALID;
     }
 
-    // Assert the the authentication instant is not newer than the assertion issuance time.
+    // Assert the authentication instant is not newer than the assertion issuance time.
     //
     if (statement.getAuthnInstant().isAfter(assertion.getIssueInstant())) {
       context.getValidationFailureMessages().add("AuthnInstant is after assertion issue instant - invalid");
@@ -176,18 +178,18 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
     final Instant authnRequestIssueInstant = getAuthnRequestIssueInstant(context);
     final Duration clockSkew = AbstractObjectValidator.getAllowedClockSkew(context);
 
-    if (forceAuthn != null && forceAuthn.booleanValue()) {
+    if (forceAuthn != null && forceAuthn) {
       if (authnRequestIssueInstant != null) {
         if (authnInstant.plus(clockSkew).isBefore(authnRequestIssueInstant)) {
           final String msg = String.format("Invalid Assertion. Force authentication was requested, but authentication "
-              + "instant (%s) is before the issuance time of the authentication request (%s)",
+                  + "instant (%s) is before the issuance time of the authentication request (%s)",
               authnInstant, authnRequestIssueInstant);
           context.getValidationFailureMessages().add(msg);
           return ValidationResult.INVALID;
         }
       }
       else {
-        log.warn("%s (or %s) not suppplied - cannot check SSO", AUTHN_REQUEST_ISSUE_INSTANT,
+        log.warn("{} (or {}) not suppplied - cannot check SSO", AUTHN_REQUEST_ISSUE_INSTANT,
             CoreValidatorParameters.AUTHN_REQUEST);
       }
     }
@@ -239,12 +241,12 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
   protected static Duration getMaxAcceptedSsoSessionTime(final ValidationContext context) {
     final Object object = context.getStaticParameters().get(MAX_ACCEPTED_SSO_SESSION_TIME);
     if (object != null) {
-      if (Duration.class.isInstance(object)) {
-        return Duration.class.cast(object);
+      if (object instanceof Duration) {
+        return (Duration) object;
       }
-      else if (Long.class.isInstance(object)) {
+      else if (object instanceof Long) {
         DeprecationSupport.warn(ObjectType.CONFIGURATION, AUTHN_REQUEST_ISSUE_INSTANT, null, Duration.class.getName());
-        return Duration.ofMillis(Long.class.cast(object));
+        return Duration.ofMillis((Long) object);
       }
     }
     return null;
@@ -261,7 +263,7 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
   protected static Boolean getForceAuthnFlag(final ValidationContext context) {
     Boolean forceAuthn = (Boolean) context.getStaticParameters().get(AUTHN_REQUEST_FORCE_AUTHN);
     if (forceAuthn == null) {
-      AuthnRequest authnRequest =
+      final AuthnRequest authnRequest =
           (AuthnRequest) context.getStaticParameters().get(CoreValidatorParameters.AUTHN_REQUEST);
       if (authnRequest != null) {
         forceAuthn = authnRequest.isForceAuthn();
@@ -281,12 +283,12 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
   protected static Instant getAuthnRequestIssueInstant(final ValidationContext context) {
     final Object object = context.getStaticParameters().get(AUTHN_REQUEST_ISSUE_INSTANT);
     if (object != null) {
-      if (Instant.class.isInstance(object)) {
-        return Instant.class.cast(object);
+      if (object instanceof Instant) {
+        return (Instant) object;
       }
-      else if (Long.class.isInstance(object)) {
+      else if (object instanceof Long) {
         DeprecationSupport.warn(ObjectType.CONFIGURATION, AUTHN_REQUEST_ISSUE_INSTANT, null, Instant.class.getName());
-        return Instant.ofEpochMilli(Long.class.cast(object));
+        return Instant.ofEpochMilli((Long) object);
       }
     }
     final AuthnRequest authnRequest =
@@ -332,8 +334,9 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
    * @return validation result
    */
   @Override
-  protected ValidationResult validateAuthnContext(final AuthnStatement statement, final Assertion assertion,
-      final ValidationContext context) {
+  @Nonnull
+  protected ValidationResult validateAuthnContext(@Nonnull final AuthnStatement statement,
+      @Nonnull final Assertion assertion, @Nonnull final ValidationContext context) {
     if (statement.getAuthnContext() == null) {
       context.getValidationFailureMessages().add("AuthnContext element is missing in Assertion/@AuthnStatement");
       return ValidationResult.INVALID;

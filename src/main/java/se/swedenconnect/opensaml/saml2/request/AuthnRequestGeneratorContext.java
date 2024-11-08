@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
 import org.opensaml.saml.saml2.core.AuthnRequest;
@@ -29,13 +23,19 @@ import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.opensaml.saml.saml2.metadata.AssertionConsumerService;
 import org.opensaml.saml.saml2.metadata.AttributeConsumingService;
+import org.opensaml.saml.saml2.metadata.IndexedEndpoint;
 import org.opensaml.saml.saml2.metadata.NameIDFormat;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.SecurityConfigurationSupport;
 import org.opensaml.xmlsec.SignatureSigningConfiguration;
-
 import se.swedenconnect.opensaml.saml2.core.build.NameIDPolicyBuilder;
 import se.swedenconnect.opensaml.saml2.core.build.RequestedAuthnContextBuilder;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Defines a context which can be used to control how
@@ -127,7 +127,7 @@ public interface AuthnRequestGeneratorContext {
    */
   default AssertionConsumerServiceResolver getAssertionConsumerServiceResolver() {
     return (list) -> list.stream()
-        .filter(a -> a.isDefault())
+        .filter(IndexedEndpoint::isDefault)
         .map(AssertionConsumerService::getLocation)
         .findFirst()
         .orElse(list.stream()
@@ -178,9 +178,9 @@ public interface AuthnRequestGeneratorContext {
   default RequestedAuthnContextBuilderFunction getRequestedAuthnContextBuilderFunction() {
     return (list, hok) -> !list.isEmpty()
         ? RequestedAuthnContextBuilder.builder()
-            .comparison(AuthnContextComparisonTypeEnumeration.EXACT)
-            .authnContextClassRefs(list)
-            .build()
+        .comparison(AuthnContextComparisonTypeEnumeration.EXACT)
+        .authnContextClassRefs(list)
+        .build()
         : null;
   }
 
@@ -199,8 +199,8 @@ public interface AuthnRequestGeneratorContext {
 
   /**
    * The {@link AuthnRequestGenerator} is normally configured with a signing credential
-   * (AuthnRequestGenerator#getSignCredential()}. This method exist so that we may override the default credential.
-   * Mainly for testing purposes.
+   * {@link AuthnRequestGenerator#getSignCredential()}. This method exist so that we may override the default
+   * credential. Mainly for testing purposes.
    * <p>
    * The default implementation returns {@code null}.
    * </p>
@@ -222,7 +222,7 @@ public interface AuthnRequestGeneratorContext {
    * cases it is up to the function to decide whether to return a {@code String} or an {@code Integer}.
    * </p>
    */
-  public interface AssertionConsumerServiceResolver extends Function<List<AssertionConsumerService>, Object> {
+  interface AssertionConsumerServiceResolver extends Function<List<AssertionConsumerService>, Object> {
   }
 
   /**
@@ -234,7 +234,7 @@ public interface AuthnRequestGeneratorContext {
    * If this function returns {@code null}, no {@code AttributeConsumingServiceIndex} attribute will be included.
    * </p>
    */
-  public interface AttributeConsumingServiceIndexResolver extends Function<List<AttributeConsumingService>, Integer> {
+  interface AttributeConsumingServiceIndexResolver extends Function<List<AttributeConsumingService>, Integer> {
   }
 
   /**
@@ -249,7 +249,7 @@ public interface AuthnRequestGeneratorContext {
    * If the resolver returns {@code null}, no {@code NameIDPolicy} will be included in the {@code AuthnRequest}.
    * </p>
    */
-  public interface NameIDPolicyBuilderFunction extends Function<List<NameIDFormat>, NameIDPolicy> {
+  interface NameIDPolicyBuilderFunction extends Function<List<NameIDFormat>, NameIDPolicy> {
   }
 
   /**
@@ -262,7 +262,7 @@ public interface AuthnRequestGeneratorContext {
    * If the function returns {@code null} no {@code RequestedAuthnContext} is added to the {@code AuthnRequest}.
    * </p>
    */
-  public interface RequestedAuthnContextBuilderFunction
+  interface RequestedAuthnContextBuilderFunction
       extends BiFunction<List<String>, Boolean, RequestedAuthnContext> {
   }
 
@@ -271,13 +271,13 @@ public interface AuthnRequestGeneratorContext {
    * {@link AuthnRequestGeneratorContext#getAuthnRequestCustomizer()} method for the customizer that may operate and add
    * customizations to the request object.
    */
-  public interface AuthnRequestCustomizer extends Consumer<AuthnRequest> {
+  interface AuthnRequestCustomizer extends Consumer<AuthnRequest> {
   }
 
   /**
    * Enumeration that tells whether the Holder-of-key WebSSO profile is required, optional or not active.
    */
-  public enum HokRequirement {
+  enum HokRequirement {
 
     /**
      * The SP will always use HoK - A call to
@@ -295,6 +295,6 @@ public interface AuthnRequestGeneratorContext {
      * The holder-of-key profile will never be used.
      */
     DONT_USE
-  };
+  }
 
 }

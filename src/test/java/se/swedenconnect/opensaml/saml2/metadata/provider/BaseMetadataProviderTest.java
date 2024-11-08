@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package se.swedenconnect.opensaml.saml2.metadata.provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -155,7 +156,7 @@ public abstract class BaseMetadataProviderTest extends OpenSAMLTestBase {
       provider.initialize();
       final Element dom = provider.getMetadataDOM();
       final EntitiesDescriptor ed =
-          EntitiesDescriptor.class.cast(XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom));
+          (EntitiesDescriptor) XMLObjectSupport.getUnmarshaller(dom).unmarshall(dom);
       for (final EntityDescriptor e : ed.getEntityDescriptors()) {
         final EntityDescriptor e2 = provider.getEntityDescriptor(e.getEntityID());
         Assertions.assertNotNull(e2, String.format("EntityDescriptor for '%s' was not found", e.getEntityID()));
@@ -220,7 +221,7 @@ public abstract class BaseMetadataProviderTest extends OpenSAMLTestBase {
     final AbstractMetadataProvider provider =
         this.createMetadataProvider(new ClassPathResource("/metadata/sveleg-fedtest.xml"));
     try {
-      provider.setInclusionPredicates(Arrays.asList(includePredicate));
+      provider.setInclusionPredicates(Collections.singletonList(includePredicate));
       provider.initialize();
       final List<EntityDescriptor> list = new ArrayList<>();
       final Iterable<EntityDescriptor> i = provider.iterator();

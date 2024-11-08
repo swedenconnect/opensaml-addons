@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.net.MalformedURLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import net.shibboleth.shared.collection.Pair;
+import net.shibboleth.shared.net.URLBuilder;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.encoder.MessageEncodingException;
 import org.opensaml.saml.common.messaging.context.SAMLBindingContext;
@@ -40,12 +37,14 @@ import org.opensaml.xmlsec.impl.BasicSignatureSigningParametersResolver;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.shibboleth.shared.collection.Pair;
-import net.shibboleth.shared.net.URLBuilder;
-import net.shibboleth.shared.resolver.CriteriaSet;
-import net.shibboleth.shared.resolver.ResolverException;
 import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
+
+import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A RequestHttpObject for sending using HTTP GET (redirect binding).
@@ -53,27 +52,26 @@ import se.swedenconnect.opensaml.xmlsec.signature.support.SAMLObjectSigner;
  * If signature credentials are supplied when creating the object the request will be signed.
  * </p>
  *
- * @author Martin Lindström (martin@idsec.se)
- *
  * @param <T> the type of the request
+ * @author Martin Lindström (martin@idsec.se)
  */
 public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HTTPRedirectDeflateEncoder
     implements RequestHttpObject<T> {
 
   /** Logging instance. */
-  private static final Logger logger = LoggerFactory.getLogger(RedirectRequestHttpObject.class);
+  private static final Logger log = LoggerFactory.getLogger(RedirectRequestHttpObject.class);
 
   /** The request. */
-  private T request;
+  private final T request;
 
   /** The URL to redirect to. */
-  private String sendUrl;
+  private final String sendUrl;
 
   /** The destination URL. */
-  private String destinationUrl;
+  private final String destinationUrl;
 
   /** HTTP headers. */
-  private Map<String, String> httpHeaders = new HashMap<>();
+  private final Map<String, String> httpHeaders = new HashMap<>();
 
   /** The query parameters. */
   private Map<String, String> requestParameters = null;
@@ -104,9 +102,9 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
    * @param signatureCredentials optional signature credentials
    * @param endpoint the endpoint where we send this request to
    * @param recipientMetadata the recipient metadata (may be null)
-   * @param defaultSignatureSigningConfiguration the default signature configuration for the application. If null, the
-   *          value returned from {@link SecurityConfigurationSupport#getGlobalSignatureSigningConfiguration()} will be
-   *          used
+   * @param defaultSignatureSigningConfiguration the default signature configuration for the application. If null,
+   *     the value returned from {@link SecurityConfigurationSupport#getGlobalSignatureSigningConfiguration()} will be
+   *     used
    * @throws MessageEncodingException for encoding errors
    * @throws SignatureException for signature errors
    */
@@ -134,7 +132,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
       if (peerConfig != null) {
         configs[pos++] = peerConfig;
       }
-      // The system wide configuration for signing.
+      // The system-wide configuration for signing.
       configs[pos++] = defaultSignatureSigningConfiguration != null
           ? defaultSignatureSigningConfiguration
           : SecurityConfigurationSupport.getGlobalSignatureSigningConfiguration();
@@ -152,7 +150,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
         final SignatureSigningParameters parameters = signatureParametersResolver.resolveSingle(criteriaSet);
         messageContext.ensureSubcontext(SecurityParametersContext.class).setSignatureSigningParameters(parameters);
       }
-      catch (ResolverException e) {
+      catch (final ResolverException e) {
         throw new SignatureException(e);
       }
     }
@@ -164,7 +162,7 @@ public class RedirectRequestHttpObject<T extends RequestAbstractType> extends HT
     this.sendUrl = this.buildRedirectURL(messageContext, endpoint, encodedMessage);
     this.destinationUrl = endpoint;
 
-    logger.trace("Redirect URL is {}", this.sendUrl);
+    log.trace("Redirect URL is {}", this.sendUrl);
 
     this.httpHeaders.put("Cache-control", "no-cache, no-store");
     this.httpHeaders.put("Pragma", "no-cache");

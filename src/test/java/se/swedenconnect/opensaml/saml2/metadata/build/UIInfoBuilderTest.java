@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
   static {
     KEYWORDS = new HashMap<String, List<String>>();
     KEYWORDS.put(Locale.ENGLISH.getLanguage(), Arrays.asList("authentication", "SAML", "two-factor"));
-    KEYWORDS.put("sv", Arrays.asList("legitimering"));
+    KEYWORDS.put("sv", List.of("legitimering"));
   }
 
   /**
@@ -78,7 +78,7 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
   @Test
   public void testCreateFull() throws Exception {
 
-    UIInfo uiInfo = (new UIInfoBuilder())
+    final UIInfo uiInfo = (new UIInfoBuilder())
       .displayNames(DISPLAY_NAMES)
       .keywords(KEYWORDS)
       .descriptions(DESCRIPTIONS)
@@ -99,21 +99,21 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
   @Test
   public void testSimple() throws Exception {
 
-    LocalizedString[] displayNames = new LocalizedString[] {
+    final LocalizedString[] displayNames = new LocalizedString[] {
         new LocalizedString("Litsec legitimering", "sv"),
         new LocalizedString("Litsec authentication", Locale.ENGLISH) };
 
-    String[] keywords = new String[] { "authentication", "SAML", "two-factor" };
+    final String[] keywords = new String[] { "authentication", "SAML", "two-factor" };
 
-    LocalizedString description = new LocalizedString("Litsecs tjänst för legitimering", "sv");
+    final LocalizedString description = new LocalizedString("Litsecs tjänst för legitimering", "sv");
 
-    Logo[] logos = new Logo[] {
+    final Logo[] logos = new Logo[] {
         createLogo("http://www.litsec.se/logo-sv.jpg", null, 16, 16),
         createLogo("http://www.litsec.se/logo-sv-large.jpg", null, 200, 200) };
 
-    LocalizedString informationURL = new LocalizedString("http://www.litsec.se", "sv");
+    final LocalizedString informationURL = new LocalizedString("http://www.litsec.se", "sv");
 
-    UIInfo uiInfo = (new UIInfoBuilder())
+    final UIInfo uiInfo = (new UIInfoBuilder())
       .displayNames(displayNames)
       .keywords(keywords)
       .descriptions(description)
@@ -125,8 +125,8 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
         informationURL }, null);
   }
 
-  public static Logo createLogo(String url, String language, Integer height, Integer width) {
-    Logo logo = (Logo) XMLObjectSupport.buildXMLObject(Logo.DEFAULT_ELEMENT_NAME);
+  public static Logo createLogo(final String url, final String language, final Integer height, final Integer width) {
+    final Logo logo = (Logo) XMLObjectSupport.buildXMLObject(Logo.DEFAULT_ELEMENT_NAME);
     logo.setURI(url);
     logo.setXMLLang(language);
     logo.setHeight(height);
@@ -134,8 +134,8 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
     return logo;
   }
 
-  public static void assertUIInfo(UIInfo uiInfo, LocalizedString[] displayNames, Map<String, List<String>> keywords, String[] keywordsArray,
-      LocalizedString[] descriptions, Logo[] logos, LocalizedString[] informationURLs, LocalizedString[] privayStatementURLs) {
+  public static void assertUIInfo(final UIInfo uiInfo, final LocalizedString[] displayNames, final Map<String, List<String>> keywords, final String[] keywordsArray,
+      final LocalizedString[] descriptions, final Logo[] logos, final LocalizedString[] informationURLs, final LocalizedString[] privayStatementURLs) {
 
     Assertions.assertEquals(displayNames != null ? displayNames.length : 0, uiInfo.getDisplayNames().size());
     for (int i = 0; i < uiInfo.getDisplayNames().size(); i++) {
@@ -145,8 +145,8 @@ public class UIInfoBuilderTest extends OpenSAMLTestBase {
 
     if (keywords != null) {
       Assertions.assertEquals(keywords.keySet().size(), uiInfo.getKeywords().size());
-      for (Keywords kw : uiInfo.getKeywords()) {
-        List<String> words = keywords.get(kw.getXMLLang());
+      for (final Keywords kw : uiInfo.getKeywords()) {
+        final List<String> words = keywords.get(kw.getXMLLang());
         Assertions.assertNotNull(words);
         Assertions.assertEquals(words, kw.getKeywords());
       }

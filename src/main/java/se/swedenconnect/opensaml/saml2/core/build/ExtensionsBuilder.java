@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
           this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(obj));
         }
       }
-      catch (MarshallingException | UnmarshallingException e) {
+      catch (final MarshallingException | UnmarshallingException e) {
         throw new RuntimeException(e);
       }
     }
@@ -96,7 +96,7 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
     try {
       this.object().getUnknownXMLObjects().add(XMLObjectSupport.cloneXMLObject(extension));
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this;

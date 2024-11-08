@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,15 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.shibboleth.shared.component.ComponentInitializationException;
 import org.apache.commons.lang3.Validate;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
 import org.opensaml.saml.metadata.resolver.impl.AbstractMetadataResolver;
 
-import net.shibboleth.shared.component.ComponentInitializationException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A metadata provider that is constructed by assigning an OpenSAML {@link MetadataResolver} instance.
@@ -34,7 +33,7 @@ import net.shibboleth.shared.component.ComponentInitializationException;
 public class ProxyMetadataProvider extends AbstractMetadataProvider {
 
   /** The metadata resolver that we wrap in this class. */
-  private AbstractMetadataResolver metadataResolver;
+  private final AbstractMetadataResolver metadataResolver;
 
   /**
    * Constructor assigning the OpenSAML metadata resolver that this instance should proxy.
@@ -46,7 +45,7 @@ public class ProxyMetadataProvider extends AbstractMetadataProvider {
    */
   public ProxyMetadataProvider(final MetadataResolver metadataResolver) {
     Validate.notNull(metadataResolver, "metadataResolver must not be null");
-    Validate.isTrue(AbstractMetadataResolver.class.isInstance(metadataResolver),
+    Validate.isTrue(metadataResolver instanceof AbstractMetadataResolver,
         "Supplied metadata resolver must extend AbstractMetadataResolver");
     this.metadataResolver = (AbstractMetadataResolver) metadataResolver;
   }

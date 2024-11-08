@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import org.opensaml.saml.saml2.core.NameIDPolicy;
 import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.opensaml.saml.saml2.core.Scoping;
 import org.opensaml.saml.saml2.core.Subject;
-
 import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 
 /**
@@ -148,7 +147,7 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
           ? XMLObjectSupport.cloneXMLObject(subject)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();
@@ -167,7 +166,7 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
           ? XMLObjectSupport.cloneXMLObject(nameIDPolicy)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();
@@ -185,7 +184,7 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
           ? XMLObjectSupport.cloneXMLObject(conditions)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();
@@ -204,7 +203,7 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
           ? XMLObjectSupport.cloneXMLObject(requestedAuthnContext)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();
@@ -222,7 +221,7 @@ public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLOb
           ? XMLObjectSupport.cloneXMLObject(scoping)
           : null);
     }
-    catch (MarshallingException | UnmarshallingException e) {
+    catch (final MarshallingException | UnmarshallingException e) {
       throw new RuntimeException(e);
     }
     return this.getThis();

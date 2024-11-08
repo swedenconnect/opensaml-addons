@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,21 @@
  */
 package se.swedenconnect.opensaml;
 
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.http.UriCompliance;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.springframework.core.io.Resource;
+
+import java.nio.ByteBuffer;
 
 /**
  * Class for supporting test cases that need a web server.
@@ -66,6 +70,15 @@ public class TestWebServer {
     connector.setHost("localhost");
     this.server.addConnector(connector);
     this.server.setHandler(handler);
+
+    for (final Connector c : this.server.getConnectors()) {
+      c.getConnectionFactories().stream()
+          .filter(HttpConnectionFactory.class::isInstance)
+          .forEach(factory -> {
+            final HttpConfiguration httpConfig = ((HttpConnectionFactory) factory).getHttpConfiguration();
+            httpConfig.setUriCompliance(UriCompliance.LEGACY);
+          });
+    }
   }
 
   /**
@@ -121,7 +134,7 @@ public class TestWebServer {
   /**
    * The {@code ResourceHandler} that is used by the server.
    */
-  public static class ResourceHandler extends AbstractHandler {
+  public static class ResourceHandler extends Handler.Abstract {
 
     private final ResourceProvider resourceProvider;
 
@@ -130,15 +143,11 @@ public class TestWebServer {
     }
 
     @Override
-    public void handle(final String target, final Request baseRequest,
-        final jakarta.servlet.http.HttpServletRequest request,
-        final jakarta.servlet.http.HttpServletResponse response) throws IOException, jakarta.servlet.ServletException {
-
-      response.getOutputStream().write(IOUtils.toByteArray(this.resourceProvider.getResource().getInputStream()));
-      baseRequest.setHandled(true);
-
+    public boolean handle(final Request request, final Response response, final Callback callback) throws Exception {
+      response.write(
+          true, ByteBuffer.wrap(this.resourceProvider.getResource().getInputStream().readAllBytes()), callback);
+      return true;
     }
-
   }
 
 }

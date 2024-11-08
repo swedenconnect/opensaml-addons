@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.request;
 
-import java.util.Map;
-
 import org.opensaml.saml.saml2.core.RequestAbstractType;
+
+import java.util.Map;
 
 /**
  * Defines an interface that represents an object that holds data necessary for the SP application to transmit a request
@@ -32,9 +32,10 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
    * <p>
    * For a redirect, this URL could look something like:
    * {@code https://www.theidp.com/auth?SAMLRequest=<encoded request>&RelayState=abcd}.
-   *
    * </p>
+   * <p>
    * <b>Note:</b> Additional query parameters may be added to the URL by the using system.
+   * </p>
    *
    * @return the URL to use when sending the user to the Identity Provider
    */
@@ -43,7 +44,7 @@ public interface RequestHttpObject<T extends RequestAbstractType> {
   /**
    * Returns the URL to where we are sending the request. If the method is "POST", this will be the same value as for
    * {@link #getSendUrl()}, and if the method is "GET", the value is just the destination and not the query parameters.
-   * 
+   *
    * @return the destination URL
    */
   String getDestinationUrl();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,15 @@
  */
 package se.swedenconnect.opensaml.common.validation;
 
-import java.time.Duration;
-import java.time.Instant;
-
+import net.shibboleth.shared.primitive.DeprecationSupport;
+import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 
-import net.shibboleth.shared.primitive.DeprecationSupport;
-import net.shibboleth.shared.primitive.DeprecationSupport.ObjectType;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Abstract base class for {@link ObjectValidator}.
@@ -60,7 +59,7 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
    */
   public static boolean isStrictValidation(final ValidationContext context) {
     final Boolean strict = (Boolean) context.getStaticParameters().get(CoreValidatorParameters.STRICT_VALIDATION);
-    return strict != null ? strict.booleanValue() : false;
+    return strict != null && strict;
   }
 
   /**
@@ -74,13 +73,13 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
   public static Duration getAllowedClockSkew(final ValidationContext context) {
     final Object object = context.getStaticParameters().get(SAML2AssertionValidationParameters.CLOCK_SKEW);
     if (object != null) {
-      if (Duration.class.isInstance(object)) {
-        return Duration.class.cast(object);
+      if (object instanceof Duration) {
+        return (Duration) object;
       }
-      else if (Long.class.isInstance(object)) {
+      else if (object instanceof Long) {
         DeprecationSupport.warn(ObjectType.CONFIGURATION, SAML2AssertionValidationParameters.CLOCK_SKEW, null,
             Duration.class.getName());
-        return Duration.ofMillis(Long.class.cast(object));
+        return Duration.ofMillis((Long) object);
       }
     }
     return SAML20AssertionValidator.DEFAULT_CLOCK_SKEW;
@@ -97,13 +96,13 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
   public static Duration getMaxAgeReceivedMessage(final ValidationContext context) {
     final Object object = context.getStaticParameters().get(CoreValidatorParameters.MAX_AGE_MESSAGE);
     if (object != null) {
-      if (Duration.class.isInstance(object)) {
-        return Duration.class.cast(object);
+      if (object instanceof Duration) {
+        return (Duration) object;
       }
-      else if (Long.class.isInstance(object)) {
+      else if (object instanceof Long) {
         DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.MAX_AGE_MESSAGE, null,
             Duration.class.getName());
-        return Duration.ofMillis(Long.class.cast(object));
+        return Duration.ofMillis((Long) object);
       }
     }
     return DEFAULT_MAX_AGE_RECEIVED_MESSAGE;
@@ -119,13 +118,13 @@ public abstract class AbstractObjectValidator<T extends XMLObject> implements Ob
   public static Instant getReceiveInstant(final ValidationContext context) {
     final Object object = context.getStaticParameters().get(CoreValidatorParameters.RECEIVE_INSTANT);
     if (object != null) {
-      if (Instant.class.isInstance(object)) {
-        return Instant.class.cast(object);
+      if (object instanceof Instant) {
+        return (Instant) object;
       }
-      else if (Long.class.isInstance(object)) {
+      else if (object instanceof Long) {
         DeprecationSupport.warn(ObjectType.CONFIGURATION, CoreValidatorParameters.RECEIVE_INSTANT, null,
             Duration.class.getName());
-        return Instant.ofEpochMilli(Long.class.cast(object));
+        return Instant.ofEpochMilli((Long) object);
       }
     }
     return Instant.now();

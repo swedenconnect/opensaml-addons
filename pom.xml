@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.1</version>
+  <version>2.1.2-SNAPSHOT</version>
 
   <name>Sweden Connect :: OpenSAML 5.X utility extensions</name>
   <description>OpenSAML 5.X utility extension library</description>
@@ -44,11 +44,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>17</java.version>
 
-    <opensaml.version>5.1.2</opensaml.version>
+    <opensaml.version>5.1.3</opensaml.version>
     <shib.support.version>9.1.2</shib.support.version>
-    <slf4j.version>2.0.13</slf4j.version>
-    <jackson.version>2.17.1</jackson.version>
-    <bc.version>1.78.1</bc.version>
+    <slf4j.version>2.0.16</slf4j.version>
+    <jackson.version>2.18.1</jackson.version>
+    <bc.version>1.79</bc.version>
   </properties>
 
   <repositories>
@@ -88,13 +88,13 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.17.0</version>
+        <version>1.17.1</version>
       </dependency>
 
       <dependency>
         <groupId>org.apache.httpcomponents.core5</groupId>
         <artifactId>httpcore5</artifactId>
-        <version>5.2.4</version>
+        <version>5.3.1</version>
       </dependency>
 
       <dependency>
@@ -136,7 +136,21 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>3.0.4</version>
+        <version>3.0.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.17.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml-bom</artifactId>
+        <version>${opensaml.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
     </dependencies>
@@ -163,12 +177,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-storage-api</artifactId>
-      <version>${opensaml.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>6.1.0</version>
@@ -178,28 +186,27 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.14.0</version>
     </dependency>
 
     <!-- For testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.10.2</version>
+      <version>5.11.3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.10.2</version>
+      <version>5.11.3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.12.0</version>
+      <version>5.14.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -213,7 +220,7 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>11.0.21</version>
+      <version>12.0.15</version>
       <!-- <version>9.4.18.v20190429</version> -->
       <scope>test</scope>
       <exclusions>
@@ -228,7 +235,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <!-- <version>9.4.18.v20190429</version> -->
-      <version>11.0.21</version>
+      <version>12.0.15</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -241,7 +248,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
+      <version>2.17.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -261,7 +268,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.13.0</version>
         <configuration>
           <release>${java.version}</release>
         </configuration>
@@ -270,25 +277,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.5.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.2</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.4.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -307,7 +314,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.10.1</version>
         <configuration>
           <doctitle>OpenSAML 5.x utility extensions - ${project.version}</doctitle>
           <windowtitle>OpenSAML 5.x utility extensions - ${project.version}</windowtitle>
@@ -357,7 +364,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.13</version>
+            <version>1.7.0</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
@@ -375,7 +382,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.2.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -390,7 +397,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>

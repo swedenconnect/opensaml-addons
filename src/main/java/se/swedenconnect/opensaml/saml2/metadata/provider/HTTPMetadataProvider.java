@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.security.KeyStore;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.httpclient.HttpClientBuilder;
+import net.shibboleth.shared.httpclient.HttpClientSupport;
+import net.shibboleth.shared.httpclient.TLSSocketFactoryBuilder;
+import net.shibboleth.shared.resolver.ResolverException;
 import org.apache.commons.lang3.Validate;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
@@ -36,14 +33,15 @@ import org.opensaml.security.httpclient.HttpClientSecurityParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.httpclient.HttpClientBuilder;
-import net.shibboleth.shared.httpclient.HttpClientSupport;
-import net.shibboleth.shared.httpclient.TLSSocketFactoryBuilder;
-import net.shibboleth.shared.resolver.ResolverException;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * A provider that downloads metadata from a HTTP resource.
+ * A provider that downloads metadata from an HTTP resource.
  *
  * @author Martin Lindström (martin@idsec.se)
  * @see HTTPMetadataResolver
@@ -52,10 +50,10 @@ import net.shibboleth.shared.resolver.ResolverException;
 public class HTTPMetadataProvider extends AbstractMetadataProvider {
 
   /** Logging instance. */
-  private Logger log = LoggerFactory.getLogger(HTTPMetadataProvider.class);
+  private static final Logger log = LoggerFactory.getLogger(HTTPMetadataProvider.class);
 
   /** The metadata resolver. */
-  private HTTPMetadataResolver metadataResolver;
+  private final HTTPMetadataResolver metadataResolver;
 
   /**
    * Creates a provider that periodically downloads data from the URL given by {@code metadataUrl}. If the
@@ -65,12 +63,9 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * that is initialized according to {@link #createDefaultHttpClient()}.
    * </p>
    *
-   * @param metadataUrl
-   *          the URL to use when downloading metadata
-   * @param backupFile
-   *          optional path to the file to where the provider should store downloaded metadata
-   * @throws ResolverException
-   *           if the supplied metadata URL is invalid
+   * @param metadataUrl the URL to use when downloading metadata
+   * @param backupFile optional path to the file to where the provider should store downloaded metadata
+   * @throws ResolverException if the supplied metadata URL is invalid
    */
   public HTTPMetadataProvider(final String metadataUrl, final String backupFile) throws ResolverException {
     this(metadataUrl, backupFile, createDefaultHttpClient());
@@ -80,14 +75,10 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * Creates a provider that periodically downloads data from the URL given by {@code metadataUrl}. If the
    * {@code backupFile} parameter is given the provider also stores the downloaded metadata on disk as backup.
    *
-   * @param metadataUrl
-   *          the URL to use when downloading metadata
-   * @param backupFile
-   *          optional path to the file to where the provider should store downloaded metadata
-   * @param httpClient
-   *          the {@code HttpClient} that should be used to download the metadata
-   * @throws ResolverException
-   *           if the supplied metadata URL is invalid
+   * @param metadataUrl the URL to use when downloading metadata
+   * @param backupFile optional path to the file to where the provider should store downloaded metadata
+   * @param httpClient the {@code HttpClient} that should be used to download the metadata
+   * @throws ResolverException if the supplied metadata URL is invalid
    */
   public HTTPMetadataProvider(final String metadataUrl, final String backupFile, final HttpClient httpClient)
       throws ResolverException {
@@ -108,8 +99,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * </p>
    *
    * @return a default {@code HttpClient} instance
-   * @throws ResolverException
-   *           for errors creating the client
+   * @throws ResolverException for errors creating the client
    */
   public static HttpClient createDefaultHttpClient() throws ResolverException {
     return createDefaultHttpClient(null, new NoopHostnameVerifier());
@@ -120,40 +110,40 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * {@code trustKeyStore} parameter. The {@code hostnameVerifier} parameter tells which hostname verifier that should
    * be used. If not supplied, a {@link DefaultHostnameVerifier} will be used.
    *
-   * @param trustKeyStore
-   *          a KeyStore holding the certificates that should be accepted (if null, all certificates are accepted)
-   * @param hostnameVerifier
-   *          the HostnameVerifier to use (if null a DefaultHostnameVerifier is used)
+   * @param trustKeyStore a KeyStore holding the certificates that should be accepted (if null, all certificates are
+   *     accepted)
+   * @param hostnameVerifier the HostnameVerifier to use (if null a DefaultHostnameVerifier is used)
    * @return a HttpClient instance
-   * @throws ResolverException
-   *           for errors creating the client
+   * @throws ResolverException for errors creating the client
    */
-  public static HttpClient createDefaultHttpClient(final KeyStore trustKeyStore, final HostnameVerifier hostnameVerifier)
+  public static HttpClient createDefaultHttpClient(final KeyStore trustKeyStore,
+      final HostnameVerifier hostnameVerifier)
       throws ResolverException {
 
     try {
-      List<TrustManager> managers = null;
+      final List<TrustManager> managers;
       if (trustKeyStore != null) {
-        final TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        final TrustManagerFactory trustManagerFactory =
+            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustKeyStore);
         managers = Arrays.asList(trustManagerFactory.getTrustManagers());
       }
       else {
-        managers = Arrays.asList(HttpClientSupport.buildNoTrustX509TrustManager());
+        managers = List.of(HttpClientSupport.buildNoTrustX509TrustManager());
       }
 
       final HostnameVerifier hnv = hostnameVerifier != null ? hostnameVerifier : new DefaultHostnameVerifier();
 
-      HttpClientBuilder builder = new HttpClientBuilder();
+      final HttpClientBuilder builder = new HttpClientBuilder();
       builder.setUseSystemProperties(true);
       builder.setTLSSocketFactory(new TLSSocketFactoryBuilder()
-        .setHostnameVerifier(hnv)
-        .setTrustManagers(managers)
-        .build());
+          .setHostnameVerifier(hnv)
+          .setTrustManagers(managers)
+          .build());
 
       return builder.buildClient();
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       throw new ResolverException("Failed to initialize HttpClient", e);
     }
   }
@@ -189,7 +179,8 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
     final String url = this.metadataResolver.getMetadataURI();
     if (url != null && url.startsWith("http:")) {
       if (this.getSignatureVerificationCertificates() == null) {
-        log.warn("Metadata is downloaded using HTTP and signature verification is not configured - metadata cannot be trusted");
+        log.warn(
+            "Metadata is downloaded using HTTP and signature verification is not configured - metadata cannot be trusted");
       }
     }
 

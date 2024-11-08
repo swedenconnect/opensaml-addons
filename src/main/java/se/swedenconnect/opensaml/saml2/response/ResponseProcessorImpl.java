@@ -15,14 +15,16 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.xml.namespace.QName;
-
+import com.google.common.base.Objects;
+import net.shibboleth.shared.codec.Base64Support;
+import net.shibboleth.shared.codec.DecodingException;
+import net.shibboleth.shared.component.ComponentInitializationException;
+import net.shibboleth.shared.component.InitializableComponent;
+import net.shibboleth.shared.component.UnmodifiableComponentException;
+import net.shibboleth.shared.resolver.CriteriaSet;
+import net.shibboleth.shared.resolver.ResolverException;
+import net.shibboleth.shared.xml.SerializeSupport;
+import net.shibboleth.shared.xml.XMLParserException;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.UnmarshallingException;
@@ -59,18 +61,6 @@ import org.opensaml.xmlsec.signature.support.SignatureValidationParametersCriter
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Objects;
-
-import net.shibboleth.shared.codec.Base64Support;
-import net.shibboleth.shared.codec.DecodingException;
-import net.shibboleth.shared.component.ComponentInitializationException;
-import net.shibboleth.shared.component.InitializableComponent;
-import net.shibboleth.shared.component.UnmodifiableComponentException;
-import net.shibboleth.shared.resolver.CriteriaSet;
-import net.shibboleth.shared.resolver.ResolverException;
-import net.shibboleth.shared.xml.SerializeSupport;
-import net.shibboleth.shared.xml.XMLParserException;
 import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AbstractAssertionValidationParametersBuilder;
 import se.swedenconnect.opensaml.saml2.assertion.validation.AssertionValidationParametersBuilder;
@@ -85,6 +75,14 @@ import se.swedenconnect.opensaml.saml2.response.validation.ResponseValidator;
 import se.swedenconnect.opensaml.xmlsec.config.SecurityConfiguration;
 import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 
+import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Response processor for SAML Response messages.
  * <p>
@@ -96,7 +94,7 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 public class ResponseProcessorImpl implements ResponseProcessor, InitializableComponent {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(ResponseProcessorImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(ResponseProcessorImpl.class);
 
   /** Metadata resolver for finding IdP and SP metadata. */
   protected MetadataResolver metadataResolver;
@@ -113,7 +111,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   /** The signature trust engine to be used when validating signatures. */
   protected SignatureTrustEngine signatureTrustEngine;
 
-  /** Validator for checking the a Signature is correct with respect to the standards. */
+  /** Validator for checking that a Signature is correct with respect to the standards. */
   protected SignaturePrevalidator signatureProfileValidator = new SAMLSignatureProfileValidator();
 
   /** The response validator. */
@@ -183,7 +181,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
       // Step 6. Decrypt assertion (if needed)
       //
-      Assertion assertion = null;
+      final Assertion assertion;
       if (!response.getEncryptedAssertions().isEmpty()) {
         assertion = this.decrypter.decrypt(response.getEncryptedAssertions().get(0), Assertion.class);
         if (log.isTraceEnabled()) {
@@ -209,10 +207,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       //
       return new ResponseProcessingResultImpl(response, assertion);
     }
-    catch (MessageReplayException e) {
+    catch (final MessageReplayException e) {
       throw new ResponseProcessingException("Message replay: " + e.getMessage(), e, response);
     }
-    catch (DecryptionException e) {
+    catch (final DecryptionException e) {
       throw new ResponseProcessingException("Failed to decrypt assertion: " + e.getMessage(), e, response);
     }
   }
@@ -248,11 +246,12 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       this.signatureTrustEngine = new ExplicitKeySignatureTrustEngine(this.metadataCredentialResolver,
           DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
 
-      this.responseValidator = this.createResponseValidator(signatureTrustEngine, signatureProfileValidator);
+      this.responseValidator = this.createResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
       if (this.responseValidator == null) {
         throw new ComponentInitializationException("createResponseValidator must not return null");
       }
-      this.assertionValidator = this.createAssertionValidator(signatureTrustEngine, signatureProfileValidator);
+      this.assertionValidator =
+          this.createAssertionValidator(this.signatureTrustEngine, this.signatureProfileValidator);
       if (this.assertionValidator == null) {
         throw new ComponentInitializationException("createAssertionValidator must not return null");
       }
@@ -276,7 +275,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * </p>
    *
    * @param signatureTrustEngine the signature trust engine to be used when validating signatures
-   * @param signatureProfileValidator validator for checking the a Signature is correct with respect to the standards
+   * @param signatureProfileValidator validator for checking that a Signature is correct with respect to the
+   *     standards
    * @return the created response validator
    */
   protected ResponseValidator createResponseValidator(final SignatureTrustEngine signatureTrustEngine,
@@ -293,7 +293,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
    * </p>
    *
    * @param signatureTrustEngine the signature trust engine to be used when validating signatures
-   * @param signatureProfileValidator validator for checking the a Signature is correct with respect to the standards
+   * @param signatureProfileValidator validator for checking that a Signature is correct with respect to the
+   *     standards
    * @return the created assertion validator
    */
   protected AssertionValidator createAssertionValidator(
@@ -301,8 +302,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
     return new AssertionValidator(signatureTrustEngine, signatureProfileValidator,
         Arrays.asList(new BearerSubjectConfirmationValidator(), new HolderOfKeySubjectConfirmationValidator()),
-        Arrays.asList(new AudienceRestrictionConditionValidator()),
-        Arrays.asList(new AuthnStatementValidator()));
+        List.of(new AudienceRestrictionConditionValidator()),
+        List.of(new AuthnStatementValidator()));
   }
 
   protected AbstractAssertionValidationParametersBuilder<?> getAssertionValidationParametersBuilder() {
@@ -323,11 +324,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         log.info("Unable to Base64 decode SAML response message");
         throw new MessageDecodingException("Unable to Base64 decode SAML response message");
       }
-      return Response.class.cast(
-          XMLObjectSupport.unmarshallFromInputStream(
-              XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes)));
+      return (Response) XMLObjectSupport.unmarshallFromInputStream(
+          XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes));
     }
-    catch (MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
+    catch (final MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
       throw new ResponseProcessingException("Failed to decode message", e, null);
     }
   }
@@ -525,7 +525,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     if (this.securityConfiguration == null) {
       return null;
     }
-    SignatureValidationParameters parameters = new SignatureValidationParameters();
+    final SignatureValidationParameters parameters = new SignatureValidationParameters();
     final SignatureValidationConfiguration config = this.securityConfiguration.getSignatureValidationConfiguration();
     parameters.setSignatureTrustEngine(this.signatureTrustEngine);
     parameters.setIncludedAlgorithms(config.getIncludedAlgorithms());
@@ -624,11 +624,11 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   }
 
   /**
-   * Assigns whether require assertions to be encrypted? The default is {@code true}.
+   * Assigns whether we require assertions to be encrypted? The default is {@code true}.
    *
    * @param requireEncryptedAssertions boolean
    */
-  public void setRequireEncryptedAssertions(boolean requireEncryptedAssertions) {
+  public void setRequireEncryptedAssertions(final boolean requireEncryptedAssertions) {
     this.checkSetterPreconditions();
     this.requireEncryptedAssertions = requireEncryptedAssertions;
   }
@@ -674,7 +674,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     try {
       return SerializeSupport.prettyPrintXML(XMLObjectSupport.marshall(object));
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       return "";
     }
   }

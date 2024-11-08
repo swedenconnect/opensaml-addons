@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata;
 
-import java.io.ByteArrayInputStream;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.xml.namespace.QName;
-
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.ext.saml2alg.DigestMethod;
@@ -40,9 +28,19 @@ import org.opensaml.security.credential.UsageType;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.security.x509.X509Credential;
 import org.opensaml.xmlsec.signature.X509Data;
-
 import se.swedenconnect.opensaml.saml2.attribute.AttributeConstants;
 import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
+
+import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Utility methods for accessing metadata elements.
@@ -52,13 +50,13 @@ import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
 public class EntityDescriptorUtils {
 
   /** Factory for creating certificates. */
-  private static CertificateFactory certFactory = null;
+  private static final CertificateFactory certFactory;
 
   static {
     try {
       certFactory = CertificateFactory.getInstance("X.509");
     }
-    catch (CertificateException e) {
+    catch (final CertificateException e) {
       throw new SecurityException(e);
     }
   }
@@ -145,7 +143,7 @@ public class EntityDescriptorUtils {
       final UsageType usageType) {
     final List<X509Credential> creds = new ArrayList<>();
     for (final KeyDescriptor kd : descriptor.getKeyDescriptors()) {
-      if (usageType.equals(kd.getUse()) || kd.getUse() == null || UsageType.UNSPECIFIED.equals(kd.getUse())) {
+      if (usageType == kd.getUse() || kd.getUse() == null || UsageType.UNSPECIFIED == kd.getUse()) {
         if (kd.getKeyInfo() == null) {
           continue;
         }
@@ -155,7 +153,7 @@ public class EntityDescriptorUtils {
               creds.add(new BasicX509Credential((X509Certificate) certFactory.generateCertificate(
                   new ByteArrayInputStream(Base64.getDecoder().decode(cert.getValue())))));
             }
-            catch (Exception e) {
+            catch (final Exception ignored) {
             }
           }
         }

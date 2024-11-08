@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,9 +67,9 @@ public class SerializableOpenSamlObjectTest {
 
     private static final long serialVersionUID = -56880659229972600L;
 
-    private String text;
+    private final String text;
 
-    private SerializableOpenSamlObject<Issuer> issuer;
+    private final SerializableOpenSamlObject<Issuer> issuer;
 
     public TestObject(final String text, final Issuer issuer) {
       this.text = text;

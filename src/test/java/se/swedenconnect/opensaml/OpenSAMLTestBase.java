@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,17 @@
  */
 package se.swedenconnect.opensaml;
 
+import net.shibboleth.shared.xml.XMLParserException;
+import org.junit.jupiter.api.BeforeAll;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.util.XMLObjectSupport;
+import org.opensaml.security.x509.X509Credential;
+import org.opensaml.security.x509.impl.KeyStoreX509CredentialAdapter;
+import org.w3c.dom.Element;
+import se.swedenconnect.opensaml.xmlsec.config.DefaultSecurityConfiguration;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,18 +36,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.opensaml.core.xml.XMLObject;
-import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.UnmarshallingException;
-import org.opensaml.core.xml.util.XMLObjectSupport;
-import org.opensaml.security.x509.X509Credential;
-import org.opensaml.security.x509.impl.KeyStoreX509CredentialAdapter;
-import org.w3c.dom.Element;
-
-import net.shibboleth.shared.xml.XMLParserException;
-import se.swedenconnect.opensaml.xmlsec.config.DefaultSecurityConfiguration;
-
 /**
  * Abstract base class that initializes OpenSAML for test classes.
  *
@@ -45,13 +44,13 @@ import se.swedenconnect.opensaml.xmlsec.config.DefaultSecurityConfiguration;
 public abstract class OpenSAMLTestBase {
 
   /** Factory for creating certificates. */
-  private static CertificateFactory certFactory = null;
+  private static final CertificateFactory certFactory;
 
   static {
     try {
       certFactory = CertificateFactory.getInstance("X.509");
     }
-    catch (CertificateException e) {
+    catch (final CertificateException e) {
       throw new SecurityException(e);
     }
   }
@@ -59,73 +58,66 @@ public abstract class OpenSAMLTestBase {
   /**
    * Initializes the OpenSAML library.
    *
-   * @throws Exception
-   *           for init errors
+   * @throws Exception for init errors
    */
   @BeforeAll
   public static void initializeOpenSAML() throws Exception {
-    OpenSAMLInitializer bootstrapper = OpenSAMLInitializer.getInstance();
+    final OpenSAMLInitializer bootstrapper = OpenSAMLInitializer.getInstance();
     if (!bootstrapper.isInitialized()) {
       bootstrapper.initialize(
-        new OpenSAMLSecurityDefaultsConfig(new DefaultSecurityConfiguration()),
-        new OpenSAMLSecurityExtensionConfig());
+          new OpenSAMLSecurityDefaultsConfig(new DefaultSecurityConfiguration()),
+          new OpenSAMLSecurityExtensionConfig());
     }
   }
 
   /**
    * Loads a {@link KeyStore} based on the given arguments.
    *
-   * @param keyStorePath
-   *          the path to the key store
-   * @param keyStorePassword
-   *          the key store password
-   * @param keyStoreType
-   *          the type of the keystore (if {@code null} the default keystore type will be assumed)
+   * @param keyStorePath the path to the key store
+   * @param keyStorePassword the key store password
+   * @param keyStoreType the type of the keystore (if {@code null} the default keystore type will be assumed)
    * @return a {@code KeyStore} instance
-   * @throws KeyStoreException
-   *           for errors loading the keystore
-   * @throws IOException
-   *           for IO errors
+   * @throws KeyStoreException for errors loading the keystore
+   * @throws IOException for IO errors
    */
-  public static KeyStore loadKeyStore(String keyStorePath, String keyStorePassword, String keyStoreType) throws KeyStoreException,
-      IOException {
+  public static KeyStore loadKeyStore(final String keyStorePath, final String keyStorePassword,
+      final String keyStoreType) throws KeyStoreException, IOException {
     return loadKeyStore(new FileInputStream(keyStorePath), keyStorePassword, keyStoreType);
   }
 
-  public static KeyStore loadKeyStore(InputStream keyStoreStream, String keyStorePassword, String keyStoreType) throws KeyStoreException,
+  public static KeyStore loadKeyStore(final InputStream keyStoreStream, final String keyStorePassword,
+      final String keyStoreType) throws KeyStoreException,
       IOException {
     try {
-      KeyStore keyStore = keyStoreType != null ? KeyStore.getInstance(keyStoreType) : KeyStore.getInstance(KeyStore.getDefaultType());
+      final KeyStore keyStore =
+          keyStoreType != null ? KeyStore.getInstance(keyStoreType) : KeyStore.getInstance(KeyStore.getDefaultType());
       keyStore.load(keyStoreStream, keyStorePassword.toCharArray());
       return keyStore;
     }
-    catch (NoSuchAlgorithmException | CertificateException e) {
+    catch (final NoSuchAlgorithmException | CertificateException e) {
       throw new KeyStoreException(e);
     }
   }
 
-  public static X509Credential loadKeyStoreCredential(InputStream keyStoreStream, String keyStorePassword, String alias, String keyPassword)
+  public static X509Credential loadKeyStoreCredential(final InputStream keyStoreStream, final String keyStorePassword,
+      final String alias, final String keyPassword)
       throws KeyStoreException, IOException {
-    KeyStore keyStore = loadKeyStore(keyStoreStream, keyStorePassword, "jks");
+    final KeyStore keyStore = loadKeyStore(keyStoreStream, keyStorePassword, "jks");
     return new KeyStoreX509CredentialAdapter(keyStore, alias, keyPassword.toCharArray());
   }
 
   /**
    * Unmarshalls the supplied input stream into the given type.
    *
-   * @param inputStream
-   *          the input stream of the XML resource
-   * @param targetClass
-   *          the required class
-   * @param <T>
-   *          the type
+   * @param inputStream the input stream of the XML resource
+   * @param targetClass the required class
+   * @param <T> the type
    * @return an {@code XMLObject} of the given type
-   * @throws XMLParserException
-   *           for XML parsing errors
-   * @throws UnmarshallingException
-   *           for unmarshalling errors
+   * @throws XMLParserException for XML parsing errors
+   * @throws UnmarshallingException for unmarshalling errors
    */
-  public static <T extends XMLObject> T unmarshall(final InputStream inputStream, final Class<T> targetClass) throws XMLParserException,
+  public static <T extends XMLObject> T unmarshall(final InputStream inputStream, final Class<T> targetClass)
+      throws XMLParserException,
       UnmarshallingException {
     final Element elm = XMLObjectProviderRegistrySupport.getParserPool().parse(inputStream).getDocumentElement();
     return targetClass.cast(XMLObjectSupport.getUnmarshaller(elm).unmarshall(elm));
@@ -134,13 +126,11 @@ public abstract class OpenSAMLTestBase {
   /**
    * Decodes a {@link X509Certificate} from an input stream.
    *
-   * @param stream
-   *          the stream to read
+   * @param stream the stream to read
    * @return a {@link X509Certificate} object
-   * @throws CertificateException
-   *           for decoding errors
+   * @throws CertificateException for decoding errors
    */
-  public static X509Certificate decodeCertificate(InputStream stream) throws CertificateException {
+  public static X509Certificate decodeCertificate(final InputStream stream) throws CertificateException {
     return (X509Certificate) certFactory.generateCertificate(stream);
   }
 

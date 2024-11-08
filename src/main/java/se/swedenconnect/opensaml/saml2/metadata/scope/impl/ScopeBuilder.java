@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Sweden Connect
+ * Copyright 2016-2024 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 package se.swedenconnect.opensaml.saml2.metadata.scope.impl;
 
 import org.opensaml.core.xml.AbstractXMLObjectBuilder;
-
 import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
+
+import javax.annotation.Nonnull;
 
 /**
  * Builder for {@link Scope} elements.
@@ -28,7 +29,8 @@ public class ScopeBuilder extends AbstractXMLObjectBuilder<Scope> {
 
   /** {@inheritDoc} */
   @Override
-  public Scope buildObject(final String namespaceURI, final String localName, final String namespacePrefix) {
+  @Nonnull
+  public Scope buildObject(final String namespaceURI, @Nonnull final String localName, final String namespacePrefix) {
     return new ScopeImpl(namespaceURI, localName, namespacePrefix);
   }
 
@@ -38,6 +40,6 @@ public class ScopeBuilder extends AbstractXMLObjectBuilder<Scope> {
    * @return a Scope object
    */
   public Scope buildObject() {
-    return buildObject("urn:mace:shibboleth:metadata:1.0", Scope.DEFAULT_ELEMENT_LOCAL_NAME, "shibmd");
+    return this.buildObject("urn:mace:shibboleth:metadata:1.0", Scope.DEFAULT_ELEMENT_LOCAL_NAME, "shibmd");
   }
 }

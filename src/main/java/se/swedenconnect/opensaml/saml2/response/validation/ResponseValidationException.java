@@ -16,9 +16,10 @@
 package se.swedenconnect.opensaml.saml2.response.validation;
 
 import org.opensaml.saml.saml2.core.Response;
-
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.saml2.response.ResponseProcessingException;
+
+import java.io.Serial;
 
 /**
  * Exception class for response validation errors.
@@ -28,6 +29,7 @@ import se.swedenconnect.opensaml.saml2.response.ResponseProcessingException;
 public class ResponseValidationException extends ResponseProcessingException {
 
   /** For serializing. */
+  @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
   /**
