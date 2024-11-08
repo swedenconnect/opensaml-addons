@@ -154,6 +154,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
     // Time to collect new metadata from the providers?
     //
     if (this.compositeMetadata == null || this.compositeMetadataCreationTime.isBefore(lastUpdate)) {
+
       this.collectMetadata();
     }
     return this.compositeMetadata;
@@ -202,8 +203,7 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
         if (entityIds.contains(ed.getEntityID())) {
           log.warn(
               "EntityDescriptor for '{}' already exists in metadata. Entry read from provider '{}' will be ignored.",
-              ed.getEntityID(),
-              provider.getID());
+              ed.getEntityID(), provider.getID());
           continue;
         }
         try {

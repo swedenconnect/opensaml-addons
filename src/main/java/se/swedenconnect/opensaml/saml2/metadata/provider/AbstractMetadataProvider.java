@@ -29,6 +29,7 @@ import org.opensaml.saml.metadata.resolver.RefreshableMetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilterContext;
+import org.opensaml.saml.metadata.resolver.filter.impl.EntityRoleFilter;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter;
 import org.opensaml.saml.metadata.resolver.filter.impl.PredicateFilter.Direction;
 import org.opensaml.saml.metadata.resolver.filter.impl.SchemaValidationFilter;
@@ -86,6 +87,9 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
 
   /** Tells whether XML schema validation should be performed on downloaded metadata. Default: false. */
   private boolean performSchemaValidation = false;
+
+  /** Tells whether we should keep only SP and IdP role descriptors. The default is true. */
+  private boolean keepOnlySpAndIdps = true;
 
   /** A list of inclusion predicates that will be applied to downloaded metadata. */
   private List<Predicate<EntityDescriptor>> inclusionPredicates = null;
@@ -242,6 +246,14 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
       filters.add(schemaValidationFilter);
     }
 
+    // Keep only SP:s and IdP:s?
+    if (this.keepOnlySpAndIdps) {
+      final EntityRoleFilter entityRoleFilter = new EntityRoleFilter(
+          List.of(SPSSODescriptor.DEFAULT_ELEMENT_NAME, IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
+      entityRoleFilter.initialize();
+      filters.add(entityRoleFilter);
+    }
+
     // Inclusion predicates?
     if (this.inclusionPredicates != null) {
       for (final Predicate<EntityDescriptor> p : this.inclusionPredicates) {
@@ -386,6 +398,16 @@ public abstract class AbstractMetadataProvider extends AbstractInitializableComp
   public void setPerformSchemaValidation(final boolean performSchemaValidation) {
     this.checkSetterPreconditions();
     this.performSchemaValidation = performSchemaValidation;
+  }
+
+  /**
+   * Tells whether we should keep only SP and IdP role descriptors. The default is true.
+   *
+   * @param keepOnlySpAndIdps whether to keep only SPs and IdPs.
+   */
+  public void setKeepOnlySpAndIdps(final boolean keepOnlySpAndIdps) {
+    this.checkSetterPreconditions();
+    this.keepOnlySpAndIdps = keepOnlySpAndIdps;
   }
 
   /**
