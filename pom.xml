@@ -6,7 +6,7 @@
   <groupId>se.swedenconnect.opensaml</groupId>
   <artifactId>opensaml-addons</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2</version>
 
   <name>Sweden Connect :: OpenSAML 5.X utility extensions</name>
   <description>OpenSAML 5.X utility extension library</description>
@@ -173,7 +173,7 @@
     <dependency>
       <groupId>se.swedenconnect.opensaml</groupId>
       <artifactId>opensaml-security-ext</artifactId>
-      <version>4.1.1</version>
+      <version>4.1.2</version>
     </dependency>
 
     <dependency>
@@ -326,7 +326,7 @@
               https://build.shibboleth.net/nexus/content/sites/site/java-shib-shared/${shib.support.version}/apidocs/
             </link>
             -->
-            <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/latest/</link>
+            <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/</link>
           </links>
           <detectJavaApiLink>true</detectJavaApiLink>
           <doclint>all,-missing</doclint>
