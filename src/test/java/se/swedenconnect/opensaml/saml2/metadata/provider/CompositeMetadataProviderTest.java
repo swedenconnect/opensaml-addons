@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2024 Sweden Connect
+ * Copyright 2016-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,8 +29,13 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Element;
-
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test cases for the {@code CompositeMetadataProvider} class.
@@ -57,27 +56,23 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
   /**
    * We use a simple StaticMetadataProvider to hold the entire metadata.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
   @BeforeAll
   public static void setup() throws Exception {
     final Resource entireMetadata = new ClassPathResource("/metadata/sveleg-fedtest.xml");
     final Element entireMetadataDOM = XMLObjectProviderRegistrySupport.getParserPool()
-      .parse(entireMetadata.getInputStream())
-      .getDocumentElement();
+        .parse(entireMetadata.getInputStream())
+        .getDocumentElement();
     entireMetadataProvider = new StaticMetadataProvider(entireMetadataDOM);
     entireMetadataProvider.initialize();
   }
 
   /**
    * Destroys the metadata provider used.
-   *
-   * @throws Exception
-   *           for errors
    */
   @AfterAll
-  public static void tearDown() throws Exception {
+  public static void tearDown() {
     if (entireMetadataProvider != null && entireMetadataProvider.isInitialized()) {
       entireMetadataProvider.destroy();
     }
@@ -87,8 +82,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
    * We split /metadata/sveleg-fedtest.xml into three parts and verify the the {@code CompositeMetadataProvider} can
    * access all metadata using three different underlying providers.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
   @Test
   public void testCompositeBasic() throws Exception {
@@ -97,7 +91,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
     //
     final CompositeMetadataProvider provider =
         new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
-          new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
+            new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
 
     try {
       provider.initialize();
@@ -143,14 +137,13 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
   /**
    * Tests getting the DOM of the entire metadata held by the provider.
    *
-   * @throws Exception
-   *           for errors
+   * @throws Exception for errors
    */
   @Test
   public void testDOM() throws Exception {
     final CompositeMetadataProvider provider =
         new CompositeMetadataProvider("MetadataService", Arrays.asList(new FilesystemMetadataProvider(part1.getFile()),
-          new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
+            new FilesystemMetadataProvider(part2.getFile()), new FilesystemMetadataProvider(part3.getFile())));
 
     try {
       provider.initialize();
@@ -171,7 +164,7 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
   @Test
   public void testValidUntil() throws Exception {
 
-    final Instant shortestValidity = Instant.parse("2025-01-01T12:00:00.00Z");
+    final Instant shortestValidity = Instant.parse("2028-01-01T12:00:00.00Z");
     final Duration shortestCacheDuration = Duration.of(7, ChronoUnit.DAYS);
 
     final EntitiesDescriptor one = unmarshall(part1.getInputStream(), EntitiesDescriptor.class);
@@ -187,10 +180,10 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
     three.setCacheDuration(shortestCacheDuration);
 
     final CompositeMetadataProvider provider = new CompositeMetadataProvider("MetadataService",
-      Arrays.asList(
-        new StaticMetadataProvider(one),
-        new StaticMetadataProvider(two),
-        new StaticMetadataProvider(three)));
+        Arrays.asList(
+            new StaticMetadataProvider(one),
+            new StaticMetadataProvider(two),
+            new StaticMetadataProvider(three)));
 
     try {
       provider.initialize();
@@ -206,10 +199,10 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
     }
 
     final CompositeMetadataProvider provider2 = new CompositeMetadataProvider("MetadataService",
-      Arrays.asList(
-        new StaticMetadataProvider(one),
-        new StaticMetadataProvider(two),
-        new StaticMetadataProvider(three)));
+        Arrays.asList(
+            new StaticMetadataProvider(one),
+            new StaticMetadataProvider(two),
+            new StaticMetadataProvider(three)));
 
     final Duration twoDays = Duration.of(2, ChronoUnit.DAYS);
     provider2.setValidity(twoDays);
