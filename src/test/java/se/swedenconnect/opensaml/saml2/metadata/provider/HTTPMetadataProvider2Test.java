@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2024 Sweden Connect
+ * Copyright 2016-2025 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.TestWebServer;
-import se.swedenconnect.security.credential.factory.X509CertificateFactoryBean;
+import se.swedenconnect.security.credential.utils.X509Utils;
 
+import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -59,10 +61,7 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnect() throws Exception {
-    final X509CertificateFactoryBean certFactory =
-        new X509CertificateFactoryBean(new ClassPathResource("sweden-connect-prod.crt"));
-    certFactory.afterPropertiesSet();
-    final X509Certificate signingCert = certFactory.getObject();
+    final X509Certificate signingCert = decodeCertificate(new ClassPathResource("sweden-connect-prod.crt"));
     HTTPMetadataProvider provider = null;
 
     try {
@@ -83,11 +82,7 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnectNotTrusted() throws Exception {
-    final X509CertificateFactoryBean certFactory =
-        new X509CertificateFactoryBean(new ClassPathResource("sweden-connect-prod.crt"));
-    certFactory.afterPropertiesSet();
-    final X509Certificate signingCert = certFactory.getObject();
-
+    final X509Certificate signingCert = decodeCertificate(new ClassPathResource("sweden-connect-prod.crt"));
     Assertions.assertThrows(ComponentInitializationException.class, () -> {
       HTTPMetadataProvider provider = null;
       try {
@@ -107,9 +102,7 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
 
   @Test
   public void testSwedenConnectFailedSignatureValidation() throws Exception {
-    final X509CertificateFactoryBean certFactory = new X509CertificateFactoryBean(new ClassPathResource("testca.crt"));
-    certFactory.afterPropertiesSet();
-    final X509Certificate signingCert = certFactory.getObject();
+    final X509Certificate signingCert = decodeCertificate(new ClassPathResource("testca.crt"));
 
     Assertions.assertThrows(ComponentInitializationException.class, () -> {
       HTTPMetadataProvider provider = null;
@@ -127,6 +120,12 @@ public class HTTPMetadataProvider2Test extends OpenSAMLTestBase {
         provider.destroy();
       }
     });
+  }
+
+  private static X509Certificate decodeCertificate(final Resource certResource) throws Exception {
+    try (final InputStream is = certResource.getInputStream()) {
+      return X509Utils.decodeCertificate(is);
+    }
   }
 
 }
