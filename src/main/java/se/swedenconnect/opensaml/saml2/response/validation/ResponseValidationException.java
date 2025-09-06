@@ -15,11 +15,16 @@
  */
 package se.swedenconnect.opensaml.saml2.response.validation;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.saml2.response.ResponseProcessingException;
 
 import java.io.Serial;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Exception class for response validation errors.
@@ -32,6 +37,9 @@ public class ResponseValidationException extends ResponseProcessingException {
   @Serial
   private static final long serialVersionUID = LibraryVersion.SERIAL_VERSION_UID;
 
+  /** Validation errors. */
+  private final List<String> validationErrors;
+
   /**
    * Constructor taking an error message.
    *
@@ -39,18 +47,35 @@ public class ResponseValidationException extends ResponseProcessingException {
    * @deprecated Also supply the response message
    */
   @Deprecated(forRemoval = true)
-  public ResponseValidationException(final String message) {
+  public ResponseValidationException(@Nonnull final String message) {
     super(message);
+    this.validationErrors = null;
   }
 
   /**
-   * Constructor taking an error message and the response being processed.
+   * Constructor taking an error message and the response and assertion being processed.
    *
    * @param message the error message
    * @param response the response being processed
+   * @param assertion the assertion being processed
    */
-  public ResponseValidationException(final String message, final Response response) {
-    super(message, response);
+  public ResponseValidationException(@Nonnull final String message, @Nullable final Response response,
+      @Nullable final Assertion assertion) {
+    super(message, response, assertion);
+    this.validationErrors = null;
+  }
+
+  /**
+   * Constructor taking a list of validation messages and the response and assertion being processed.
+   *
+   * @param validationErrors the validation errors
+   * @param response the response being processed
+   * @param assertion the assertion being processed
+   */
+  public ResponseValidationException(@Nonnull final List<String> validationErrors, @Nullable final Response response,
+      @Nullable final Assertion assertion) {
+    super(buildExceptionMessage(validationErrors), response, assertion);
+    this.validationErrors = Collections.unmodifiableList(validationErrors);
   }
 
   /**
@@ -61,19 +86,55 @@ public class ResponseValidationException extends ResponseProcessingException {
    * @deprecated Also supply the response message
    */
   @Deprecated(forRemoval = true)
-  public ResponseValidationException(final String message, final Throwable cause) {
+  public ResponseValidationException(@Nonnull final String message, @Nullable final Throwable cause) {
     super(message, cause);
+    this.validationErrors = null;
   }
 
   /**
-   * Constructor taking an error message, the cause of the error and the response being processed.
+   * Constructor taking an error message, the cause of the error and the response and assertion being processed.
    *
    * @param message the error message
    * @param cause the cause of the error
    * @param response the response being processed
+   * @param assertion the assertion being processed
    */
-  public ResponseValidationException(final String message, final Throwable cause, final Response response) {
-    super(message, cause, response);
+  public ResponseValidationException(@Nonnull final String message, @Nullable final Throwable cause,
+      @Nullable final Response response, @Nullable final Assertion assertion) {
+    super(message, cause, response, assertion);
+    this.validationErrors = null;
+  }
+
+  /**
+   * Constructor taking a list of validation messages, the cause of the error and the response and assertion being
+   * processed.
+   *
+   * @param validationErrors the validation errors
+   * @param cause the cause of the error
+   * @param response the response being processed
+   * @param assertion the assertion being processed
+   */
+  public ResponseValidationException(@Nonnull final List<String> validationErrors, @Nullable final Throwable cause,
+      @Nullable final Response response, @Nullable final Assertion assertion) {
+    super(buildExceptionMessage(validationErrors), cause, response, assertion);
+    this.validationErrors = validationErrors;
+  }
+
+  /**
+   * Gets the list of validation errors (may be {@code null})
+   *
+   * @return a list of validation errors, or {@code null}
+   */
+  @Nullable
+  public List<String> getValidationErrors() {
+    return this.validationErrors;
+  }
+
+  private static String buildExceptionMessage(final List<String> validationErrors) {
+    if (validationErrors == null || validationErrors.isEmpty()) {
+      return "Validation error";
+    }
+    return String.join(" - ", validationErrors);
   }
 
 }

@@ -15,6 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.response;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import se.swedenconnect.opensaml.common.LibraryVersion;
 import se.swedenconnect.opensaml.common.utils.SerializableOpenSamlObject;
@@ -36,13 +39,16 @@ public class ResponseProcessingException extends Exception {
   /** The response. */
   private final SerializableOpenSamlObject<Response> response;
 
+  /** The assertion. */
+  private final SerializableOpenSamlObject<Assertion> assertion;
+
   /**
    * Constructor taking an error message.
    *
    * @param message the error message
    */
-  public ResponseProcessingException(final String message) {
-    this(message, null, null);
+  public ResponseProcessingException(@Nonnull final String message) {
+    this(message, null, null, null);
   }
 
   /**
@@ -50,9 +56,11 @@ public class ResponseProcessingException extends Exception {
    *
    * @param message the error message
    * @param response the response that was processed when the error was reported
+   * @param assertion the assertion that was processed when the error was reported
    */
-  public ResponseProcessingException(final String message, final Response response) {
-    this(message, null, response);
+  public ResponseProcessingException(@Nonnull final String message, @Nullable final Response response,
+      @Nullable final Assertion assertion) {
+    this(message, null, response, assertion);
   }
 
   /**
@@ -61,8 +69,8 @@ public class ResponseProcessingException extends Exception {
    * @param message the error message
    * @param cause the cause of the error
    */
-  public ResponseProcessingException(final String message, final Throwable cause) {
-    this(message, cause, null);
+  public ResponseProcessingException(@Nonnull final String message, @Nullable final Throwable cause) {
+    this(message, cause, null, null);
   }
 
   /**
@@ -71,10 +79,13 @@ public class ResponseProcessingException extends Exception {
    * @param message the error message
    * @param cause the cause of the error
    * @param response the response that was processed when the error was reported
+   * @param assertion the assertion that was processed when the error was reported
    */
-  public ResponseProcessingException(final String message, final Throwable cause, final Response response) {
+  public ResponseProcessingException(@Nonnull final String message, @Nullable final Throwable cause,
+      @Nullable final Response response, @Nullable final Assertion assertion) {
     super(message, cause);
     this.response = response != null ? new SerializableOpenSamlObject<>(response) : null;
+    this.assertion = assertion != null ? new SerializableOpenSamlObject<>(assertion) : null;
   }
 
   /**
@@ -82,8 +93,21 @@ public class ResponseProcessingException extends Exception {
    *
    * @return the {@link Response} or {@code null} if no response was assigned
    */
+  @Nullable
   public Response getResponse() {
     return Optional.ofNullable(this.response)
+        .map(SerializableOpenSamlObject::get)
+        .orElse(null);
+  }
+
+  /**
+   * Gets the {@link Assertion} that was processed when the error was reported.
+   *
+   * @return the {@link Assertion} or {@code null} if no assertion was assigned
+   */
+  @Nullable
+  public Assertion getAssertion() {
+    return Optional.of(this.assertion)
         .map(SerializableOpenSamlObject::get)
         .orElse(null);
   }
