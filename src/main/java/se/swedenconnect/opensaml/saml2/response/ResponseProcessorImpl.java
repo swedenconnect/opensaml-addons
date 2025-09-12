@@ -142,6 +142,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       throws ResponseStatusErrorException, ResponseProcessingException {
 
     Response response = null;
+    Assertion assertion = null;
 
     try {
       // Step 1: Decode the SAML response message.
@@ -181,21 +182,25 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
 
       // Step 6. Decrypt assertion (if needed)
       //
-      final Assertion assertion;
       if (!response.getEncryptedAssertions().isEmpty()) {
         assertion = this.decrypter.decrypt(response.getEncryptedAssertions().get(0), Assertion.class);
         if (log.isTraceEnabled()) {
           log.trace("[{}] Decrypted Assertion: {}", logId(response, assertion), toString(assertion));
         }
       }
-      else if (this.requireEncryptedAssertions) {
-        throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required",
-            response);
-      }
       else {
-        assertion = response.getAssertions().get(0);
-        if (log.isTraceEnabled()) {
-          log.trace("[{}] Assertion: {}", logId(response, assertion), toString(assertion));
+        assertion = response.getAssertions().isEmpty() ? null : response.getAssertions().get(0);
+        if (assertion == null) {
+          throw new ResponseProcessingException("No assertion present in Response", response, null);
+        }
+        else if (this.requireEncryptedAssertions) {
+          throw new ResponseProcessingException("Assertion in response message is not encrypted - this is required",
+              response, assertion);
+        }
+        else {
+          if (log.isTraceEnabled()) {
+            log.trace("[{}] Assertion: {}", logId(response, assertion), toString(assertion));
+          }
         }
       }
 
@@ -208,10 +213,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       return new ResponseProcessingResultImpl(response, assertion);
     }
     catch (final MessageReplayException e) {
-      throw new ResponseProcessingException("Message replay: " + e.getMessage(), e, response);
+      throw new ResponseProcessingException("Message replay: " + e.getMessage(), e, response, assertion);
     }
     catch (final DecryptionException e) {
-      throw new ResponseProcessingException("Failed to decrypt assertion: " + e.getMessage(), e, response);
+      throw new ResponseProcessingException("Failed to decrypt assertion: " + e.getMessage(), e, response, assertion);
     }
   }
 
@@ -328,7 +333,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
           XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes));
     }
     catch (final MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
-      throw new ResponseProcessingException("Failed to decode message", e, null);
+      throw new ResponseProcessingException("Failed to decode message", e, null, null);
     }
   }
 
@@ -350,14 +355,14 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     if (authnRequest == null) {
       final String msg = String.format("No AuthnRequest available when processing Response [%s]", logId(response));
       log.info("{}", msg);
-      throw new ResponseValidationException(msg, response);
+      throw new ResponseValidationException(msg, response, null);
     }
 
     final IDPSSODescriptor descriptor =
         idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
       throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Response signature",
-          response);
+          response, null);
     }
 
     final ResponseValidationParametersBuilder b = ResponseValidationParametersBuilder.builder()
@@ -391,7 +396,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       break;
     case INVALID:
       log.info("Validation of Response failed - {} [{}]", context.getValidationFailureMessages(), logId(response));
-      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()), response);
+      throw new ResponseValidationException(context.getValidationFailureMessages(), response, null);
     }
   }
 
@@ -416,7 +421,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
           String.format("RelayState variable received with response (%s) does not match the sent one (%s)",
               relayState, requestRelayState);
       log.info("{} [{}]", msg, logId(response));
-      throw new ResponseValidationException(msg, response);
+      throw new ResponseValidationException(msg, response, null);
     }
   }
 
@@ -438,7 +443,8 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     final IDPSSODescriptor descriptor =
         idpMetadata != null ? idpMetadata.getIDPSSODescriptor(SAMLConstants.SAML20P_NS) : null;
     if (descriptor == null) {
-      throw new ResponseValidationException("Invalid/missing IdP metadata - cannot verify Assertion", response);
+      throw new ResponseValidationException(
+          "Invalid/missing IdP metadata - cannot verify Assertion", response, assertion);
     }
 
     final AuthnRequest authnRequest = input.getAuthnRequest(response.getInResponseTo());
@@ -494,7 +500,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       break;
     case INVALID:
       log.info("Validation of Assertion failed - {}", context.getValidationFailureMessages());
-      throw new ResponseValidationException(String.join(" - ", context.getValidationFailureMessages()), response);
+      throw new ResponseValidationException(context.getValidationFailureMessages(), response, assertion);
     }
   }
 
