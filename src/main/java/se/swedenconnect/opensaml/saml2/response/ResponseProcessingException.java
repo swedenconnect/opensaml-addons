@@ -107,7 +107,7 @@ public class ResponseProcessingException extends Exception {
    */
   @Nullable
   public Assertion getAssertion() {
-    return Optional.of(this.assertion)
+    return Optional.ofNullable(this.assertion)
         .map(SerializableOpenSamlObject::get)
         .orElse(null);
   }
