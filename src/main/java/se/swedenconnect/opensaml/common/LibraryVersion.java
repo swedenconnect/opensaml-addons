@@ -24,7 +24,7 @@ public final class LibraryVersion {
 
   private static final int MAJOR = 2;
   private static final int MINOR = 1;
-  private static final int PATCH = 7;
+  private static final int PATCH = 8;
 
   /**
    * Global serialization value for library classes.
