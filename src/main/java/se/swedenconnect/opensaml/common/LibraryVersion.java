@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025 Sweden Connect
+ * Copyright 2016-2026 Sweden Connect
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ package se.swedenconnect.opensaml.common;
 public final class LibraryVersion {
 
   private static final int MAJOR = 2;
-  private static final int MINOR = 1;
-  private static final int PATCH = 8;
+  private static final int MINOR = 2;
+  private static final int PATCH = 0;
 
   /**
    * Global serialization value for library classes.
