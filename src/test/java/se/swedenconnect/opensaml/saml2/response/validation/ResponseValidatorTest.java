@@ -20,13 +20,18 @@ import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
+import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
+import se.swedenconnect.opensaml.common.validation.CoreValidatorParameters;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test cases for {@link ResponseValidator}.
@@ -50,6 +55,34 @@ class ResponseValidatorTest extends OpenSAMLTestBase {
     final ValidationResult result = validator.validate(createResponse(), new ValidationContext(Collections.emptyMap()));
     Assertions.assertEquals(ValidationResult.INVALID, result);
     Assertions.assertFalse(validator.steps.contains("assertions"));
+  }
+
+  @Test
+  void testIssueInstant() {
+    final ResponseValidator validator = new ResponseValidator(null, new SAMLSignatureProfileValidator());
+    final Instant receiveInstant = Instant.now();
+    final ValidationContext context = new ValidationContext(Map.of(
+        CoreValidatorParameters.RECEIVE_INSTANT, receiveInstant,
+        CoreValidatorParameters.MAX_AGE_MESSAGE, Duration.ofMinutes(3),
+        SAML2AssertionValidationParameters.CLOCK_SKEW, Duration.ofSeconds(30)));
+
+    final Response response = createResponse();
+
+    // Issued 60 seconds before it was received - OK
+    response.setIssueInstant(receiveInstant.minusSeconds(60));
+    Assertions.assertEquals(ValidationResult.VALID, validator.validateIssueInstant(response, context));
+
+    // Issued 10 seconds after it was received - within clock skew
+    response.setIssueInstant(receiveInstant.plusSeconds(10));
+    Assertions.assertEquals(ValidationResult.VALID, validator.validateIssueInstant(response, context));
+
+    // Too old
+    response.setIssueInstant(receiveInstant.minusSeconds(240));
+    Assertions.assertEquals(ValidationResult.INVALID, validator.validateIssueInstant(response, context));
+
+    // Issued in the future
+    response.setIssueInstant(receiveInstant.plusSeconds(120));
+    Assertions.assertEquals(ValidationResult.INVALID, validator.validateIssueInstant(response, context));
   }
 
   private static Response createResponse() {

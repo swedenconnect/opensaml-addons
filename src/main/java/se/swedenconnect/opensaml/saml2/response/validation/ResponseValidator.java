@@ -197,7 +197,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     // Too old?
     // receiveInstant - issueInstant > maxAgeResponse + allowedClockSkew
     //
-    if (Duration.between(receiveInstant, issueInstant).compareTo(maxAgeResponse.plus(allowedClockSkew)) > 0) {
+    if (Duration.between(issueInstant, receiveInstant).compareTo(maxAgeResponse.plus(allowedClockSkew)) > 0) {
       final String msg = String.format("Received Response message is too old - issue-instant: %s - receive-time: %s",
           response.getIssueInstant(), receiveInstant);
       context.getValidationFailureMessages().add(msg);
@@ -207,7 +207,7 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
     // Not yet valid? -> Clock skew is unacceptable.
     // issueInstant - receiveInstant > allowedClockSkew
     //
-    if (Duration.between(issueInstant, receiveInstant).compareTo(allowedClockSkew) > 0) {
+    if (Duration.between(receiveInstant, issueInstant).compareTo(allowedClockSkew) > 0) {
       final String msg = String.format(
           "Issue-instant of Response message (%s) is newer than receive time (%s) - Non accepted clock skew",
           response.getIssueInstant(), receiveInstant);

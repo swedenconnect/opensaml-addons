@@ -14,6 +14,8 @@
 
 - An INDETERMINATE validation result stopped the validation of a response or assertion, and was then accepted by [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java). For example, a missing receive URL meant that the signature of the response was never checked. All validation steps are now run, and an INDETERMINATE result makes the response processing fail.
 
+- The check of the `IssueInstant` of a response in [ResponseValidator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/validation/ResponseValidator.java) was inverted. A response received more than 30 seconds (the allowed clock skew) after it was issued was rejected, while a response with an issue time up to 3.5 minutes in the future was accepted.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
