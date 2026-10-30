@@ -87,7 +87,12 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
    * @return the builder
    */
   public EncryptionMethodBuilder keySize(final Integer keySize) {
+    if (keySize == null) {
+      this.object().setKeySize(null);
+      return this;
+    }
     final KeySize size = (KeySize) XMLObjectSupport.buildXMLObject(KeySize.DEFAULT_ELEMENT_NAME);
+    size.setValue(keySize);
     this.object().setKeySize(size);
     return this;
   }
@@ -99,7 +104,12 @@ public class EncryptionMethodBuilder extends AbstractSAMLObjectBuilder<Encryptio
    * @return the builder
    */
   public EncryptionMethodBuilder oAEPparams(final String base64Encoding) {
+    if (base64Encoding == null) {
+      this.object().setOAEPparams(null);
+      return this;
+    }
     final OAEPparams p = (OAEPparams) XMLObjectSupport.buildXMLObject(OAEPparams.DEFAULT_ELEMENT_NAME);
+    p.setValue(base64Encoding);
     this.object().setOAEPparams(p);
     return this;
   }

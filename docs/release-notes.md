@@ -54,6 +54,8 @@
 
 - Passing `null` to `extensions` of the [ExtensionsBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/core/build/ExtensionsBuilder.java) classes (for requests and [metadata](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/ExtensionsBuilder.java)) failed with a `NullPointerException` instead of removing all extensions.
 
+- `keySize` and `oAEPparams` of [EncryptionMethodBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/EncryptionMethodBuilder.java) dropped the given value, which resulted in empty `KeySize` and `OAEPparams` elements in the metadata.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
