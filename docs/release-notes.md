@@ -20,6 +20,8 @@
 
 - The SP metadata cache of [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java) was not thread safe. Also, if the SP metadata could not be found the first time, this was remembered for the lifetime of the processor.
 
+- [ProxyMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/ProxyMetadataProvider.java) did not work when the wrapped resolver already had a metadata filter. Initialization either failed, or the provider's own filters (including signature validation) were not installed.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
