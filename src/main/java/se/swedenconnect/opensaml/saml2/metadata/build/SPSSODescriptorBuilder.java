@@ -131,7 +131,7 @@ public class SPSSODescriptorBuilder extends AbstractSSODescriptorBuilder<SPSSODe
       final List<AttributeConsumingService> attributeConsumingServices) {
     this.object().getAttributeConsumingServices().clear();
     if (attributeConsumingServices == null || attributeConsumingServices.isEmpty()) {
-      return null;
+      return this;
     }
     for (final AttributeConsumingService a : attributeConsumingServices) {
       try {
