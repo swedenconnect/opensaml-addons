@@ -105,24 +105,25 @@ public class ResponseValidator extends AbstractSignableObjectValidator<Response>
   @Override
   public ValidationResult validate(final Response response, final ValidationContext context) {
 
+    ValidationResult result = ValidationResult.VALID;
     try {
-      ValidationSupport.check(this.validateID(response, context));
-      ValidationSupport.check(this.validateVersion(response, context));
-      ValidationSupport.check(this.validateStatus(response, context));
-      ValidationSupport.check(this.validateIssueInstant(response, context));
-      ValidationSupport.check(this.validateInResponseTo(response, context));
-      ValidationSupport.check(this.validateDestination(response, context));
-      ValidationSupport.check(this.validateConsent(response, context));
-      ValidationSupport.check(this.validateIssuer(response, context));
-      ValidationSupport.check(this.validateSignature(response, context));
-      ValidationSupport.check(this.validateAssertions(response, context));
-      ValidationSupport.check(this.validateExtensions(response, context));
+      result = ValidationSupport.check(this.validateID(response, context), result);
+      result = ValidationSupport.check(this.validateVersion(response, context), result);
+      result = ValidationSupport.check(this.validateStatus(response, context), result);
+      result = ValidationSupport.check(this.validateIssueInstant(response, context), result);
+      result = ValidationSupport.check(this.validateInResponseTo(response, context), result);
+      result = ValidationSupport.check(this.validateDestination(response, context), result);
+      result = ValidationSupport.check(this.validateConsent(response, context), result);
+      result = ValidationSupport.check(this.validateIssuer(response, context), result);
+      result = ValidationSupport.check(this.validateSignature(response, context), result);
+      result = ValidationSupport.check(this.validateAssertions(response, context), result);
+      result = ValidationSupport.check(this.validateExtensions(response, context), result);
     }
     catch (final ValidationResultException e) {
       return e.getResult();
     }
 
-    return ValidationResult.VALID;
+    return result;
   }
 
   /**

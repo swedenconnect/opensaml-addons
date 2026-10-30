@@ -111,12 +111,13 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
       final ValidationContext context)
       throws AssertionValidationException {
 
+    ValidationResult result = ValidationResult.VALID;
     try {
-      ValidationSupport.check(this.validateAuthnInstant(statement, assertion, context));
-      ValidationSupport.check(this.validateSessionIndex(statement, assertion, context));
-      ValidationSupport.check(this.validateSessionNotOnOrAfter(statement, assertion, context));
-      ValidationSupport.check(this.validateSubjectLocality(statement, assertion, context));
-      ValidationSupport.check(this.validateAuthnContext(statement, assertion, context));
+      result = ValidationSupport.check(this.validateAuthnInstant(statement, assertion, context), result);
+      result = ValidationSupport.check(this.validateSessionIndex(statement, assertion, context), result);
+      result = ValidationSupport.check(this.validateSessionNotOnOrAfter(statement, assertion, context), result);
+      result = ValidationSupport.check(this.validateSubjectLocality(statement, assertion, context), result);
+      result = ValidationSupport.check(this.validateAuthnContext(statement, assertion, context), result);
     }
     catch (final AssertionValidationException e) {
       log.warn("Error during determining AuthnStatement validity", e);
@@ -126,7 +127,7 @@ public class AuthnStatementValidator extends org.opensaml.saml.saml2.assertion.i
     catch (final ValidationResultException e) {
       return e.getResult();
     }
-    return ValidationResult.VALID;
+    return result;
   }
 
   /**

@@ -393,7 +393,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     case INDETERMINATE:
       log.info("Validation of Response was indeterminate - {} [{}]", context.getValidationFailureMessages(),
           logId(response));
-      break;
+      throw new ResponseValidationException(context.getValidationFailureMessages(), response, null);
     case INVALID:
       log.info("Validation of Response failed - {} [{}]", context.getValidationFailureMessages(), logId(response));
       throw new ResponseValidationException(context.getValidationFailureMessages(), response, null);
@@ -497,7 +497,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     case INDETERMINATE:
       log.info("Validation of Assertion with ID '{}' was indeterminate - {}", assertion.getID(),
           context.getValidationFailureMessages());
-      break;
+      throw new ResponseValidationException(context.getValidationFailureMessages(), response, assertion);
     case INVALID:
       log.info("Validation of Assertion failed - {}", context.getValidationFailureMessages());
       throw new ResponseValidationException(context.getValidationFailureMessages(), response, assertion);
