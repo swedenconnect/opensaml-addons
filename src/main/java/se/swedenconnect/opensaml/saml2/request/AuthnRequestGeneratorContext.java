@@ -120,7 +120,7 @@ public interface AuthnRequestGeneratorContext {
    * attribute.
    * <p>
    * The default implementation will return a {@code AssertionConsumerServiceURL} based on (1) {@code isDefault}
-   * attribute and (2) the lowest {@code Index}.
+   * attribute and (2) the lowest {@code Index}. If the list is empty, {@code null} is returned.
    * </p>
    *
    * @return a function for resolving AssertionConsumerService elements
@@ -130,10 +130,10 @@ public interface AuthnRequestGeneratorContext {
         .filter(IndexedEndpoint::isDefault)
         .map(AssertionConsumerService::getLocation)
         .findFirst()
-        .orElse(list.stream()
+        .orElseGet(() -> list.stream()
             .min(Comparator.comparing(a -> a.getIndex() != null ? a.getIndex() : Integer.MAX_VALUE))
             .map(AssertionConsumerService::getLocation)
-            .orElse(list.get(0).getLocation()));
+            .orElse(null));
   }
 
   /**

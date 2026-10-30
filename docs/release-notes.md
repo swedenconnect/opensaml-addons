@@ -40,6 +40,8 @@
 
 - [ScopeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/ScopeUtils.java) and [ScopeBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/ScopeBuilder.java) failed for `shibmd:Scope` implementations other than the one in this library (for example the Shibboleth implementation) when the methods for the value and regexp attribute were inherited from a parent class.
 
+- Generating an authentication request with the Holder-of-key requirement "if available" failed with an `IndexOutOfBoundsException` when the IdP had a Holder-of-key endpoint but the SP did not. [AbstractAuthnRequestGenerator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AbstractAuthnRequestGenerator.java) now uses the normal Web SSO profile in this case, and the default `AssertionConsumerService` resolver of [AuthnRequestGeneratorContext](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AuthnRequestGeneratorContext.java) no longer fails on an empty list.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
