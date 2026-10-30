@@ -50,6 +50,12 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   /** The underlying {@link MetadataResolver}. */
   private final FunctionDrivenDynamicHTTPMetadataResolver resolver;
 
+  /** The MDQ base URL. */
+  private final String metadataBaseUrl;
+
+  /** The {@code HttpClient} created by this provider (null if the client was supplied). Closed on destroy. */
+  private final HttpClient defaultHttpClient;
+
   /** Metadata as last seen at a call to {@link #getMetadata()}. */
   private EntitiesDescriptor cachedMetadata;
 
@@ -67,8 +73,10 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
       @Nonnull final String metadataBaseUrl, @Nullable final HttpClient httpClient,
       @Nullable final String cacheBaseDir) throws ResolverException {
 
+    this.metadataBaseUrl = metadataBaseUrl;
+    this.defaultHttpClient = httpClient == null ? HTTPMetadataProvider.createDefaultHttpClient() : null;
     this.resolver = new FunctionDrivenDynamicHTTPMetadataResolver(
-        httpClient != null ? httpClient : HTTPMetadataProvider.createDefaultHttpClient());
+        httpClient != null ? httpClient : this.defaultHttpClient);
     this.resolver.setRequestURLBuilder(new MDQRequestURLBuilder(metadataBaseUrl));
 
     if (cacheBaseDir != null) {
@@ -140,6 +148,8 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   /** {@inheritDoc} */
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
+    HTTPMetadataProvider.warnIfUntrusted(this.metadataBaseUrl, this.defaultHttpClient != null,
+        this.getSignatureVerificationCertificates() == null);
     this.resolver.initialize();
   }
 
@@ -149,6 +159,7 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
     if (this.resolver != null) {
       this.resolver.destroy();
     }
+    HTTPMetadataProvider.closeHttpClient(this.defaultHttpClient);
   }
 
 }

@@ -2,7 +2,7 @@
 
 # opensaml-addons
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Maven Central](https://img.shields.io/maven-central/v/se.swedenconnect.opensaml/opensaml-addons.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
 
 ---
 
@@ -21,6 +21,8 @@
 - The SP metadata cache of [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java) was not thread safe. Also, if the SP metadata could not be found the first time, this was remembered for the lifetime of the processor.
 
 - [ProxyMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/ProxyMetadataProvider.java) did not work when the wrapped resolver already had a metadata filter. Initialization either failed, or the provider's own filters (including signature validation) were not installed.
+
+- The default `HttpClient` created by [HTTPMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/HTTPMetadataProvider.java) and [MDQMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/MDQMetadataProvider.java) was never closed, so each destroyed provider leaked a connection pool. The default client does not validate the TLS server certificate, and a warning is now also logged when metadata is downloaded using HTTPS with this client without signature verification.
 
 ---
 
