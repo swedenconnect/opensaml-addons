@@ -30,6 +30,8 @@
 
 - The `dynamicParameter` and `addDynamicParameter` methods of [AbstractValidationParametersBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/validation/AbstractValidationParametersBuilder.java) added the parameter as a static parameter.
 
+- `getMetadataCertificates` of [EntityDescriptorUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/EntityDescriptorUtils.java) ignored certificates whose Base64 encoding contained line breaks, which is common in metadata.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

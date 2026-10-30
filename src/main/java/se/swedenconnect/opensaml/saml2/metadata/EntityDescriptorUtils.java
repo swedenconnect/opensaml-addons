@@ -151,7 +151,7 @@ public class EntityDescriptorUtils {
           for (final org.opensaml.xmlsec.signature.X509Certificate cert : xd.getX509Certificates()) {
             try {
               creds.add(new BasicX509Credential((X509Certificate) certFactory.generateCertificate(
-                  new ByteArrayInputStream(Base64.getDecoder().decode(cert.getValue())))));
+                  new ByteArrayInputStream(Base64.getMimeDecoder().decode(cert.getValue())))));
             }
             catch (final Exception ignored) {
             }
