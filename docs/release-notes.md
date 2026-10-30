@@ -62,6 +62,8 @@
 
 - [AbstractSignableObjectValidator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/validation/AbstractSignableObjectValidator.java) added the issuer to the signature validation criteria supplied by the caller. If the same criteria were reused for objects from another issuer, the signature was checked against the wrong issuer.
 
+- [AbstractMetadataContainer](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/AbstractMetadataContainer.java) calculated an incorrect `validUntil` for very long validity periods (more than 68 years).
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

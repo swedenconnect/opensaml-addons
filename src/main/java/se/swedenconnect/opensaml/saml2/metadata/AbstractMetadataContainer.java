@@ -143,7 +143,7 @@ public abstract class AbstractMetadataContainer<T extends TimeBoundSAMLObject & 
     this.assignID(this.descriptor, generator.generateIdentifier(true));
 
     // Assign the validity.
-    final Instant validUntil = Instant.now().plusSeconds((int) this.validity.getSeconds());
+    final Instant validUntil = Instant.now().plus(this.validity);
     this.descriptor.setValidUntil(validUntil);
 
     log.debug("Descriptor '{}' was updated with ID '{}' and validUntil '{}'",
