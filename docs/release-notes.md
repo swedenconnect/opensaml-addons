@@ -52,6 +52,8 @@
 
 - [AuthnRequestBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/core/build/AuthnRequestBuilder.java) set the `ProtocolBinding` attribute to HTTP-POST even when `AssertionConsumerServiceIndex` was set. The SAML specification does not allow both attributes in the same request.
 
+- Passing `null` to `extensions` of the [ExtensionsBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/core/build/ExtensionsBuilder.java) classes (for requests and [metadata](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/ExtensionsBuilder.java)) failed with a `NullPointerException` instead of removing all extensions.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

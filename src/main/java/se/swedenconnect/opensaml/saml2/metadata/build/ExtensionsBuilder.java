@@ -73,6 +73,9 @@ public class ExtensionsBuilder extends AbstractSAMLObjectBuilder<Extensions> {
   public ExtensionsBuilder extensions(final List<XMLObject> extensions) {
     // First clear all previous values ...
     this.object().getUnknownXMLObjects().clear();
+    if (extensions == null) {
+      return this;
+    }
 
     for (final XMLObject obj : extensions) {
       try {
