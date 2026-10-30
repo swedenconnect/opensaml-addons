@@ -478,6 +478,11 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         .validAddresses(input.getClientIpAddress())
         .clientCertificate(input.getClientCertificate());
 
+    if (validationContext == null || validationContext.getStaticParameters()
+        .get(AuthnStatementValidator.MAX_ACCEPTED_SSO_SESSION_TIME) == null) {
+      builder.maxAcceptedSsoSessionTime(this.responseValidationSettings.getMaxSessionAge());
+    }
+
     // TODO: We should really make sure that we honor all passed in validation context settings
     if (validationContext == null
         || validationContext.getStaticParameters().get(CoreValidatorParameters.SP_METADATA) == null) {
