@@ -33,10 +33,13 @@ import se.swedenconnect.opensaml.common.builder.AbstractSAMLObjectBuilder;
 public abstract class AbstractAuthnRequestBuilder<BUILDER extends AbstractSAMLObjectBuilder<AuthnRequest>>
     extends AbstractRequestBuilder<AuthnRequest, BUILDER> {
 
-  /** {@inheritDoc} */
+  /**
+   * Builds the {@code AuthnRequest}. If no {@code ProtocolBinding} has been assigned, it is set to HTTP-POST, unless
+   * {@code AssertionConsumerServiceIndex} has been assigned (the two attributes are mutually exclusive).
+   */
   @Override
   public AuthnRequest build() {
-    if (this.object().getProtocolBinding() == null) {
+    if (this.object().getProtocolBinding() == null && this.object().getAssertionConsumerServiceIndex() == null) {
       this.postProtocolBinding();
     }
     return super.build();

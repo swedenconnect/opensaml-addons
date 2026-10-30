@@ -50,6 +50,8 @@
 
 - `hashCode()` of [LocalizedString](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/utils/LocalizedString.java) failed with a `NullPointerException` when the language or string was not set, and did not match `equals()`.
 
+- [AuthnRequestBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/core/build/AuthnRequestBuilder.java) set the `ProtocolBinding` attribute to HTTP-POST even when `AssertionConsumerServiceIndex` was set. The SAML specification does not allow both attributes in the same request.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

@@ -41,6 +41,16 @@ import se.swedenconnect.opensaml.saml2.core.build.ScopingBuilder;
 public class AuthnRequestBuilderTest extends OpenSAMLTestBase {
 
   @Test
+  public void testProtocolBinding() {
+    Assertions.assertEquals(SAMLConstants.SAML2_POST_BINDING_URI,
+        AuthnRequestBuilder.builder().build().getProtocolBinding());
+
+    final AuthnRequest request = AuthnRequestBuilder.builder().assertionConsumerServiceIndex(2).build();
+    Assertions.assertNull(request.getProtocolBinding());
+    Assertions.assertEquals(2, request.getAssertionConsumerServiceIndex());
+  }
+
+  @Test
   public void testBuildAuthnRequest() throws Exception {
 
     final String assertionConsumerServiceURL = "https://eid.litsec.se/svelegtest-sp/saml2/post/11";
