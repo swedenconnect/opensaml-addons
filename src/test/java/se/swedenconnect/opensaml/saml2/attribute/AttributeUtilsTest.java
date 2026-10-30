@@ -17,6 +17,8 @@ package se.swedenconnect.opensaml.saml2.attribute;
 
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -86,6 +88,30 @@ public class AttributeUtilsTest extends OpenSAMLTestBase {
 
     // Using the AttributeUtils.getAttributeStringValues method gives a list with one element.
     Assertions.assertEquals(List.of("Eriksson"), AttributeUtils.getAttributeStringValues(attribute));
+  }
+
+  @Test
+  public void testGetAttributeDateTimeNoTimezone() throws Exception {
+    final String xml = "<saml2:Attribute Name=\"urn:example:date\" " +
+        "NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\">" +
+        "<saml2:AttributeValue>2024-01-01T12:00:00</saml2:AttributeValue>" +
+        "</saml2:Attribute>";
+
+    final Attribute attribute = unmarshall(new ByteArrayInputStream(xml.getBytes()), Attribute.class);
+    final XSDateTime value = AttributeUtils.getAttributeValue(attribute, XSDateTime.class);
+    Assertions.assertNotNull(value);
+    // A time without a timezone is read as local time (as OpenSAML does for typed values)
+    Assertions.assertEquals(
+        LocalDateTime.parse("2024-01-01T12:00:00").atZone(ZoneId.systemDefault()).toInstant(), value.getValue());
+  }
+
+  @Test
+  public void testGetAttributeWithoutName() {
+    final Attribute noName = AttributeBuilder.builder("dummy").build();
+    noName.setName(null);
+    final Attribute attribute = AttributeBuilder.builder("urn:oid:2.5.4.4").build();
+
+    Assertions.assertSame(attribute, AttributeUtils.getAttribute("urn:oid:2.5.4.4", List.of(noName, attribute)));
   }
 
   @Test

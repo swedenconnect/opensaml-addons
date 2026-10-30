@@ -58,6 +58,8 @@
 
 - [AbstractAuthnRequestGenerator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AbstractAuthnRequestGenerator.java) could select a Holder-of-key endpoint with a binding that is not supported (for example HTTP-Artifact), and then fail, instead of using another endpoint.
 
+- `getAttribute` of [AttributeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/attribute/AttributeUtils.java) failed with a `NullPointerException` if the list held an attribute without a name. Also, an attribute value without a type declaration could not be read as a date if the time had no timezone.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

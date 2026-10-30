@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.attribute;
 
+import net.shibboleth.shared.xml.DOMTypeSupport;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSBoolean;
@@ -105,7 +106,7 @@ public class AttributeUtils {
       return null;
     }
     return attributes.stream()
-        .filter(a -> a.getName().equals(name))
+        .filter(a -> name != null && name.equals(a.getName()))
         .findFirst()
         .orElse(null);
   }
@@ -169,7 +170,7 @@ public class AttributeUtils {
           return Stream.empty();
         }
         try {
-          final Instant date = Instant.parse(text);
+          final Instant date = DOMTypeSupport.stringToInstant(text.trim());
           if (date != null) {
             final XSDateTime newObject = (XSDateTime) XMLObjectSupport.buildXMLObject(XSDateTime.TYPE_NAME);
             newObject.setValue(date);
