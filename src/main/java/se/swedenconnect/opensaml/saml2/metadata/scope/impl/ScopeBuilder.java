@@ -15,10 +15,9 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.scope.impl;
 
+import jakarta.annotation.Nonnull;
 import org.opensaml.core.xml.AbstractXMLObjectBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
-
-import javax.annotation.Nonnull;
 
 /**
  * Builder for {@link Scope} elements.

@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import jakarta.annotation.Nonnull;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.resolver.ResolverException;
 import net.shibboleth.shared.security.RandomIdentifierParameterSpec;
@@ -35,7 +36,6 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;

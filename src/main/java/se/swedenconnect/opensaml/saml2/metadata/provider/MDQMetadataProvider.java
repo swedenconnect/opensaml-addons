@@ -15,6 +15,8 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.shibboleth.shared.collection.Pair;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.resolver.ResolverException;
@@ -30,8 +32,6 @@ import org.opensaml.saml.metadata.resolver.impl.FunctionDrivenDynamicHTTPMetadat
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**
