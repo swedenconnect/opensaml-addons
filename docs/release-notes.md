@@ -36,6 +36,8 @@
 
 - `attributeConsumingServices` of [SPSSODescriptorBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/SPSSODescriptorBuilder.java) and `requestedAttributes` of [AttributeConsumingServiceBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/AttributeConsumingServiceBuilder.java) returned `null` instead of the builder when given an empty value, which led to a `NullPointerException` in the next call.
 
+- A `shibmd:Scope` element with `regexp="1"` was read as a non-regexp scope by [ScopeUnmarshaller](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/impl/ScopeUnmarshaller.java), so scoped attributes matching the expression were rejected.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
