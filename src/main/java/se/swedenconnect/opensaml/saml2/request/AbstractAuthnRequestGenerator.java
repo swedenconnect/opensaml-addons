@@ -404,7 +404,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
         if (context.getPreferredBinding().equals(protocolBinding)) {
           return sso;
         }
-        else {
+        else if (SAMLConstants.SAML2_POST_BINDING_URI.equals(protocolBinding)
+            || SAMLConstants.SAML2_REDIRECT_BINDING_URI.equals(protocolBinding)) {
           ssoService = sso;
         }
       }

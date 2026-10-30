@@ -56,6 +56,8 @@
 
 - `keySize` and `oAEPparams` of [EncryptionMethodBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/EncryptionMethodBuilder.java) dropped the given value, which resulted in empty `KeySize` and `OAEPparams` elements in the metadata.
 
+- [AbstractAuthnRequestGenerator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AbstractAuthnRequestGenerator.java) could select a Holder-of-key endpoint with a binding that is not supported (for example HTTP-Artifact), and then fail, instead of using another endpoint.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

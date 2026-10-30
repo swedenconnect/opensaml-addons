@@ -18,10 +18,12 @@ package se.swedenconnect.opensaml.saml2.request;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
+import se.swedenconnect.opensaml.saml2.metadata.HolderOfKeyMetadataSupport;
 import se.swedenconnect.opensaml.saml2.metadata.build.AssertionConsumerServiceBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.build.EntityDescriptorBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.build.IDPSSODescriptorBuilder;
@@ -75,6 +77,39 @@ class DefaultAuthnRequestGeneratorTest extends OpenSAMLTestBase {
         generator.generateAuthnRequest(idpMetadata, null, IF_AVAILABLE_CONTEXT);
     Assertions.assertEquals(IDP_SSO, request.getRequest().getDestination());
     Assertions.assertEquals(SP_ACS, request.getRequest().getAssertionConsumerServiceURL());
+  }
+
+  @Test
+  void testHokIfAvailableUnsupportedBinding() throws Exception {
+    final EntityDescriptor spMetadata = EntityDescriptorBuilder.builder()
+        .entityID(SP_ENTITY_ID)
+        .ssoDescriptor(SPSSODescriptorBuilder.builder()
+            .assertionConsumerServices(
+                AssertionConsumerServiceBuilder.builder().postBinding().location(SP_ACS).index(0).build(),
+                AssertionConsumerServiceBuilder.builder().hokPostBinding().location(SP_ACS + "/hok").index(1).build())
+            .build())
+        .build();
+
+    final EntityDescriptor idpMetadata = EntityDescriptorBuilder.builder()
+        .entityID("https://idp.example.com")
+        .ssoDescriptor(IDPSSODescriptorBuilder.builder()
+            .singleSignOnServices(
+                SingleSignOnServiceBuilder.builder()
+                    .binding(HolderOfKeyMetadataSupport.HOK_WEBSSO_PROFILE_URI)
+                    .protocolBinding(SAMLConstants.SAML2_ARTIFACT_BINDING_URI)
+                    .location(IDP_HOK_SSO)
+                    .build(),
+                SingleSignOnServiceBuilder.builder().redirectBinding().location(IDP_SSO).build())
+            .build())
+        .build();
+
+    final DefaultAuthnRequestGenerator generator =
+        new DefaultAuthnRequestGenerator(spMetadata, null, Mockito.mock(MetadataResolver.class));
+    generator.initialize();
+
+    final RequestHttpObject<AuthnRequest> request =
+        generator.generateAuthnRequest(idpMetadata, null, IF_AVAILABLE_CONTEXT);
+    Assertions.assertEquals(IDP_SSO, request.getRequest().getDestination());
   }
 
 }
