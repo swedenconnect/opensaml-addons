@@ -28,6 +28,14 @@ import org.junit.jupiter.api.Test;
 public class LocalizedStringTest {
 
   @Test
+  public void testHashCode() {
+    Assertions.assertDoesNotThrow(() -> new LocalizedString().hashCode());
+    Assertions.assertEquals(new LocalizedString("Hi", (String) null), new LocalizedString("Hi", "en"));
+    Assertions.assertEquals(new LocalizedString("Hi", (String) null).hashCode(),
+        new LocalizedString("Hi", "en").hashCode());
+  }
+
+  @Test
   public void testDefaultConstructor() {
     final LocalizedString ls = new LocalizedString();
     Assertions.assertEquals(LocalizedString.DEFAULT_LANGUAGE_TAG, ls.getLanguage());

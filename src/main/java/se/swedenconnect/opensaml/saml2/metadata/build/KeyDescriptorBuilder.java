@@ -89,6 +89,7 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
       if (this.object().getKeyInfo() != null && !this.object().getKeyInfo().getKeyNames().isEmpty()) {
         this.object().getKeyInfo().getKeyNames().clear();
       }
+      return this;
     }
     if (this.object().getKeyInfo() == null) {
       this.object().setKeyInfo((KeyInfo) XMLObjectSupport.buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME));
@@ -147,6 +148,7 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
       if (this.object().getKeyInfo() != null && !this.object().getKeyInfo().getX509Datas().isEmpty()) {
         this.object().getKeyInfo().getX509Datas().clear();
       }
+      return this;
     }
     if (this.object().getKeyInfo() == null) {
       this.object().setKeyInfo((KeyInfo) XMLObjectSupport.buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME));
@@ -174,7 +176,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   }
 
   /**
-   * Assigns a list of encryption methods.
+   * Adds a list of encryption methods to the encryption methods already assigned. If {@code null} or an empty list is
+   * supplied, all encryption methods are removed.
    * <p>
    * Note: the method only accepts algorithm URI:s. If you need to assign other parts of an {@code EncryptionMethod}
    * object you must use {@link #encryptionMethodsExt(List)}.
@@ -209,7 +212,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   }
 
   /**
-   * Assigns a list of encryption methods.
+   * Adds a list of encryption methods to the encryption methods already assigned. If {@code null} or an empty list is
+   * supplied, all encryption methods are removed.
    *
    * @param algorithms ordered list of encryption methods
    * @return the builder

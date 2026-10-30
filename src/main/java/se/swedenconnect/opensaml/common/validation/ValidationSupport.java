@@ -44,6 +44,26 @@ public class ValidationSupport {
   }
 
   /**
+   * Checks the result of a validation step that is part of a chain of steps. An INVALID result is thrown as a
+   * {@code ValidationResultException}. An INDETERMINATE result does not stop the chain, but is remembered, so that the
+   * remaining steps are still run and the chain as a whole is reported as INDETERMINATE.
+   *
+   * @param result the result of the validation step
+   * @param previous the combined result of the previous steps
+   * @return the combined result, i.e., VALID or INDETERMINATE
+   * @throws ValidationResultException for INVALID results
+   */
+  public static ValidationResult check(final ValidationResult result, final ValidationResult previous)
+      throws ValidationResultException {
+    if (ValidationResult.INVALID == result) {
+      throw new ValidationResultException(result);
+    }
+    return ValidationResult.INDETERMINATE == result || ValidationResult.INDETERMINATE == previous
+        ? ValidationResult.INDETERMINATE
+        : ValidationResult.VALID;
+  }
+
+  /**
    * Exception class that should be used internally by validators to process errors.
    */
   public static class ValidationResultException extends Exception {

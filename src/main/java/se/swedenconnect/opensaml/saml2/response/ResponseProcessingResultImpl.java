@@ -100,8 +100,11 @@ public class ResponseProcessingResultImpl implements ResponseProcessingResult {
   public String getAuthnContextClassUri() {
     return this.assertion.getAuthnStatements().stream()
         .map(AuthnStatement::getAuthnContext)
+        .filter(Objects::nonNull)
         .map(AuthnContext::getAuthnContextClassRef)
+        .filter(Objects::nonNull)
         .map(AuthnContextClassRef::getURI)
+        .filter(Objects::nonNull)
         .findFirst()
         .orElse(null);
   }

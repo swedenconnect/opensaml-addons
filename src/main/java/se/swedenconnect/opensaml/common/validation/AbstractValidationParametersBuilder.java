@@ -67,7 +67,7 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
    * @return the builder
    */
   public T dynamicParameter(final String name, final Object value) {
-    this.addStaticParameter(name, value);
+    this.addDynamicParameter(name, value);
     return this.getThis();
   }
 
@@ -221,7 +221,7 @@ public abstract class AbstractValidationParametersBuilder<T extends AbstractVali
    */
   public final void addDynamicParameter(final String name, final Object value) {
     if (name != null) {
-      this.staticParameters.put(name, value);
+      this.dynamicParameters.put(name, value);
     }
   }
 

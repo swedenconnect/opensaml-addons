@@ -126,8 +126,8 @@ public class LocalizedString {
   @Override
   public int hashCode() {
     int hash = 1;
-    hash = hash * 31 + this.language.hashCode();
-    hash = hash * 31 + this.localizedString.hashCode();
+    hash = hash * 31 + this.getLanguage().hashCode();
+    hash = hash * 31 + (this.localizedString != null ? this.localizedString.hashCode() : 0);
     return hash;
   }
 

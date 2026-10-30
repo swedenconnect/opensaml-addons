@@ -175,21 +175,22 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
    */
   @Override
   public ValidationResult validate(final Assertion assertion, final ValidationContext context) {
+    ValidationResult result = ValidationResult.VALID;
     try {
-      ValidationSupport.check(this.validateID(assertion, context));
-      ValidationSupport.check(this.validateVersion(assertion, context));
-      ValidationSupport.check(this.validateIssueInstant(assertion, context));
-      ValidationSupport.check(this.validateIssuer(assertion, context));
-      ValidationSupport.check(this.validateHolderOfKeyRequirement(assertion, context));
-      ValidationSupport.check(this.validateSignature(assertion, context));
-      ValidationSupport.check(this.validateSubject(assertion, context));
-      ValidationSupport.check(this.validateConditions(assertion, context));
-      ValidationSupport.check(this.validateStatements(assertion, context));
+      result = ValidationSupport.check(this.validateID(assertion, context), result);
+      result = ValidationSupport.check(this.validateVersion(assertion, context), result);
+      result = ValidationSupport.check(this.validateIssueInstant(assertion, context), result);
+      result = ValidationSupport.check(this.validateIssuer(assertion, context), result);
+      result = ValidationSupport.check(this.validateHolderOfKeyRequirement(assertion, context), result);
+      result = ValidationSupport.check(this.validateSignature(assertion, context), result);
+      result = ValidationSupport.check(this.validateSubject(assertion, context), result);
+      result = ValidationSupport.check(this.validateConditions(assertion, context), result);
+      result = ValidationSupport.check(this.validateStatements(assertion, context), result);
     }
     catch (final ValidationResultException e) {
       return e.getResult();
     }
-    return ValidationResult.VALID;
+    return result;
   }
 
   /**
@@ -563,6 +564,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       return timeboundsResult;
     }
 
+    ValidationResult result = ValidationResult.VALID;
     for (final Condition condition : conditions.getConditions()) {
       ConditionValidator validator = this.conditionValidators.get(condition.getElementQName());
       if (validator == null && condition.getSchemaType() != null) {
@@ -575,11 +577,9 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
         log.warn(msg);
         if (isStrictValidation(context)) {
           context.getValidationFailureMessages().add(msg);
-          return ValidationResult.INDETERMINATE;
+          result = ValidationResult.INDETERMINATE;
         }
-        else {
-          continue;
-        }
+        continue;
       }
 
       ValidationResult r;
@@ -604,7 +604,7 @@ public class AssertionValidator extends AbstractSignableObjectValidator<Assertio
       }
     }
 
-    return ValidationResult.VALID;
+    return result;
   }
 
   /**

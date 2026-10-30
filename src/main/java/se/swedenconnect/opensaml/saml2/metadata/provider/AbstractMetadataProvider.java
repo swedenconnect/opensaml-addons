@@ -15,6 +15,7 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import jakarta.annotation.Nonnull;
 import net.shibboleth.shared.component.AbstractInitializableComponent;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.resolver.CriteriaSet;
@@ -48,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
 import javax.xml.namespace.QName;
 import java.security.cert.X509Certificate;
 import java.time.Instant;

@@ -135,6 +135,35 @@ public class CompositeMetadataProviderTest extends OpenSAMLTestBase {
   }
 
   /**
+   * Tests that one provider without metadata does not break the composite provider.
+   *
+   * @throws Exception for errors
+   */
+  @Test
+  public void testProviderWithoutMetadata() throws Exception {
+    final HTTPMetadataProvider failingProvider = new HTTPMetadataProvider("http://localhost:1/metadata.xml", null);
+    failingProvider.setFailFastInitialization(false);
+
+    final CompositeMetadataProvider provider = new CompositeMetadataProvider("MetadataService",
+        Arrays.asList(new FilesystemMetadataProvider(part1.getFile()), failingProvider,
+            new FilesystemMetadataProvider(part2.getFile())));
+
+    try {
+      provider.initialize();
+      Assertions.assertNull(failingProvider.getMetadata());
+
+      final XMLObject xmlObject = provider.getMetadata();
+      Assertions.assertNotNull(xmlObject, "Could not get metadata XMLObject from provider");
+      Assertions.assertFalse(((EntitiesDescriptor) xmlObject).getEntityDescriptors().isEmpty());
+    }
+    finally {
+      if (provider.isInitialized()) {
+        provider.destroy();
+      }
+    }
+  }
+
+  /**
    * Tests getting the DOM of the entire metadata held by the provider.
    *
    * @throws Exception for errors

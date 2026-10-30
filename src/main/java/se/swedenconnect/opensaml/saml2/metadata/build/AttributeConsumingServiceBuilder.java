@@ -134,7 +134,7 @@ public class AttributeConsumingServiceBuilder extends AbstractSAMLObjectBuilder<
   public AttributeConsumingServiceBuilder requestedAttributes(final List<RequestedAttribute> attributes) {
     this.object().getRequestedAttributes().clear();
     if (attributes == null) {
-      return null;
+      return this;
     }
     for (final RequestedAttribute attribute : attributes) {
       try {

@@ -15,9 +15,20 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
+import jakarta.annotation.Nonnull;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
+import org.opensaml.saml.metadata.resolver.filter.MetadataFilterChain;
+import org.opensaml.saml.metadata.resolver.filter.MetadataFilterContext;
 import org.opensaml.saml.metadata.resolver.impl.FilesystemMetadataResolver;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Test cases for the {@code ProxyMetadataProvider}.
@@ -34,6 +45,58 @@ public class ProxyMetadataProviderTest extends BaseMetadataProviderTest {
     resolver.setId(resource.getFilename());
     resolver.setParserPool(XMLObjectProviderRegistrySupport.getParserPool());
     return new ProxyMetadataProvider(resolver);
+  }
+
+  @Test
+  void testInstalledFilter() throws Exception {
+    this.testInstalledFilter(false);
+  }
+
+  @Test
+  void testInstalledFilterChain() throws Exception {
+    this.testInstalledFilter(true);
+  }
+
+  private void testInstalledFilter(final boolean installChain) throws Exception {
+    final Resource resource = new ClassPathResource("/metadata/sveleg-fedtest.xml");
+    final FilesystemMetadataResolver resolver = new FilesystemMetadataResolver(resource.getFile());
+    resolver.setId(resource.getFilename());
+    resolver.setParserPool(XMLObjectProviderRegistrySupport.getParserPool());
+
+    final AtomicBoolean installedFilterCalled = new AtomicBoolean(false);
+    final MetadataFilter installedFilter = new MetadataFilter() {
+      @Override
+      @Nonnull
+      public String getType() {
+        return "TestFilter";
+      }
+
+      @Override
+      public XMLObject filter(final XMLObject metadata, @Nonnull final MetadataFilterContext context) {
+        installedFilterCalled.set(true);
+        return metadata;
+      }
+    };
+    if (installChain) {
+      final MetadataFilterChain chain = new MetadataFilterChain();
+      chain.setFilters(List.of(installedFilter));
+      resolver.setMetadataFilter(chain);
+    }
+    else {
+      resolver.setMetadataFilter(installedFilter);
+    }
+
+    final ProxyMetadataProvider provider = new ProxyMetadataProvider(resolver);
+    try {
+      provider.initialize();
+      Assertions.assertNotNull(provider.getMetadata(), "The provider's own filters were not installed");
+      Assertions.assertTrue(installedFilterCalled.get(), "The installed filter was not called");
+    }
+    finally {
+      if (provider.isInitialized()) {
+        provider.destroy();
+      }
+    }
   }
 
 }

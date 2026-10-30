@@ -386,8 +386,17 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
     final IDPSSODescriptor descriptor = Optional.ofNullable(idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS))
         .orElseThrow(() -> new RequestGenerationException("Invalid IdP metadata - missing IDPSSODescriptor"));
 
-    if (HokRequirement.REQUIRED == context.getHokRequirement()
-        || HokRequirement.IF_AVAILABLE == context.getHokRequirement()) {
+    boolean useHok = HokRequirement.REQUIRED == context.getHokRequirement()
+        || HokRequirement.IF_AVAILABLE == context.getHokRequirement();
+
+    if (useHok && HokRequirement.IF_AVAILABLE == context.getHokRequirement()
+        && HolderOfKeyMetadataSupport.getHokAssertionConsumerServices(
+        this.getSpMetadata().getSPSSODescriptor(SAMLConstants.SAML20P_NS)).isEmpty()) {
+      log.debug("SP does not have an AssertionConsumerService for Holder-of-key - using normal WebSSO Profile");
+      useHok = false;
+    }
+
+    if (useHok) {
       SingleSignOnService ssoService = null;
       for (final SingleSignOnService sso : HolderOfKeyMetadataSupport.getHokSingleSignOnServices(descriptor)) {
         final String protocolBinding =
@@ -395,7 +404,8 @@ public abstract class AbstractAuthnRequestGenerator extends AbstractInitializabl
         if (context.getPreferredBinding().equals(protocolBinding)) {
           return sso;
         }
-        else {
+        else if (SAMLConstants.SAML2_POST_BINDING_URI.equals(protocolBinding)
+            || SAMLConstants.SAML2_REDIRECT_BINDING_URI.equals(protocolBinding)) {
           ssoService = sso;
         }
       }

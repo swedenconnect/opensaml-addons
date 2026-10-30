@@ -19,6 +19,7 @@ import jakarta.annotation.Nonnull;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.AbstractXMLObjectUnmarshaller;
 import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.core.xml.schema.XSBooleanValue;
 import org.w3c.dom.Attr;
 import se.swedenconnect.opensaml.saml2.metadata.scope.Scope;
 
@@ -35,7 +36,7 @@ public class ScopeUnmarshaller extends AbstractXMLObjectUnmarshaller {
       throws UnmarshallingException {
     final Scope scope = (Scope) xmlObject;
     if (attribute.getLocalName().equals(Scope.REGEXP_ATTRIB_NAME)) {
-      scope.setRegexp(Boolean.valueOf(attribute.getValue()));
+      scope.setRegexp(XSBooleanValue.valueOf(attribute.getValue()));
     }
   }
 

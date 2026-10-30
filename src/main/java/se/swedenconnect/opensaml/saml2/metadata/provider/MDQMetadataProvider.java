@@ -15,12 +15,15 @@
  */
 package se.swedenconnect.opensaml.saml2.metadata.provider;
 
-import net.shibboleth.shared.collection.Pair;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.shibboleth.shared.component.ComponentInitializationException;
 import net.shibboleth.shared.resolver.ResolverException;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
+import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.persist.FilesystemLoadSaveManager;
 import org.opensaml.core.xml.persist.MapLoadSaveManager;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -29,10 +32,12 @@ import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.impl.FunctionDrivenDynamicHTTPMetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A {@link MetadataProvider} that supports the <a href="https://www.ietf.org/id/draft-young-md-query-17.html">MDQ
@@ -47,11 +52,23 @@ import java.io.IOException;
  */
 public class MDQMetadataProvider extends AbstractMetadataProvider {
 
+  /** Logger instance. */
+  private static final Logger log = LoggerFactory.getLogger(MDQMetadataProvider.class);
+
   /** The underlying {@link MetadataResolver}. */
-  private final FunctionDrivenDynamicHTTPMetadataResolver resolver;
+  private final MDQResolver resolver;
+
+  /** The MDQ base URL. */
+  private final String metadataBaseUrl;
+
+  /** The {@code HttpClient} created by this provider (null if the client was supplied). Closed on destroy. */
+  private final HttpClient defaultHttpClient;
 
   /** Metadata as last seen at a call to {@link #getMetadata()}. */
   private EntitiesDescriptor cachedMetadata;
+
+  /** The resolved entity descriptors that {@link #cachedMetadata} was built from. */
+  private List<EntityDescriptor> cachedDescriptors;
 
   /**
    * Constructor setting up a {@link MetadataProvider} that uses the MDQ protocol to download metadata for requested
@@ -67,8 +84,9 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
       @Nonnull final String metadataBaseUrl, @Nullable final HttpClient httpClient,
       @Nullable final String cacheBaseDir) throws ResolverException {
 
-    this.resolver = new FunctionDrivenDynamicHTTPMetadataResolver(
-        httpClient != null ? httpClient : HTTPMetadataProvider.createDefaultHttpClient());
+    this.metadataBaseUrl = metadataBaseUrl;
+    this.defaultHttpClient = httpClient == null ? HTTPMetadataProvider.createDefaultHttpClient() : null;
+    this.resolver = new MDQResolver(httpClient != null ? httpClient : this.defaultHttpClient);
     this.resolver.setRequestURLBuilder(new MDQRequestURLBuilder(metadataBaseUrl));
 
     if (cacheBaseDir != null) {
@@ -88,8 +106,8 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   }
 
   /**
-   * Gets all {@link EntityDescriptor} objects available in the cache and adds them to a {@link EntitiesDescriptor}
-   * object.
+   * Gets all {@link EntityDescriptor} objects resolved by the provider and adds copies of them to a
+   * {@link EntitiesDescriptor} object.
    * <p>
    * Note: The {@link MDQMetadataProvider} version of this method does not return all metadata entries available at the
    * source. It only returns those that have been downloaded by the provider and are present in the cache.
@@ -97,28 +115,52 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
    */
   @Override
   public synchronized XMLObject getMetadata() {
-    if (this.cachedMetadata != null) {
+    final List<EntityDescriptor> descriptors = this.resolver.getResolvedEntityDescriptors();
+    if (this.cachedMetadata != null && isSameInstances(descriptors, this.cachedDescriptors)) {
       return this.cachedMetadata;
     }
-    try {
-      final EntitiesDescriptor entities =
-          (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
 
-      final Iterable<Pair<String, EntityDescriptor>> it = this.resolver.getPersistentCacheManager().listAll();
-      it.forEach((e) -> entities.getEntityDescriptors().add(e.getSecond()));
+    final EntitiesDescriptor entities =
+        (EntitiesDescriptor) XMLObjectSupport.buildXMLObject(EntitiesDescriptor.DEFAULT_ELEMENT_NAME);
 
-      this.cachedMetadata = entities;
-      return entities;
+    // The resolved objects belong to the resolver, so we add copies of them.
+    for (final EntityDescriptor descriptor : descriptors) {
+      try {
+        entities.getEntityDescriptors().add(XMLObjectSupport.cloneXMLObject(descriptor));
+      }
+      catch (final MarshallingException | UnmarshallingException e) {
+        log.warn("Failed to copy metadata for '{}' - it will not be included", descriptor.getEntityID(), e);
+      }
     }
-    catch (final IOException e) {
-      return null;
+
+    this.cachedMetadata = entities;
+    this.cachedDescriptors = descriptors;
+    return entities;
+  }
+
+  /**
+   * Tells whether two lists hold the same object instances, in the same order.
+   *
+   * @param list1 the first list
+   * @param list2 the second list (may be null)
+   * @return true if the lists hold the same instances, and false otherwise
+   */
+  private static boolean isSameInstances(final List<EntityDescriptor> list1, final List<EntityDescriptor> list2) {
+    if (list2 == null || list1.size() != list2.size()) {
+      return false;
     }
+    for (int i = 0; i < list1.size(); i++) {
+      if (list1.get(i) != list2.get(i)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /** {@inheritDoc} */
   @Override
   protected synchronized void setMetadata(final XMLObject metadata) {
-    this.cachedMetadata = null;
+    // The metadata is built from the resolved entities in getMetadata(), so we don't save anything here.
     super.setMetadata(null);
   }
 
@@ -140,6 +182,8 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   /** {@inheritDoc} */
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
+    HTTPMetadataProvider.warnIfUntrusted(this.metadataBaseUrl, this.defaultHttpClient != null,
+        this.getSignatureVerificationCertificates() == null);
     this.resolver.initialize();
   }
 
@@ -148,6 +192,38 @@ public class MDQMetadataProvider extends AbstractMetadataProvider {
   protected void destroyMetadataResolver() {
     if (this.resolver != null) {
       this.resolver.destroy();
+    }
+    HTTPMetadataProvider.closeHttpClient(this.defaultHttpClient);
+  }
+
+  /**
+   * MDQ resolver that gives access to the entity descriptors that have been resolved (after filtering).
+   */
+  private static class MDQResolver extends FunctionDrivenDynamicHTTPMetadataResolver {
+
+    /**
+     * Constructor.
+     *
+     * @param httpClient the HTTP client
+     * @throws ResolverException for errors setting up the resolver
+     */
+    MDQResolver(final HttpClient httpClient) throws ResolverException {
+      super(httpClient);
+    }
+
+    /**
+     * Gets the entity descriptors that have been resolved, sorted by entityID.
+     *
+     * @return a list of entity descriptors
+     */
+    List<EntityDescriptor> getResolvedEntityDescriptors() {
+      if (!this.isInitialized() || this.isDestroyed()) {
+        return Collections.emptyList();
+      }
+      return this.getBackingStore().getIndexedDescriptors().values().stream()
+          .flatMap(List::stream)
+          .sorted(Comparator.comparing(EntityDescriptor::getEntityID))
+          .toList();
     }
   }
 

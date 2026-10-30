@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import java.io.Closeable;
+import java.io.IOException;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.List;
@@ -55,6 +57,9 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
   /** The metadata resolver. */
   private final HTTPMetadataResolver metadataResolver;
 
+  /** The {@code HttpClient} created by this provider (null if the client was supplied). Closed on destroy. */
+  private final HttpClient defaultHttpClient;
+
   /**
    * Creates a provider that periodically downloads data from the URL given by {@code metadataUrl}. If the
    * {@code backupFile} parameter is given the provider also stores the downloaded metadata on disk as backup.
@@ -68,7 +73,7 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    * @throws ResolverException if the supplied metadata URL is invalid
    */
   public HTTPMetadataProvider(final String metadataUrl, final String backupFile) throws ResolverException {
-    this(metadataUrl, backupFile, createDefaultHttpClient());
+    this(metadataUrl, backupFile, createDefaultHttpClient(), true);
   }
 
   /**
@@ -82,12 +87,27 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
    */
   public HTTPMetadataProvider(final String metadataUrl, final String backupFile, final HttpClient httpClient)
       throws ResolverException {
+    this(metadataUrl, backupFile, httpClient, false);
+  }
+
+  /**
+   * Creates a provider that periodically downloads data from the URL given by {@code metadataUrl}.
+   *
+   * @param metadataUrl the URL to use when downloading metadata
+   * @param backupFile optional path to the file to where the provider should store downloaded metadata
+   * @param httpClient the {@code HttpClient} that should be used to download the metadata
+   * @param defaultHttpClient whether {@code httpClient} was created by this provider
+   * @throws ResolverException if the supplied metadata URL is invalid
+   */
+  private HTTPMetadataProvider(final String metadataUrl, final String backupFile, final HttpClient httpClient,
+      final boolean defaultHttpClient) throws ResolverException {
     Validate.notEmpty(metadataUrl, "metadataUrl must be set");
     Validate.notNull(httpClient, "httpClient must not be null");
 
     this.metadataResolver = backupFile != null
         ? new FileBackedHTTPMetadataResolver(httpClient, metadataUrl, backupFile)
         : new HTTPMetadataResolver(httpClient, metadataUrl);
+    this.defaultHttpClient = defaultHttpClient ? httpClient : null;
   }
 
   /**
@@ -176,13 +196,8 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
   @Override
   protected void initializeMetadataResolver() throws ComponentInitializationException {
 
-    final String url = this.metadataResolver.getMetadataURI();
-    if (url != null && url.startsWith("http:")) {
-      if (this.getSignatureVerificationCertificates() == null) {
-        log.warn(
-            "Metadata is downloaded using HTTP and signature verification is not configured - metadata cannot be trusted");
-      }
-    }
+    warnIfUntrusted(this.metadataResolver.getMetadataURI(), this.defaultHttpClient != null,
+        this.getSignatureVerificationCertificates() == null);
 
     this.metadataResolver.initialize();
   }
@@ -192,6 +207,47 @@ public class HTTPMetadataProvider extends AbstractMetadataProvider {
   protected void destroyMetadataResolver() {
     if (this.metadataResolver != null) {
       this.metadataResolver.destroy();
+    }
+    closeHttpClient(this.defaultHttpClient);
+  }
+
+  /**
+   * Logs a warning if metadata is downloaded without any protection, i.e., signature verification is not configured
+   * and the metadata is downloaded using HTTP, or using HTTPS with a default client (that does not validate the TLS
+   * server certificate).
+   *
+   * @param url the metadata URL
+   * @param defaultHttpClient whether a default {@code HttpClient} is used
+   * @param noSignatureVerification whether signature verification is not configured
+   */
+  static void warnIfUntrusted(
+      final String url, final boolean defaultHttpClient, final boolean noSignatureVerification) {
+    if (url == null || !noSignatureVerification) {
+      return;
+    }
+    if (url.startsWith("http:")) {
+      log.warn("Metadata is downloaded from {} using HTTP and signature verification is not configured "
+          + "- metadata cannot be trusted", url);
+    }
+    else if (url.startsWith("https:") && defaultHttpClient) {
+      log.warn("Metadata is downloaded from {} using a client that does not validate the TLS server certificate, "
+          + "and signature verification is not configured - metadata cannot be trusted", url);
+    }
+  }
+
+  /**
+   * Closes the supplied {@code HttpClient} if it is closeable.
+   *
+   * @param httpClient the client to close (may be null)
+   */
+  static void closeHttpClient(final HttpClient httpClient) {
+    if (httpClient instanceof final Closeable closeable) {
+      try {
+        closeable.close();
+      }
+      catch (final IOException e) {
+        log.debug("Failed to close HttpClient", e);
+      }
     }
   }
 

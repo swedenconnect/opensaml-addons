@@ -98,6 +98,30 @@ class MDQMetadataProviderTest extends OpenSAMLTestBase {
   }
 
   @Test
+  void testGetMetadataInMemoryCache() throws Exception {
+
+    final MDQMetadataProvider provider = new MDQMetadataProvider(server.getUrl(),
+        HTTPMetadataProvider.createDefaultHttpClient(trustStore, null), null);
+    try {
+      provider.initialize();
+
+      Assertions.assertNotNull(provider.getEntityDescriptor("https://sickelstatest.transportstyrelsen.se/extweb/"));
+      EntitiesDescriptor metadata = (EntitiesDescriptor) provider.getMetadata();
+      Assertions.assertEquals(1, metadata.getEntityDescriptors().size());
+      Assertions.assertSame(metadata, provider.getMetadata());
+
+      // Fetch another entity and rebuild metadata
+      Assertions.assertNotNull(provider.getEntityDescriptor("https://idp.svelegtest.se/idp"));
+      metadata = (EntitiesDescriptor) provider.getMetadata();
+      Assertions.assertEquals(2, metadata.getEntityDescriptors().size());
+      Assertions.assertEquals(1, provider.getIdentityProviders().size());
+    }
+    finally {
+      provider.destroy();
+    }
+  }
+
+  @Test
   void testGet() throws Exception {
 
     final MDQMetadataProvider provider = new MDQMetadataProvider(server.getUrl(),

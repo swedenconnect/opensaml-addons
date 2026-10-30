@@ -60,7 +60,7 @@ public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
     }
     else {
       try {
-        final Method method = this.object().getClass().getDeclaredMethod("setRegexp", Boolean.class);
+        final Method method = this.object().getClass().getMethod("setRegexp", Boolean.class);
         method.invoke(this.object(), regexp);
       }
       catch (final Exception e) {
@@ -82,7 +82,7 @@ public class ScopeBuilder extends AbstractSAMLObjectBuilder<XMLObject> {
     }
     else {
       try {
-        final Method method = this.object().getClass().getDeclaredMethod("setValue", String.class);
+        final Method method = this.object().getClass().getMethod("setValue", String.class);
         method.invoke(this.object(), value);
       }
       catch (final Exception e) {

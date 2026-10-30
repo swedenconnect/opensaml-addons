@@ -26,6 +26,7 @@ import net.shibboleth.shared.resolver.ResolverException;
 import net.shibboleth.shared.xml.SerializeSupport;
 import net.shibboleth.shared.xml.XMLParserException;
 import org.opensaml.core.criterion.EntityIdCriterion;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -78,10 +79,10 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Response processor for SAML Response messages.
@@ -133,7 +134,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   private boolean isInitialized = false;
 
   /** A cache for the SP metadata. */
-  private Map<String, EntityDescriptor> spMetadataCache;
+  private final Map<String, EntityDescriptor> spMetadataCache = new ConcurrentHashMap<>();
 
   /** {@inheritDoc} */
   @Override
@@ -183,6 +184,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       // Step 6. Decrypt assertion (if needed)
       //
       if (!response.getEncryptedAssertions().isEmpty()) {
+        if (this.decrypter == null) {
+          throw new ResponseProcessingException(
+              "Response contains an encrypted assertion, but no decrypter is configured", response, null);
+        }
         assertion = this.decrypter.decrypt(response.getEncryptedAssertions().get(0), Assertion.class);
         if (log.isTraceEnabled()) {
           log.trace("[{}] Decrypted Assertion: {}", logId(response, assertion), toString(assertion));
@@ -329,8 +334,13 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         log.info("Unable to Base64 decode SAML response message");
         throw new MessageDecodingException("Unable to Base64 decode SAML response message");
       }
-      return (Response) XMLObjectSupport.unmarshallFromInputStream(
+      final XMLObject message = XMLObjectSupport.unmarshallFromInputStream(
           XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes));
+      if (message instanceof final Response response) {
+        return response;
+      }
+      log.info("Received message is not a SAML Response - {}", message.getElementQName());
+      throw new MessageDecodingException("Received message is not a SAML Response");
     }
     catch (final MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
       throw new ResponseProcessingException("Failed to decode message", e, null, null);
@@ -478,6 +488,11 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         .validAddresses(input.getClientIpAddress())
         .clientCertificate(input.getClientCertificate());
 
+    if (validationContext == null || validationContext.getStaticParameters()
+        .get(AuthnStatementValidator.MAX_ACCEPTED_SSO_SESSION_TIME) == null) {
+      builder.maxAcceptedSsoSessionTime(this.responseValidationSettings.getMaxSessionAge());
+    }
+
     // TODO: We should really make sure that we honor all passed in validation context settings
     if (validationContext == null
         || validationContext.getStaticParameters().get(CoreValidatorParameters.SP_METADATA) == null) {
@@ -578,14 +593,15 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     if (entityID == null) {
       return null;
     }
-    if (this.spMetadataCache != null && this.spMetadataCache.containsKey(entityID)) {
-      return this.spMetadataCache.get(entityID);
+    final EntityDescriptor cached = this.spMetadataCache.get(entityID);
+    if (cached != null) {
+      return cached;
     }
     final EntityDescriptor spMetadata = this.getMetadata(entityID, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
-    if (this.spMetadataCache == null) {
-      this.spMetadataCache = new HashMap<>();
+    if (spMetadata != null) {
+      // Metadata that is not found is not cached, so that we try again next time.
+      this.spMetadataCache.put(entityID, spMetadata);
     }
-    this.spMetadataCache.put(entityID, spMetadata);
     return spMetadata;
   }
 

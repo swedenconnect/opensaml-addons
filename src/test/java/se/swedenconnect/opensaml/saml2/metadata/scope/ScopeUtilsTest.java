@@ -17,9 +17,16 @@ package se.swedenconnect.opensaml.saml2.metadata.scope;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.impl.XSStringImpl;
+import org.opensaml.core.xml.util.XMLObjectSupport;
 
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
 import se.swedenconnect.opensaml.saml2.metadata.build.ScopeBuilder;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Test cases for {@link ScopeUtils}.
@@ -48,6 +55,41 @@ public class ScopeUtilsTest extends OpenSAMLTestBase {
         ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.com$").build(), "kalle@example.com"));
     Assertions.assertFalse(
         ScopeUtils.isMatch(ScopeBuilder.builder().regexp(true).value("^.*\\.se$").build(), "kalle@example.com"));
+  }
+
+  @Test
+  public void testUnmarshallNumericRegexp() throws Exception {
+    final String xml = "<shibmd:Scope xmlns:shibmd=\"urn:mace:shibboleth:metadata:1.0\" regexp=\"1\">"
+        + "^.*\\.example\\.com$</shibmd:Scope>";
+    final XMLObject scope = XMLObjectSupport.unmarshallFromInputStream(
+        XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+    Assertions.assertTrue(ScopeUtils.isMatch(scope, "kalle@a.example.com"));
+  }
+
+  @Test
+  public void testForeignScopeImplementation() {
+    final ForeignScope scope = new ForeignScope();
+    scope.setValue("example.com");
+    Assertions.assertTrue(ScopeUtils.isMatch(scope, "kalle@example.com"));
+    Assertions.assertFalse(ScopeUtils.isMatch(scope, "kalle@example.se"));
+  }
+
+  /**
+   * A Scope implementation that does not implement our {@link Scope} interface, and where the methods are inherited.
+   */
+  public static class BaseForeignScope extends XSStringImpl {
+
+    protected BaseForeignScope() {
+      super(Scope.DEFAULT_ELEMENT_NAME.getNamespaceURI(), Scope.DEFAULT_ELEMENT_NAME.getLocalPart(),
+          Scope.DEFAULT_ELEMENT_NAME.getPrefix());
+    }
+
+    public Boolean getRegexp() {
+      return null;
+    }
+  }
+
+  public static class ForeignScope extends BaseForeignScope {
   }
 
 }
