@@ -28,6 +28,8 @@
 
 - `getMetadata()` of [CompositeMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/CompositeMetadataProvider.java) failed with a `NullPointerException` when one of the underlying providers had no metadata (for example after a failed download). Also, the composite metadata was not rebuilt when an MDQ or static provider got new metadata.
 
+- The `dynamicParameter` and `addDynamicParameter` methods of [AbstractValidationParametersBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/validation/AbstractValidationParametersBuilder.java) added the parameter as a static parameter.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
