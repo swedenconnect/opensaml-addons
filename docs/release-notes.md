@@ -8,9 +8,15 @@
 
 ## Release Notes
 
-### 2.2.2
+### 2.2.3
 
 **Date:** _not yet released_
+
+-
+
+### 2.2.2
+
+**Date:** 2026-10-30
 
 - An INDETERMINATE validation result stopped the validation of a response or assertion, and the remaining steps were never run, while the result was still accepted by [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java). For example, a missing receive URL meant that the signature of the response was never checked. All validation steps are now run, and an INVALID result in any step makes the validation fail.
 
