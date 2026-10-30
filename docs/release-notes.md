@@ -44,6 +44,8 @@
 
 - [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java) failed with a `NullPointerException` when a response contained an encrypted assertion and no decrypter was configured. A `ResponseProcessingException` is now thrown.
 
+- [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java) failed with a `ClassCastException` when the received message was not a SAML Response (for example a `LogoutResponse`). A `ResponseProcessingException` is now thrown.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

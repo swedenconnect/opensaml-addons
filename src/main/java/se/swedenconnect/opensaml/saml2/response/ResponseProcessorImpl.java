@@ -26,6 +26,7 @@ import net.shibboleth.shared.resolver.ResolverException;
 import net.shibboleth.shared.xml.SerializeSupport;
 import net.shibboleth.shared.xml.XMLParserException;
 import org.opensaml.core.criterion.EntityIdCriterion;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.util.XMLObjectSupport;
@@ -333,8 +334,13 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
         log.info("Unable to Base64 decode SAML response message");
         throw new MessageDecodingException("Unable to Base64 decode SAML response message");
       }
-      return (Response) XMLObjectSupport.unmarshallFromInputStream(
+      final XMLObject message = XMLObjectSupport.unmarshallFromInputStream(
           XMLObjectProviderRegistrySupport.getParserPool(), new ByteArrayInputStream(decodedBytes));
+      if (message instanceof final Response response) {
+        return response;
+      }
+      log.info("Received message is not a SAML Response - {}", message.getElementQName());
+      throw new MessageDecodingException("Received message is not a SAML Response");
     }
     catch (final MessageDecodingException | XMLParserException | UnmarshallingException | DecodingException e) {
       throw new ResponseProcessingException("Failed to decode message", e, null, null);
