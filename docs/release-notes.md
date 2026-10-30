@@ -24,6 +24,8 @@
 
 - The default `HttpClient` created by [HTTPMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/HTTPMetadataProvider.java) and [MDQMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/MDQMetadataProvider.java) was never closed, so each destroyed provider leaked a connection pool. The default client does not validate the TLS server certificate, and a warning is now also logged when metadata is downloaded using HTTPS with this client without signature verification.
 
+- `getMetadata()` of [MDQMetadataProvider](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/provider/MDQMetadataProvider.java) failed with an `IllegalArgumentException` when the in-memory cache was used and new entities had been fetched since the last call. It also returned metadata that had not been processed by the configured filters, and could miss newly fetched entities. The metadata is now built from copies of the resolved (and filtered) entities.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
