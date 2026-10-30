@@ -100,6 +100,21 @@ public class AbstractSignableObjectValidatorTest extends OpenSAMLTestBase {
     Assertions.assertEquals(ValidationResult.INVALID, result);
   }
 
+  @Test
+  public void testSuppliedCriteriaSetIsNotModified() throws Exception {
+    final TestResponseValidator validator = new TestResponseValidator(this.signatureTrustEngine, this.signatureProfileValidator);
+
+    final CriteriaSet criteriaSet = new CriteriaSet();
+    final ValidationContext context = new ValidationContext(
+      Map.of(SAML2AssertionValidationParameters.SIGNATURE_VALIDATION_CRITERIA_SET, criteriaSet));
+
+    final Response response = unmarshall(new ClassPathResource("signed/signed-response.xml").getInputStream(), Response.class);
+
+    final CriteriaSet used = validator.getSignatureValidationCriteriaSet(response, context);
+    Assertions.assertTrue(used.contains(EntityIdCriterion.class));
+    Assertions.assertTrue(criteriaSet.isEmpty());
+  }
+
   private static class TestResponseValidator extends AbstractSignableObjectValidator<Response> {
 
     public TestResponseValidator(final SignatureTrustEngine trustEngine, final SignaturePrevalidator signaturePrevalidator) {

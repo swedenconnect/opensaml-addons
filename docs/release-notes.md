@@ -60,6 +60,8 @@
 
 - `getAttribute` of [AttributeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/attribute/AttributeUtils.java) failed with a `NullPointerException` if the list held an attribute without a name. Also, an attribute value without a type declaration could not be read as a date if the time had no timezone.
 
+- [AbstractSignableObjectValidator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/validation/AbstractSignableObjectValidator.java) added the issuer to the signature validation criteria supplied by the caller. If the same criteria were reused for objects from another issuer, the signature was checked against the wrong issuer.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

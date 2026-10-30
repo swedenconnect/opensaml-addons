@@ -184,10 +184,12 @@ public abstract class AbstractSignableObjectValidator<T extends SignableXMLObjec
    */
   protected CriteriaSet getSignatureValidationCriteriaSet(final T token, final ValidationContext context) {
 
-    CriteriaSet criteriaSet = (CriteriaSet) context.getStaticParameters()
+    // Make a copy, so that we don't modify the criteria set supplied by the caller.
+    final CriteriaSet criteriaSet = new CriteriaSet();
+    final CriteriaSet suppliedCriteriaSet = (CriteriaSet) context.getStaticParameters()
         .get(SAML2AssertionValidationParameters.SIGNATURE_VALIDATION_CRITERIA_SET);
-    if (criteriaSet == null) {
-      criteriaSet = new CriteriaSet();
+    if (suppliedCriteriaSet != null) {
+      criteriaSet.addAll(suppliedCriteriaSet);
     }
 
     if (!criteriaSet.contains(EntityIdCriterion.class)) {
