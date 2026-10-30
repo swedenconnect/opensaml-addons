@@ -42,6 +42,8 @@
 
 - Generating an authentication request with the Holder-of-key requirement "if available" failed with an `IndexOutOfBoundsException` when the IdP had a Holder-of-key endpoint but the SP did not. [AbstractAuthnRequestGenerator](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AbstractAuthnRequestGenerator.java) now uses the normal Web SSO profile in this case, and the default `AssertionConsumerService` resolver of [AuthnRequestGeneratorContext](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/request/AuthnRequestGeneratorContext.java) no longer fails on an empty list.
 
+- [ResponseProcessorImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessorImpl.java) failed with a `NullPointerException` when a response contained an encrypted assertion and no decrypter was configured. A `ResponseProcessingException` is now thrown.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

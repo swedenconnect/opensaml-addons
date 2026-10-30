@@ -183,6 +183,10 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
       // Step 6. Decrypt assertion (if needed)
       //
       if (!response.getEncryptedAssertions().isEmpty()) {
+        if (this.decrypter == null) {
+          throw new ResponseProcessingException(
+              "Response contains an encrypted assertion, but no decrypter is configured", response, null);
+        }
         assertion = this.decrypter.decrypt(response.getEncryptedAssertions().get(0), Assertion.class);
         if (log.isTraceEnabled()) {
           log.trace("[{}] Decrypted Assertion: {}", logId(response, assertion), toString(assertion));
