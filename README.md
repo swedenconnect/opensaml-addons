@@ -17,8 +17,9 @@ This open source package is an extension to OpenSAML that offers utility classes
 * A builder pattern for some commonly used objects, such as creating SAML attribute objects, entity descriptors (metadata) or authentication requests.
 * A framework for validation of responses and assertions.
 
-* Java API documentation of the opensaml-addons library is found at [https://docs.swedenconnect.se/opensaml-addons/apidoc](https://docs.swedenconnect.se/opensaml-addons/apidoc/).
-* [Release notes](https://docs.swedenconnect.se/opensaml-addons/release-notes.html)
+Java API documentation of the opensaml-addons library is found at [https://docs.swedenconnect.se/opensaml-addons/apidoc](https://docs.swedenconnect.se/opensaml-addons/apidoc/).
+
+[Release notes](https://docs.swedenconnect.se/opensaml-addons/release-notes.html)
 
 
 ### Maven and opensaml-addons
