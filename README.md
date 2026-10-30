@@ -1,10 +1,8 @@
-![Logo](img/sweden-connect-logo.png)
+![Logo](https://docs.swedenconnect.se/technical-framework/img/sweden-connect.png)
 
 # opensaml-addons
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![Maven Central](https://img.shields.io/maven-central/v/se.swedenconnect.opensaml/opensaml-addons.svg)
-
-
 
 Utility extensions for OpenSAML.
 
@@ -19,7 +17,9 @@ This open source package is an extension to OpenSAML that offers utility classes
 * A builder pattern for some commonly used objects, such as creating SAML attribute objects, entity descriptors (metadata) or authentication requests.
 * A framework for validation of responses and assertions.
 
-Java API documentation of the opensaml-addons library is found at [https://docs.swedenconnect.se/opensaml-addons/apidoc](https://docs.swedenconnect.se/opensaml-addons/apidoc/).
+* Java API documentation of the opensaml-addons library is found at [https://docs.swedenconnect.se/opensaml-addons/apidoc](https://docs.swedenconnect.se/opensaml-addons/apidoc/).
+* [Release notes](https://docs.swedenconnect.se/opensaml-addons/release-notes.html)
+
 
 ### Maven and opensaml-addons
 
