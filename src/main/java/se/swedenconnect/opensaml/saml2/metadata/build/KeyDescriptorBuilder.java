@@ -176,7 +176,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   }
 
   /**
-   * Assigns a list of encryption methods.
+   * Adds a list of encryption methods to the encryption methods already assigned. If {@code null} or an empty list is
+   * supplied, all encryption methods are removed.
    * <p>
    * Note: the method only accepts algorithm URI:s. If you need to assign other parts of an {@code EncryptionMethod}
    * object you must use {@link #encryptionMethodsExt(List)}.
@@ -211,7 +212,8 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
   }
 
   /**
-   * Assigns a list of encryption methods.
+   * Adds a list of encryption methods to the encryption methods already assigned. If {@code null} or an empty list is
+   * supplied, all encryption methods are removed.
    *
    * @param algorithms ordered list of encryption methods
    * @return the builder
