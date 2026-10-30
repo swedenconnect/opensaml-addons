@@ -38,6 +38,8 @@
 
 - A `shibmd:Scope` element with `regexp="1"` was read as a non-regexp scope by [ScopeUnmarshaller](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/impl/ScopeUnmarshaller.java), so scoped attributes matching the expression were rejected.
 
+- [ScopeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/ScopeUtils.java) and [ScopeBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/ScopeBuilder.java) failed for `shibmd:Scope` implementations other than the one in this library (for example the Shibboleth implementation) when the methods for the value and regexp attribute were inherited from a parent class.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

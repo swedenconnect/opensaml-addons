@@ -110,13 +110,13 @@ public class ScopeUtils {
     final String scopeValue;
 
     if (scope instanceof Scope) {
-      isRegexp = ((Scope) scope).getRegexp();
+      isRegexp = Boolean.TRUE.equals(((Scope) scope).getRegexp());
       scopeValue = ((Scope) scope).getValue();
     }
     else {
       try {
-        isRegexp = (Boolean) scope.getClass().getDeclaredMethod("getRegexp").invoke(scope);
-        scopeValue = (String) scope.getClass().getDeclaredMethod("getValue").invoke(scope);
+        isRegexp = Boolean.TRUE.equals(scope.getClass().getMethod("getRegexp").invoke(scope));
+        scopeValue = (String) scope.getClass().getMethod("getValue").invoke(scope);
       }
       catch (final Exception e) {
         throw new XMLRuntimeException("Not a valid Scope object", e);
