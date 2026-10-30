@@ -181,6 +181,10 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
       if (this.validity == null || this.cacheDuration == null) {
         try {
           final XMLObject providerMetadata = provider.getMetadata();
+          if (providerMetadata == null) {
+            log.debug("No metadata available from provider '{}'", provider.getID());
+            continue;
+          }
           final Instant providerValidUntil = ((TimeBoundSAMLObject) providerMetadata).getValidUntil();
           if (calculatedValidUntil == null
               || (providerValidUntil != null && providerValidUntil.isBefore(calculatedValidUntil)
@@ -248,7 +252,16 @@ public class CompositeMetadataProvider extends AbstractMetadataProvider {
   /** {@inheritDoc} */
   @Override
   public Instant getLastUpdate() {
-    return Optional.ofNullable(this.metadataResolver.getLastUpdate()).orElse(this.initTime);
+    // We don't use the composite resolver's last update time since it only covers refreshable resolvers, and fails
+    // if one of them has no metadata.
+    Instant lastUpdate = null;
+    for (final MetadataProvider provider : this.metadataProviders) {
+      final Instant providerLastUpdate = provider.getLastUpdate();
+      if (providerLastUpdate != null && (lastUpdate == null || providerLastUpdate.isAfter(lastUpdate))) {
+        lastUpdate = providerLastUpdate;
+      }
+    }
+    return Optional.ofNullable(lastUpdate).orElse(this.initTime);
   }
 
   /** {@inheritDoc} */
