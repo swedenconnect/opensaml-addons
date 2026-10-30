@@ -89,6 +89,7 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
       if (this.object().getKeyInfo() != null && !this.object().getKeyInfo().getKeyNames().isEmpty()) {
         this.object().getKeyInfo().getKeyNames().clear();
       }
+      return this;
     }
     if (this.object().getKeyInfo() == null) {
       this.object().setKeyInfo((KeyInfo) XMLObjectSupport.buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME));
@@ -147,6 +148,7 @@ public class KeyDescriptorBuilder extends AbstractSAMLObjectBuilder<KeyDescripto
       if (this.object().getKeyInfo() != null && !this.object().getKeyInfo().getX509Datas().isEmpty()) {
         this.object().getKeyInfo().getX509Datas().clear();
       }
+      return this;
     }
     if (this.object().getKeyInfo() == null) {
       this.object().setKeyInfo((KeyInfo) XMLObjectSupport.buildXMLObject(KeyInfo.DEFAULT_ELEMENT_NAME));

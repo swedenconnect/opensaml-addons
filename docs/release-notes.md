@@ -32,6 +32,8 @@
 
 - `getMetadataCertificates` of [EntityDescriptorUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/EntityDescriptorUtils.java) ignored certificates whose Base64 encoding contained line breaks, which is common in metadata.
 
+- Passing `null` to `keyName` or `certificate` of [KeyDescriptorBuilder](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/build/KeyDescriptorBuilder.java) added an empty `KeyName` or `X509Certificate` element instead of removing the value.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
