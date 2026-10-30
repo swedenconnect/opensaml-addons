@@ -78,10 +78,10 @@ import se.swedenconnect.opensaml.xmlsec.encryption.support.SAMLObjectDecrypter;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Response processor for SAML Response messages.
@@ -133,7 +133,7 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
   private boolean isInitialized = false;
 
   /** A cache for the SP metadata. */
-  private Map<String, EntityDescriptor> spMetadataCache;
+  private final Map<String, EntityDescriptor> spMetadataCache = new ConcurrentHashMap<>();
 
   /** {@inheritDoc} */
   @Override
@@ -583,14 +583,15 @@ public class ResponseProcessorImpl implements ResponseProcessor, InitializableCo
     if (entityID == null) {
       return null;
     }
-    if (this.spMetadataCache != null && this.spMetadataCache.containsKey(entityID)) {
-      return this.spMetadataCache.get(entityID);
+    final EntityDescriptor cached = this.spMetadataCache.get(entityID);
+    if (cached != null) {
+      return cached;
     }
     final EntityDescriptor spMetadata = this.getMetadata(entityID, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
-    if (this.spMetadataCache == null) {
-      this.spMetadataCache = new HashMap<>();
+    if (spMetadata != null) {
+      // Metadata that is not found is not cached, so that we try again next time.
+      this.spMetadataCache.put(entityID, spMetadata);
     }
-    this.spMetadataCache.put(entityID, spMetadata);
     return spMetadata;
   }
 
