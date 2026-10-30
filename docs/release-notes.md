@@ -48,6 +48,8 @@
 
 - `getAuthnContextClassUri()` of [ResponseProcessingResultImpl](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/response/ResponseProcessingResultImpl.java) failed with a `NullPointerException` when the `AuthnContext` had no `AuthnContextClassRef`.
 
+- `hashCode()` of [LocalizedString](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/common/utils/LocalizedString.java) failed with a `NullPointerException` when the language or string was not set, and did not match `equals()`.
+
 ---
 
 Copyright &copy; 2016-2026, [Sweden Connect](https://swedenconnect.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
