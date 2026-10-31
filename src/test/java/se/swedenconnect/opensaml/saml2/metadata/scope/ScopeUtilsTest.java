@@ -23,10 +23,12 @@ import org.opensaml.core.xml.schema.impl.XSStringImpl;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 
 import se.swedenconnect.opensaml.OpenSAMLTestBase;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeBuilder;
 import se.swedenconnect.opensaml.saml2.metadata.build.ScopeBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Test cases for {@link ScopeUtils}.
@@ -45,8 +47,33 @@ public class ScopeUtilsTest extends OpenSAMLTestBase {
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), (String) null));
     Assertions.assertFalse(
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), ""));
-    Assertions.assertTrue(
+    Assertions.assertFalse(
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example@.com").build(), "kalle@example@.com"));
+    Assertions.assertTrue(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("org.se").build(), "john@example.com@org.se"));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "john@example.com@org.se"));
+  }
+
+  @Test
+  public void testIsAuthorizedMultiValued() {
+    final List<XMLObject> scopes = List.of(
+        ScopeBuilder.builder().value("org1.se").build(), ScopeBuilder.builder().value("org2.se").build());
+
+    Assertions.assertTrue(ScopeUtils.isAuthorized(
+        AttributeBuilder.builder("urn:oid:1.2.752.201.3.1").value("a@org1.se").value("b@org2.se").build(), scopes));
+    Assertions.assertFalse(ScopeUtils.isAuthorized(
+        AttributeBuilder.builder("urn:oid:1.2.752.201.3.1").value("a@org1.se").value("b@org3.se").build(), scopes));
+    Assertions.assertFalse(ScopeUtils.isAuthorized(
+        AttributeBuilder.builder("urn:oid:1.2.752.201.3.1").build(), scopes));
+  }
+
+  @Test
+  public void testGetScopedDomain() {
+    Assertions.assertEquals("org.se", ScopeUtils.getScopedDomain("john@example.com@org.se"));
+    Assertions.assertEquals("org.se", ScopeUtils.getScopedDomain("john@org.se"));
+    Assertions.assertNull(ScopeUtils.getScopedDomain("john"));
+    Assertions.assertNull(ScopeUtils.getScopedDomain("john@"));
   }
 
   @Test
