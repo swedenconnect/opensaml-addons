@@ -10,7 +10,7 @@
 
 ### 2.2.3
 
-**Date:** _not yet released_
+**Date:** 2026-10-31
 
 - [ScopeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/ScopeUtils.java) used the first `@` character when splitting a scoped attribute value into its value and scope parts. A value that itself contained `@` (for example an email address) got the wrong scope and was rejected. The last `@` character is now used. See [#101](https://github.com/swedenconnect/opensaml-addons/issues/101).
 
