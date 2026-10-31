@@ -52,6 +52,10 @@ public class ScopeUtils {
    * Predicate that tells if a scoped attribute is "authorized", i.e., if its scope is listed in the supplied list of
    * {@code shibmd:Scope} elements (gotten from the IdP metadata).
    * <p>
+   * For a multi-valued attribute, each value must match at least one of the scopes. The values may have different
+   * scopes.
+   * </p>
+   * <p>
    * If an attribute that is not "scoped" (value@scope) the method returns {@code false}.
    * </p>
    *
@@ -60,8 +64,12 @@ public class ScopeUtils {
    * @return true if the attribute scope is listed among the Scope extensions and false otherwise
    */
   public static boolean isAuthorized(final Attribute scopedAttribute, final List<XMLObject> scopes) {
-    return scopes.stream()
-        .anyMatch(s -> isMatch(s, scopedAttribute));
+    if (scopedAttribute == null) {
+      return false;
+    }
+    final List<String> attributeValues = AttributeUtils.getAttributeStringValues(scopedAttribute);
+    return !attributeValues.isEmpty() && attributeValues.stream()
+        .allMatch(v -> scopes.stream().anyMatch(s -> isMatch(s, v)));
   }
 
   /**

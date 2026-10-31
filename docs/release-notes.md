@@ -14,6 +14,8 @@
 
 - [ScopeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/ScopeUtils.java) used the first `@` character when splitting a scoped attribute value into its value and scope parts. A value that itself contained `@` (for example an email address) got the wrong scope and was rejected. The last `@` character is now used. See [#101](https://github.com/swedenconnect/opensaml-addons/issues/101).
 
+- `isAuthorized` of [ScopeUtils](https://github.com/swedenconnect/opensaml-addons/blob/main/src/main/java/se/swedenconnect/opensaml/saml2/metadata/scope/ScopeUtils.java) required all values of a multi-valued scoped attribute (for example `orgAffiliation`) to have the same scope. Each value now only needs to match one of the scopes of the IdP. See [#102](https://github.com/swedenconnect/opensaml-addons/issues/102).
+
 ### 2.2.2
 
 **Date:** 2026-10-30
