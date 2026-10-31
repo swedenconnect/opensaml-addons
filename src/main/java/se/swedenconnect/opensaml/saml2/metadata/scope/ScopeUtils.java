@@ -137,18 +137,19 @@ public class ScopeUtils {
   }
 
   /**
-   * Gets the domain part (value@domain) from a scoped attribute value.
+   * Gets the domain part (value@domain) from a scoped attribute value. The last {@code @} character is used as the
+   * delimiter, since the value part may itself contain {@code @} characters.
    *
    * @param attributeValue the attribute value
-   * @return the domain part, or null
+   * @return the domain part, or null if the value is not scoped
    */
   public static String getScopedDomain(final String attributeValue) {
-    final String[] attributeParts = attributeValue.split("@", 2);
-    if (attributeParts.length == 1) {
+    final int pos = attributeValue.lastIndexOf('@');
+    if (pos == -1 || pos == attributeValue.length() - 1) {
       // Not a scoped attribute
       return null;
     }
-    return attributeParts[1];
+    return attributeValue.substring(pos + 1);
   }
 
   // Hidden

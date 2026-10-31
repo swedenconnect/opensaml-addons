@@ -45,8 +45,20 @@ public class ScopeUtilsTest extends OpenSAMLTestBase {
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), (String) null));
     Assertions.assertFalse(
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), ""));
-    Assertions.assertTrue(
+    Assertions.assertFalse(
         ScopeUtils.isMatch(ScopeBuilder.builder().value("example@.com").build(), "kalle@example@.com"));
+    Assertions.assertTrue(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("org.se").build(), "john@example.com@org.se"));
+    Assertions.assertFalse(
+        ScopeUtils.isMatch(ScopeBuilder.builder().value("example.com").build(), "john@example.com@org.se"));
+  }
+
+  @Test
+  public void testGetScopedDomain() {
+    Assertions.assertEquals("org.se", ScopeUtils.getScopedDomain("john@example.com@org.se"));
+    Assertions.assertEquals("org.se", ScopeUtils.getScopedDomain("john@org.se"));
+    Assertions.assertNull(ScopeUtils.getScopedDomain("john"));
+    Assertions.assertNull(ScopeUtils.getScopedDomain("john@"));
   }
 
   @Test
